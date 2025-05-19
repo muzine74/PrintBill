@@ -1,0 +1,7 @@
+﻿Enable-Migrations
+
+# Créer une nouvelle migration
+Add-Migration NomDeLaMigration
+
+# Appliquer les changements à la base de données
+Update-Database -verbose

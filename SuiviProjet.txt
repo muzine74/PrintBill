@@ -1,0 +1,6 @@
+ajout de fichier de Log  <<.NET 8, vous pouvez utiliser Microsoft.Extensions.Logging>>
+
+reste :  imprimer dans createbill il faut appeler enregistrer avant d'applere PrintPdfWithDialog(pdfPath);
+
+
+
