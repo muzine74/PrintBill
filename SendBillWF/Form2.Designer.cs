@@ -1,4 +1,7 @@
-﻿using SendBillWF.Employee;
+﻿using SendBillWF.Bill;
+using SendBillWF.Employee;
+using SendBillWF.Work;
+using SendBillWF.Employee.CreatEmployee;
 
 namespace SendBillWF
 {
@@ -38,12 +41,21 @@ namespace SendBillWF
             TreeNode treeNode5 = new TreeNode("UpdateEmployee");
             TreeNode treeNode6 = new TreeNode("Employee", new TreeNode[] { treeNode4, treeNode5 });
             TreeNode treeNode7 = new TreeNode("CreateBill");
-            TreeNode treeNode8 = new TreeNode("Update Bill");
+            TreeNode treeNode8 = new TreeNode("UpdateBill");
             TreeNode treeNode9 = new TreeNode("Print Bill");
             TreeNode treeNode10 = new TreeNode("Send Bill");
             TreeNode treeNode11 = new TreeNode("generate Bill From GDrive");
             TreeNode treeNode12 = new TreeNode("BillHistory");
             TreeNode treeNode13 = new TreeNode("Bill", new TreeNode[] { treeNode7, treeNode8, treeNode9, treeNode10, treeNode11, treeNode12 });
+            TreeNode treeNode14 = new TreeNode("EmployeeSchedular");
+            TreeNode treeNode15 = new TreeNode("CompagnySchedular");
+            TreeNode treeNode16 = new TreeNode("schedular", new TreeNode[] { treeNode14, treeNode15 });
+            TreeNode treeNode17 = new TreeNode("Visualizer");
+            TreeNode treeNode18 = new TreeNode("Employee Work Report");
+            TreeNode treeNode19 = new TreeNode("Compagny work Rport");
+            TreeNode treeNode20 = new TreeNode("compagny paiment");
+            TreeNode treeNode21 = new TreeNode("Employee paiment");
+            TreeNode treeNode22 = new TreeNode("Report", new TreeNode[] { treeNode18, treeNode19, treeNode20, treeNode21 });
             panel1 = new Panel();
             panel2 = new Panel();
             Menu = new TreeView();
@@ -83,6 +95,8 @@ namespace SendBillWF
             treeNode4.ForeColor = Color.Green;
             treeNode4.Name = "CreateEmployee";
             treeNode4.Text = "CreateEmployee";
+            treeNode5.BackColor = Color.White;
+            treeNode5.ForeColor = Color.Lime;
             treeNode5.Name = "UpdateEmployee";
             treeNode5.Text = "UpdateEmployee";
             treeNode6.Name = "Employee";
@@ -90,8 +104,9 @@ namespace SendBillWF
             treeNode7.ForeColor = Color.Green;
             treeNode7.Name = "CreateBill";
             treeNode7.Text = "CreateBill";
+            treeNode8.ForeColor = Color.Green;
             treeNode8.Name = "UpdateBill";
-            treeNode8.Text = "Update Bill";
+            treeNode8.Text = "UpdateBill";
             treeNode9.Name = "PrintBill";
             treeNode9.Text = "Print Bill";
             treeNode10.Name = "SendBill";
@@ -104,7 +119,25 @@ namespace SendBillWF
             treeNode12.Text = "BillHistory";
             treeNode13.Name = "Bill";
             treeNode13.Text = "Bill";
-            Menu.Nodes.AddRange(new TreeNode[] { treeNode3, treeNode6, treeNode13 });
+            treeNode14.Name = "EmployeeSchedular";
+            treeNode14.Text = "EmployeeSchedular";
+            treeNode15.Name = "CompagnySchedular";
+            treeNode15.Text = "CompagnySchedular";
+            treeNode16.Name = "s";
+            treeNode16.Text = "schedular";
+            treeNode17.Name = "V";
+            treeNode17.Text = "Visualizer";
+            treeNode18.Name = "Node1";
+            treeNode18.Text = "Employee Work Report";
+            treeNode19.Name = "Node2";
+            treeNode19.Text = "Compagny work Rport";
+            treeNode20.Name = "Node3";
+            treeNode20.Text = "compagny paiment";
+            treeNode21.Name = "Node4";
+            treeNode21.Text = "Employee paiment";
+            treeNode22.Name = "Node0";
+            treeNode22.Text = "Report";
+            Menu.Nodes.AddRange(new TreeNode[] { treeNode3, treeNode6, treeNode13, treeNode16, treeNode17, treeNode22 });
             Menu.Size = new Size(190, 728);
             Menu.TabIndex = 0;
             Menu.AfterSelect += Menu_AfterSelect;
@@ -117,7 +150,7 @@ namespace SendBillWF
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1621, 854);
+            ClientSize = new Size(1523, 999);
             Controls.Add(panel1);
             Name = "Form2";
             Text = "Form2";
@@ -138,7 +171,11 @@ namespace SendBillWF
         private ErrorProvider errorProvider1;
         private CreateBillUsCtr createBillUsCtr;
         private CreatEmployeeUsCtr creatEmployeeUsCtr;
-        
+        private UpdateBillUsCtr updateBillUsCtr;
+        private EmployeeSchedularUsCtr employeeSchedularUsCtr;
+        private UpdateEmployeeUct updateEmployeeUct;
+        private ComapgnySchedularUsCtr compagnySchedularUsCtr;
+
 
         //private UpdateCmpUsctr updateCmpUsctr1;
     }

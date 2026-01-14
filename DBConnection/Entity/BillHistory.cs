@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,7 +11,6 @@ namespace DBConnection.Entity
 {
     public class BillHistory
     {
-
         public Guid Id { get; set; }
         public string BillNumber { get; set; }
 
@@ -20,7 +20,7 @@ namespace DBConnection.Entity
         public string compagnyCode { get; set; }
         public string MouthBill { get; set; }
         public DateTime BilledDate { get; set; }
-        public string BillDescription { get; set; }
+        public string? BillDescriptionText { get; set; } // Renamed to avoid conflict
         public float compagnyPrice { get; set; }
         public int NumberOfVisite { get; set; }
         public float TotalWithOutTax { get; set; }
@@ -33,5 +33,8 @@ namespace DBConnection.Entity
         public bool? IsPayed { get; set; }
         public string? BillHistoryNote { get; set; }
 
+
+        public ICollection<BillDescription> BillDescriptions { get; set; }
+         = new List<BillDescription>();
     }
-}
+}   

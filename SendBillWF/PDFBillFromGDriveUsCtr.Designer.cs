@@ -29,8 +29,9 @@
         private void InitializeComponent()
         {
             SpreadSheetCombobx = new ComboBox();
-            button1 = new Button();
+            enregistrer = new Button();
             checkAll = new CheckBox();
+            billDate = new DateTimePicker();
             SuspendLayout();
             // 
             // SpreadSheetCombobx
@@ -42,15 +43,15 @@
             SpreadSheetCombobx.TabIndex = 2;
             SpreadSheetCombobx.SelectedIndexChanged += SpreadSheetCombobx_SelectedIndexChanged;
             // 
-            // button1
+            // enregistrer
             // 
-            button1.Location = new Point(482, 25);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 23);
-            button1.TabIndex = 3;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            enregistrer.Location = new Point(482, 25);
+            enregistrer.Name = "enregistrer";
+            enregistrer.Size = new Size(75, 23);
+            enregistrer.TabIndex = 3;
+            enregistrer.Text = "enregistrer";
+            enregistrer.UseVisualStyleBackColor = true;
+            enregistrer.Click += Save_Click;
             // 
             // checkAll
             // 
@@ -63,22 +64,32 @@
             checkAll.UseVisualStyleBackColor = true;
             checkAll.CheckedChanged += checkAll_CheckedChanged;
             // 
+            // billDate
+            // 
+            billDate.Location = new Point(831, 17);
+            billDate.Name = "billDate";
+            billDate.Size = new Size(200, 23);
+            billDate.TabIndex = 5;
+            billDate.ValueChanged += billDate_ValueChanged;
+            // 
             // PDFBillFromGDriveUsCtr
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(billDate);
             Controls.Add(checkAll);
-            Controls.Add(button1);
+            Controls.Add(enregistrer);
             Controls.Add(SpreadSheetCombobx);
             Name = "PDFBillFromGDriveUsCtr";
-            Size = new Size(1062, 560);
+            Size = new Size(1062, 638);
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
         private ComboBox SpreadSheetCombobx;
-        private Button button1;
+        private Button enregistrer;
         private CheckBox checkAll;
+        private DateTimePicker billDate;
     }
 }

@@ -118,7 +118,7 @@
             compagnieProviderCBX.Name = "compagnieProviderCBX";
             compagnieProviderCBX.Size = new Size(212, 23);
             compagnieProviderCBX.TabIndex = 8;
-            compagnieProviderCBX.SelectedIndexChanged += compagnieProviderCBX_SelectedIndexChanged;
+            compagnieProviderCBX.ValueMemberChanged += compagnieProviderCBX_SelectedIndexChanged;
             // 
             // lbl
             // 

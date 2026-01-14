@@ -15,7 +15,7 @@ namespace DataBridge.Entity
 
         public string CompagnieName { get; set; }
         public string CompagnieCode { get; set; }
-        public string CompagnieStatus { get; set; }
+        public bool CompagnieStatus { get; set; }
         public string Compagniecountry { get; set; }
         public string CompagnieState { get; set; }
         public string Compagniecity { get; set; }
@@ -26,7 +26,17 @@ namespace DataBridge.Entity
         public string ContactName { get; set; }
         public string ContactMail { get; set; }
         public string ContactPhones { get; set; }
-        public string? Compagnieprividercode { get; set; }
+        //public string? Compagnieprividercode { get; set; }
+
+        public string? smtpServer { get; set; }
+        public int? smtpPort { get; set; }
+        public string? smtpUsername { get; set; }
+        public string? smtpPassword { get; set; }
+
+        public string? TPSNumber { get; set; }
+        public string? TVQNumber { get; set; }
+
+
 
         public List<WorkBillInfo> _workBillInfoList;
 

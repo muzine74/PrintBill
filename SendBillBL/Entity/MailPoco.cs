@@ -14,5 +14,10 @@ namespace SendBillBL.Entity
         public String Path { get; set; }
         public string Body { get; set; }
 
+        public string smtpServer { get; set; }
+        public int smtpPort { get; set; }
+        public string smtpUsername { get; set; }
+        public string smtpPasswor { get; set; }
+
     }
 }

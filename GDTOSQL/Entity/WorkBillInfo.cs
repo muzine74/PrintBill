@@ -16,6 +16,8 @@ namespace GDTOSQL.Entity
         public string CompagnyCode{ get; set; }
         public float compagnyPrice { get; set; }
 
+        DateTime? _jobDate;
+
         public string? JobDescription { get; set; }
         public int NumberOfVisite { get; set; }
         public float Totalprice { get; set; }

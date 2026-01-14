@@ -1,0 +1,115 @@
+SELECT TOP (1000) [CompanyId]
+      ,[companyName]
+      ,[companyCode]
+      ,[companyStatus]
+      ,[Notes]
+      ,[Notes2]
+      ,[prividercode]
+      ,[IdMailCredentiel]
+      ,[TPSNumber]
+      ,[TVQNumber]
+  FROM [RamssisCleaningDB].[dbo].[Companies]
+
+
+
+--  INSERT INTO [RamssisCleaningDB].[dbo].[Companies]
+--  SELECT *
+--FROM [RamssisCleaningDB_Bak].[dbo].[Companies]
+
+
+--  INSERT INTO [RamssisCleaningDB].[dbo].Addresses
+--  SELECT *
+--FROM [RamssisCleaningDB_Bak].[dbo].Addresses
+
+--  INSERT INTO [RamssisCleaningDB].[dbo].CompanyAddresses
+--  SELECT *
+--FROM [RamssisCleaningDB_Bak].[dbo].CompanyAddresses
+
+--  INSERT INTO [RamssisCleaningDB].[dbo].Employees
+--  SELECT *
+--FROM [RamssisCleaningDB_Bak].[dbo].Employees
+
+--  INSERT INTO [RamssisCleaningDB].[dbo].EmployeeAddresses
+--  SELECT *
+--FROM [RamssisCleaningDB_Bak].[dbo].EmployeeAddresses
+
+
+--  INSERT INTO [RamssisCleaningDB].[dbo].EmployeeCompanies
+--  SELECT *
+--FROM [RamssisCleaningDB_Bak].[dbo].EmployeeCompanies
+
+
+--  INSERT INTO [RamssisCleaningDB].[dbo].MailCredentials
+--  SELECT *
+--FROM [RamssisCleaningDB_Bak].[dbo].MailCredentials
+
+--SET IDENTITY_INSERT RamssisCleaningDB.dbo.BillHistories ON;
+
+--  INSERT INTO [RamssisCleaningDB].[dbo].BillHistories
+--  ([billIdentifier]
+--      ,[Id]
+--      ,[BillNumber]
+--      ,[compagnyName]
+--      ,[compagnyCode]
+--      ,[MouthBill]
+--      ,[BilledDate]
+--      ,[BillDescriptionText]
+--      ,[compagnyPrice]
+--      ,[NumberOfVisite]
+--      ,[TotalWithOutTax]
+--      ,[TPS]
+--      ,[TVQ]
+--      ,[TotalWithTax]
+--      ,[BillPath]
+--      ,[AfterSendedBillPath]
+--      ,[Issended]
+--      ,[IsPayed]
+--      ,[BillHistoryNote])
+--  SELECT [billIdentifier]
+--      ,[Id]
+--      ,[BillNumber]
+--      ,[compagnyName]
+--      ,[compagnyCode]
+--      ,[MouthBill]
+--      ,[BilledDate]
+--      ,[BillDescriptionText]
+--      ,[compagnyPrice]
+--      ,[NumberOfVisite]
+--      ,[TotalWithOutTax]
+--      ,[TPS]
+--      ,[TVQ]
+--      ,[TotalWithTax]
+--      ,[BillPath]
+--      ,[AfterSendedBillPath]
+--      ,[Issended]
+--      ,[IsPayed]
+--      ,[BillHistoryNote]
+--FROM [RamssisCleaningDB_Bak].[dbo].BillHistories
+--SET IDENTITY_INSERT RamssisCleaningDB.dbo.BillHistories OFF;
+
+
+--  INSERT INTO [RamssisCleaningDB].[dbo].BillDescriptions
+--  ([BillDescriptionId]
+--      ,[BillHistoryId]
+--      ,[Quantity]
+--      ,[Description]
+--      ,[UnitPrice]
+--      ,[SubTotalPrice])
+--  SELECT [BillDescriptionId]
+--      ,[BillHistoryId]
+--      ,[Quantity]
+--      ,[Description]
+--      ,[UnitPrice]
+--      ,[SubTotalPrice]
+--FROM [RamssisCleaningDB_Bak].[dbo].BillDescriptions
+
+
+
+
+
+
+
+
+
+
+

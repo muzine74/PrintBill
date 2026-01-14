@@ -16,10 +16,12 @@ namespace SendBillWF
 {
     public partial class CompagnyUsCtr : UserControl
     {
+
+        public event EventHandler<CompagniePoco> OnCompanySelected;
         public CompagnyUsCtr()
         {
             InitializeComponent();
-            compagnieProviderCBX.SelectedIndexChanged += compagnieProviderCBX_SelectedIndexChanged;
+           // compagnieProviderCBX.SelectedIndexChanged += compagnieProviderCBX_SelectedIndexChanged;
         }
 
         public string compagnyNameCompagny
@@ -46,14 +48,11 @@ namespace SendBillWF
             set { CompagnyStatusTxt.Checked = value; }
         }
 
-        //public string compagnyProvider
-        //{
-        //    get { return compagnyProviderCBX.Text; }
-        //    set { compagnyNameTxt.Text = value; }
-        //}
-
-
-        public event EventHandler<CompagniePoco> OnCompanySelected;
+        public string compagnyProviderselected
+        {
+            get { return (compagnieProviderCBX.SelectedItem as CompagniePoco).CompagnieCode; }
+            set { compagnieProviderCBX.SelectedItem = value; }
+        }
 
         private void compagnieProviderCBX_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -68,12 +67,10 @@ namespace SendBillWF
             compagnieProviderCBX.ValueMember = "CompagnieID"; // Valeur de l'item
 
             if (cpy != null)
-                compagnieProviderCBX.SelectedItem = cpy;
+                compagnieProviderCBX.SelectedValue = cpy.CompagnieID;
             else
                 compagnieProviderCBX.SelectedIndex = -1;
         }
-
-
     }
 }
 

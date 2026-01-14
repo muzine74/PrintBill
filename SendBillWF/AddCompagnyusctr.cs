@@ -24,6 +24,7 @@ namespace SendBillWF
             compagniManipulation = new CompagniManipulation();
             LoadCompanies();
             compagnyUsCtr1.OnCompanySelected += CompagnyUsCtr1_CompanySelected;
+
         }
 
         //proprietè compagnie
@@ -44,11 +45,18 @@ namespace SendBillWF
             get { return compagnyUsCtr1.compagnieNoteCompagny; }
             set { compagnyUsCtr1.compagnieNoteCompagny = value; }
         }
+        public string compagnyProviderSelected
+        {
+            get { return compagnyUsCtr1.compagnyProviderselected; }
+            set { compagnyUsCtr1.compagnyProviderselected = value; }
+        }
         public bool compagnieStatusSaisie
         {
             get { return compagnyUsCtr1.compagnieStatusCompagny; }
             set { compagnyUsCtr1.compagnieStatusCompagny = value; }
         }
+
+
 
         ////proprietè Addresse
         public string civicNumberSaisie
@@ -118,7 +126,19 @@ namespace SendBillWF
             set { customUsCtr1.CustomNoteCustom = value; }
         }
 
-        //compagnyNameSaisie
+        // Tax
+
+        public string compagnyTPSSaisi
+        {
+            get { return taxUsCtr1.compagnyTPSCompagny; }
+            set { taxUsCtr1.compagnyTPSCompagny = value; }
+        }
+
+        public string compagnyTVQCompagny
+        {
+            get { return taxUsCtr1.compagnyTVQCompagny; }
+            set { taxUsCtr1.compagnyTVQCompagny = value; }
+        }
 
 
 
@@ -144,6 +164,8 @@ namespace SendBillWF
             {
                 compagniePoco.CompagnieName = compagnyNameSaisie;
                 compagniePoco.CompagnieCode = CompagnieCodeSaisie;
+                compagniePoco.CompagnieStatus = compagnieStatusSaisie;
+
                 compagniePoco.CompagnieCivicNumber = civicNumberSaisie;
                 compagniePoco.Compagniecity = CitySaisie;
                 compagniePoco.CompagnieState = StateSaisie;
@@ -152,11 +174,10 @@ namespace SendBillWF
                 compagniePoco.ContactName = CustomNameSaisie;
                 compagniePoco.ContactMail = CustomMailSaisie;
                 compagniePoco.ContactPhones = CustomPhoneSaisie;
+                compagniePoco.CompagnieProvider = compagnyProviderSelected;
 
-                if (compagnieStatusSaisie)
-                {
-                    compagniePoco.CompagnieStatus = "Active";
-                }
+                compagniePoco.TPSNumber = compagnyTPSSaisi;
+                compagniePoco.TVQNumber = compagnyTVQCompagny;
 
                 compagniManipulation.SaveCompagnyInfo(compagniePoco);
             }

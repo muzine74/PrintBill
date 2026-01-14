@@ -60,7 +60,7 @@
             addUsctr.Location = new Point(39, 392);
             addUsctr.Name = "addUsctr";
             addUsctr.noteAdress = "";
-            addUsctr.Size = new Size(563, 223);
+            addUsctr.Size = new Size(513, 223);
             addUsctr.stateAdress = "";
             addUsctr.suiteAdress = "";
             addUsctr.TabIndex = 1;

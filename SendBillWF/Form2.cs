@@ -1,4 +1,9 @@
-﻿using System;
+﻿using DataBridge.Entity;
+using SendBillWF.Bill;
+using SendBillWF.Employee;
+using SendBillWF.Employee.CreatEmployee;
+using SendBillWF.Work;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,8 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataBridge.Entity;
-using SendBillWF.Employee;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SendBillWF
@@ -19,7 +22,10 @@ namespace SendBillWF
 
         public Form2()
         {
-            InitializeComponent();
+            
+
+            InitializeComponent(); 
+
             compagniePoco = new CompagniePoco();
             addCompagnyusctr1 = new AddCompagnyusctr();
             updateCmpUsctr = new UpdateCmpUsctr();
@@ -27,6 +33,10 @@ namespace SendBillWF
             pDFBillFromGDriveUsCtr = new PDFBillFromGDriveUsCtr();
             createBillUsCtr = new CreateBillUsCtr();
             creatEmployeeUsCtr = new CreatEmployeeUsCtr();
+            updateBillUsCtr = new UpdateBillUsCtr();
+            employeeSchedularUsCtr = new EmployeeSchedularUsCtr();
+            updateEmployeeUct = new UpdateEmployeeUct();
+            compagnySchedularUsCtr = new ComapgnySchedularUsCtr();
 
 
             // updateCmpUsctr1.Hide();
@@ -43,6 +53,19 @@ namespace SendBillWF
 
         private void Menu_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            if (e.Node.Name == "UpdateBill")  //updateBillUsCtr
+            {
+                RemoveControl();
+
+                updateBillUsCtr.Location = new Point(201, 33);
+                updateBillUsCtr.Name = "updateBillUsCtr";
+                updateBillUsCtr.Size = new Size(1750, 900);
+                updateBillUsCtr.TabIndex = 1;
+
+                Controls.Add(updateBillUsCtr);
+                updateBillUsCtr.Show();
+            }
+
             if (e.Node.Name == "AddNewCompagny")
             {
                 RemoveControl();
@@ -94,11 +117,11 @@ namespace SendBillWF
                 pDFBillFromGDriveUsCtr.TabIndex = 1;
 
                 Controls.Add(pDFBillFromGDriveUsCtr);
-                billHistoryUsctr.Show();
+                pDFBillFromGDriveUsCtr.Show();
 
             }
 
-            if (e.Node.Name == "CreateBill")
+            if (e.Node.Name == "CreateBill")  //CreateBill 
             {
                 RemoveControl();
 
@@ -108,9 +131,11 @@ namespace SendBillWF
                 createBillUsCtr.TabIndex = 1;
 
                 Controls.Add(createBillUsCtr);
-                billHistoryUsctr.Show();
+                createBillUsCtr.Show();
 
             }
+
+
 
             if (e.Node.Name == "CreateEmployee")
             {
@@ -126,19 +151,62 @@ namespace SendBillWF
 
             }
 
-        } //PDFBillFromGDrive
+            if (e.Node.Name == "EmployeeSchedular")  //updateBillUsCtr
+            {
+                RemoveControl();
+
+                employeeSchedularUsCtr.Location = new Point(201, 33);
+                employeeSchedularUsCtr.Name = "employeeSchedularUsCtr";
+                employeeSchedularUsCtr.Size = new Size(1750, 900);
+                employeeSchedularUsCtr.TabIndex = 1;
+
+                Controls.Add(employeeSchedularUsCtr);
+                employeeSchedularUsCtr.Show();
+            }
+
+
+            if (e.Node.Name == "UpdateEmployee")  //updateBillUsCtr
+            {
+                RemoveControl();
+
+                updateEmployeeUct.Location = new Point(201, 33);
+                updateEmployeeUct.Name = "updateEmployeeUct";
+                updateEmployeeUct.Size = new Size(1750, 900);
+                updateEmployeeUct.TabIndex = 1;
+
+                Controls.Add(updateEmployeeUct);
+                updateEmployeeUct.Show();
+            }
+
+
+            if (e.Node.Name == "CompagnySchedular")  //CompagnyShedular
+            {
+                RemoveControl();
+
+                compagnySchedularUsCtr.Location = new Point(201, 33);
+                compagnySchedularUsCtr.Name = "compagnyShedularUsCtr";
+                compagnySchedularUsCtr.Size = new Size(1750, 900);
+                compagnySchedularUsCtr.TabIndex = 1;
+
+                Controls.Add(compagnySchedularUsCtr);
+                compagnySchedularUsCtr.Show();
+            }
+
+        } //updateEmployeeUct
 
 
         private void RemoveControl()
         {
-            Controls.Remove(addCompagnyusctr1);
+            Controls.Remove(addCompagnyusctr1); 
             Controls.Remove(updateCmpUsctr);
             Controls.Remove(billHistoryUsctr);
             Controls.Remove(pDFBillFromGDriveUsCtr);
             Controls.Remove(createBillUsCtr);
             Controls.Remove(creatEmployeeUsCtr);
-
-
+            Controls.Remove(updateBillUsCtr);
+            Controls.Remove(employeeSchedularUsCtr);
+            Controls.Remove(updateEmployeeUct);
+            Controls.Remove(compagnySchedularUsCtr);
         }
     }
 }

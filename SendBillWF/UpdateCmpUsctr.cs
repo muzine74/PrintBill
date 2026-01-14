@@ -51,6 +51,12 @@ namespace SendBillWF
             set { CmpUsCtr.compagnieStatusCompagny = value; }
         }
 
+
+        public string compagnyproviderSaisie
+        {
+            get { return CmpUsCtr.compagnyProviderselected; }
+            set { CmpUsCtr.compagnyProviderselected = value; }
+        }
         ////proprietè Addresse
         public string civicNumberSaisie
         {
@@ -205,7 +211,7 @@ namespace SendBillWF
 
             DataGridViewTextBoxColumn CompagnyProvider = new DataGridViewTextBoxColumn();
             CompagnyProvider.HeaderText = "Provider"; // Texte d'en-tête de la colonne
-            CompagnyProvider.DataPropertyName = "CompagnyProvider"; // Propriété de la source de données à lier
+            CompagnyProvider.DataPropertyName = "CompagnieProvider"; // Propriété de la source de données à lier
             compagniesGrid.Columns.Add(CompagnyProvider);
 
             SearchUp();
@@ -240,8 +246,8 @@ namespace SendBillWF
 
                 compagnyNameSaisie = compagniePoco.CompagnieName = (string)compagniesGrid.Rows[e.RowIndex].Cells[3].Value;
                 CompagnieCodeSaisie = compagniePoco.CompagnieCode = (string)compagniesGrid.Rows[e.RowIndex].Cells[4].Value;
-                compagniePoco.CompagnieStatus = (string)compagniesGrid.Rows[e.RowIndex].Cells[5].Value;
-                if (compagniePoco.CompagnieStatus == "Active")
+                compagniePoco.CompagnieStatus = (bool)compagniesGrid.Rows[e.RowIndex].Cells[5].Value;
+                if (compagniePoco.CompagnieStatus == true)
                 {
                     compagnieStatusSaisie = true;
                 }
@@ -260,7 +266,7 @@ namespace SendBillWF
                 CustomNameSaisie = compagniePoco.ContactName = (string)compagniesGrid.Rows[e.RowIndex].Cells[11].Value;
                 CustomMailSaisie = compagniePoco.ContactMail = (string)compagniesGrid.Rows[e.RowIndex].Cells[12].Value;
                 CustomPhoneSaisie = compagniePoco.ContactPhones = (string)compagniesGrid.Rows[e.RowIndex].Cells[13].Value;
-                compagniePoco.CompagnieProvider = (string)compagniesGrid.Rows[e.RowIndex].Cells[14].Value;
+                compagnyproviderSaisie = compagniePoco.CompagnieProvider = (string)compagniesGrid.Rows[e.RowIndex].Cells[14].Value;
                 //CmpUsCtr.FillProviderCBX(string)compagniesGrid.Rows[e.RowIndex].Cells[14].Value);
 
 
@@ -334,6 +340,11 @@ namespace SendBillWF
                 isChanged = true;
             }
 
+            if (compagnyproviderSaisie != compagniePoco.CompagnieProvider)
+            {
+                compagniePoco.CompagnieProvider = compagnyproviderSaisie;    //compagnyProviderselected
+                isChanged = true;
+            }
 
             //                    compagniePoco.CompagnieStatus = "Active";
             //    compagnieStatusSaisie = true;

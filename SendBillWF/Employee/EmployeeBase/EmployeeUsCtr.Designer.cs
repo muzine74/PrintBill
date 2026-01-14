@@ -36,6 +36,8 @@
             label1 = new Label();
             EmployeeNoteTxt = new TextBox();
             EmployeeMailTxt = new TextBox();
+            label5 = new Label();
+            EmployeeNasTxt = new TextBox();
             SuspendLayout();
             // 
             // label4
@@ -103,10 +105,28 @@
             EmployeeMailTxt.Size = new Size(237, 23);
             EmployeeMailTxt.TabIndex = 5;
             // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(389, 55);
+            label5.Name = "label5";
+            label5.Size = new Size(36, 15);
+            label5.TabIndex = 8;
+            label5.Text = "NAS :";
+            // 
+            // EmployeeNasTxt
+            // 
+            EmployeeNasTxt.Location = new Point(446, 51);
+            EmployeeNasTxt.Name = "EmployeeNasTxt";
+            EmployeeNasTxt.Size = new Size(263, 23);
+            EmployeeNasTxt.TabIndex = 9;
+            // 
             // EmployeeUsCtr
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(EmployeeNasTxt);
+            Controls.Add(label5);
             Controls.Add(EmployeeMailTxt);
             Controls.Add(EmployeeNoteTxt);
             Controls.Add(label1);
@@ -116,7 +136,7 @@
             Controls.Add(label2);
             Controls.Add(label3);
             Name = "EmployeeUsCtr";
-            Size = new Size(407, 210);
+            Size = new Size(764, 192);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -131,5 +151,7 @@
         private Label label1;
         private TextBox EmployeeNoteTxt;
         private TextBox EmployeeMailTxt;
+        private Label label5;
+        private TextBox EmployeeNasTxt;
     }
 }

@@ -47,7 +47,7 @@ namespace DataBridge
                 join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
                 join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
                 join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
-                where C.companyStatus == "Active"
+                where C.companyStatus == true
                 orderby C.companyName
 
                 select new
@@ -85,14 +85,14 @@ namespace DataBridge
                 ContactName = cp.name,
                 ContactMail = cp.mail,
                 ContactPhones = cp.phone,
-                Compagnieprividercode = cp.prividercode
+                CompagnieProvider = cp.prividercode
             }
             ).ToList();
 
 
             //enlever les code doublons qui devrais aller dans la meme factuer
             return (copiedList.GroupBy(p => p.CompagnieCode)
-            .Select(g => g.First()).ToList());
+            .Select(g => g.First()).OrderBy(c => c.CompagnieName).ToList());
         }
 
         public List<CompagniePoco> LinkCompagniePayment(SheetInfo sfo)
@@ -153,21 +153,114 @@ namespace DataBridge
             return googleDrive.LoadGGDrBillData(sfo);
         }
 
-        public void SaveBillHisrory(List<BillHistoryPoco> _billHistoryPocoLst)
+        public void SaveBillHisrory(List<BillHistoryPoco> _billHistoryPocoLst, List<BillDescriptionPoco> billDescriptionPocolist)
         {
+            BillSearchStatus billSearchStatus = new BillSearchStatus();
+
+            billSearchStatus.keysearch = _billHistoryPocoLst[0].BillNumber;
+            ;//_billHistoryPocoLst[0].BillNumber;
+                                                       //var bhs = GetBillByBillNumber(billSearchStatus).FirstOrDefault();
+
+
+
+           // var bhst = (from rcc in ramssisCleaningContex.BillHistories
+             //             select rcc).AsQueryable();
+
+
+               var bhs = ramssisCleaningContex.BillHistories
+                        .Include(b => b.BillDescriptions)
+                        .FirstOrDefault(bhs => bhs.BillNumber == billSearchStatus.keysearch);
+            //select rcc).Where(s => s.BillNumber.ToString().Contains("")).FirstOrDefault();
+
+
+
+            if (bhs == null)
+            {
+                InsertNewHistoryBill(_billHistoryPocoLst, billDescriptionPocolist);
+            }
+            else
+            {
+                UpdatExistingHistoryBill(_billHistoryPocoLst, billDescriptionPocolist, bhs);
+            }
+        }
+
+        void UpdatExistingHistoryBill(List<BillHistoryPoco> _billHistoryPocoLst, List<BillDescriptionPoco> billDescriptionPocolist, BillHistory bhs)
+        {
+            //les seul information qui devrais pas etre mis a jours
+            //  bhs.Id;bhs.BillNumber
+            //  bhs.billIdentifier;
+            // bhs.BillPath;
+            bhs.compagnyName = _billHistoryPocoLst[0].compagnyName;
+            bhs.compagnyCode = _billHistoryPocoLst[0].compagnyCode;
+            bhs.MouthBill = _billHistoryPocoLst[0].MouthBill;
+            bhs.BilledDate = _billHistoryPocoLst[0].BilledDate;
+            bhs.BillDescriptionText = _billHistoryPocoLst[0].BillDescriptionText;
+            bhs.compagnyPrice = _billHistoryPocoLst[0].compagnyPrice;
+            bhs.NumberOfVisite = _billHistoryPocoLst[0].NumberOfVisite;
+            bhs.TotalWithOutTax = _billHistoryPocoLst[0].TotalWithOutTax;
+            bhs.TPS = _billHistoryPocoLst[0].TPS;
+            bhs.TVQ = _billHistoryPocoLst[0].TVQ;
+            bhs.TotalWithTax = _billHistoryPocoLst[0].TotalWithTax;
+            bhs.BillHistoryNote = _billHistoryPocoLst[0].BillHistoryNote;
+            bhs.Issended = _billHistoryPocoLst[0].Issended;
+            bhs.IsPayed = _billHistoryPocoLst[0].IsPayed;
+
+
+            var toRemove = bhs.BillDescriptions
+                            .Where(d => !billDescriptionPocolist
+                            .Any(p => p.BillDescriptionPocoId == d.BillDescriptionId))
+                            .ToList();
+
+            ramssisCleaningContex.BillDescriptions.RemoveRange(toRemove);
+
+            foreach (var itr in billDescriptionPocolist)
+            {
+                var existingDesc = bhs.BillDescriptions
+                    .FirstOrDefault(d => d.BillDescriptionId == itr.BillDescriptionPocoId);
+
+                if (existingDesc != null)
+                {
+                    // UPDATE
+                    existingDesc.Quantity = itr.QuantityPoco;
+                    existingDesc.Description = itr.DescriptionPoco;
+                    existingDesc.UnitPrice = itr.UnitPricePoco;
+                    existingDesc.SubTotalPrice = itr.SubTotalPricePoco;
+                }
+                else
+                {
+                    // INSERT
+                    bhs.BillDescriptions.Add(new BillDescription
+                    {
+                        Quantity = itr.QuantityPoco,
+                        Description = itr.DescriptionPoco,
+                        UnitPrice = itr.UnitPricePoco,
+                        SubTotalPrice = itr.SubTotalPricePoco,
+                        BillHistoris = bhs
+                    });
+                }
+            }
+
+            ramssisCleaningContex.SaveChanges();
+        }
+
+
+        private void InsertNewHistoryBill(List<BillHistoryPoco> _billHistoryPocoLst, List<BillDescriptionPoco> billDescriptionPocolist)
+        {
+            List<BillDescription> billDescriptionlist = new List<BillDescription>();
+            //List<BillDescriptionPoco> billDescriptionPocolist = new List<BillDescriptionPoco>();
+
             foreach (var item in _billHistoryPocoLst)
             {
                 BillHistory billHistory = new BillHistory();
 
                 billHistory.Id = item.Id;
-                //billHistory.billIdentifier = item.billIdentifier;
+                // billHistory.billIdentifier = item.billIdentifier;
                 billHistory.BillNumber = item.BillNumber;
                 billHistory.compagnyName = item.compagnyName;
                 billHistory.compagnyCode = item.compagnyCode;
                 billHistory.compagnyPrice = item.compagnyPrice;
                 billHistory.MouthBill = item.MouthBill;
                 billHistory.BilledDate = item.BilledDate;
-                billHistory.BillDescription = item.BillDescription;
                 billHistory.compagnyPrice = item.compagnyPrice;
                 billHistory.NumberOfVisite = item.NumberOfVisite;
                 billHistory.TotalWithOutTax = item.TotalWithOutTax;
@@ -177,13 +270,53 @@ namespace DataBridge
                 billHistory.BillPath = item.BillPath;
                 billHistory.BillHistoryNote = item.BillHistoryNote;
 
+                billHistory.BillDescriptions = new List<BillDescription>();
+
+                foreach (var itr in billDescriptionPocolist)
+                {
+
+                    billHistory.BillDescriptions.Add(new BillDescription
+                    {
+                        BillDescriptionId = itr.BillDescriptionPocoId, // Corrected property assignment
+                        Quantity = itr.QuantityPoco,
+                        Description = itr.DescriptionPoco,
+                        UnitPrice = itr.UnitPricePoco,
+                        SubTotalPrice = itr.SubTotalPricePoco,
+                        BillHistoryId = itr.BillHistoryIdPoco,
+                        BillHistoris = billHistory
+
+                    });
+                }
 
                 ramssisCleaningContex.BillHistories.Add(billHistory);
-                ramssisCleaningContex.SaveChanges();
+                ramssisCleaningContex.BillDescriptions.AddRange(billHistory.BillDescriptions);
 
             }
 
+            //string logChanges = "";
+
+            //foreach (var entry in ramssisCleaningContex.ChangeTracker.Entries())
+            //{
+            //    logChanges +=  $"{entry.Entity.GetType().Name} - {entry.State}"; 
+            //    logChanges += Environment.NewLine;
+            //}
+
             ramssisCleaningContex.SaveChanges();
+            billDescriptionPocolist.Clear();
+            _billHistoryPocoLst.Clear();
+
+        }
+
+
+
+        public List<BillDescription> GetBilDescription(string searchKey)
+        {
+
+            var billDescriptions = (from bdsc in ramssisCleaningContex.BillDescriptions
+                                    where bdsc.BillHistoryId.Equals(searchKey)
+                                    select bdsc).AsQueryable();
+
+            return billDescriptions.ToList();
         }
 
         public List<BillHistory> GetBill(BillSearchStatus BillSearchStatus)
@@ -194,7 +327,7 @@ namespace DataBridge
             if (!string.IsNullOrEmpty(BillSearchStatus.keysearch))
             {
                 billhs = billhs.Where(s => s.compagnyName.Contains(BillSearchStatus.keysearch) || s.compagnyCode.Contains(BillSearchStatus.keysearch)
-                                        || s.BillDescription.Contains(BillSearchStatus.keysearch) || s.BillNumber.ToString().Contains(BillSearchStatus.keysearch)
+                                        || s.BillNumber.ToString().Contains(BillSearchStatus.keysearch) //s.BillDescription.Contains(BillSearchStatus.keysearch) ||
                                         || s.TotalWithTax.ToString().Contains(BillSearchStatus.keysearch) || s.TotalWithOutTax.ToString().Contains(BillSearchStatus.keysearch)
                                         || s.BillNumber.ToString().Contains(BillSearchStatus.keysearch));
             }
@@ -311,7 +444,10 @@ namespace DataBridge
             CompagnyTemp.companyName = cmpPoco.CompagnieName;
             CompagnyTemp.companyCode = cmpPoco.CompagnieCode;
             CompagnyTemp.companyStatus = cmpPoco.CompagnieStatus;
-
+            CompagnyTemp.prividercode = cmpPoco.CompagnieProvider;
+            CompagnyTemp.TPSNumber = cmpPoco.TPSNumber;
+            CompagnyTemp.TVQNumber = cmpPoco.TVQNumber; 
+            
 
             //Fill Address to last Company
             AdressTemp.AddressId = AdressGuid;
@@ -328,6 +464,7 @@ namespace DataBridge
             ClientTemp.mail = cmpPoco.ContactMail;
             ClientTemp.phone = cmpPoco.ContactPhones;
 
+            
             ClientTemp.CompanyId = CompagnyGuid;
 
             CompagnyAdress.AddressId = AdressGuid;
@@ -352,7 +489,7 @@ namespace DataBridge
                 join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
                 join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
                 join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
-                where C.companyStatus == "Active" && (C.companyName.Contains(searchKey) || C.companyCode.Contains(searchKey))
+                where (C.companyName.Contains(searchKey) || C.companyCode.Contains(searchKey))
 
                 select new
                 {
@@ -363,6 +500,8 @@ namespace DataBridge
                     C.companyStatus,
                     C.companyCode,
                     C.prividercode,
+                    C.TPSNumber,
+                    C.TVQNumber,
                     A.country,
                     A.state,
                     A.city,
@@ -389,7 +528,9 @@ namespace DataBridge
                 CompagnieZipCode = cp.zipCode,
                 CompagnieSuite = cp.suite,
                 CompagnieCivicNumber = cp.civicNumber,
-                CompagnieProvider =cp.prividercode,
+                CompagnieProvider = cp.prividercode,
+                TPSNumber = cp.TPSNumber,
+                TVQNumber = cp.TVQNumber,
                 ContactName = cp.name,
                 ContactMail = cp.mail,
                 ContactPhones = cp.phone
@@ -403,6 +544,49 @@ namespace DataBridge
             .Select(g => g.First()).ToList());
 
         }
+
+        public CompagniePoco GetCompagnyByCode(string cpCode)
+        {
+            var result =
+                (from c in ramssisCleaningContex.Companies
+                 join ac in ramssisCleaningContex.CompanyAddresses on c.CompanyId equals ac.CompanyId
+                 join a in ramssisCleaningContex.Addresses on ac.AddressId equals a.AddressId
+                 join cl in ramssisCleaningContex.Clients on c.CompanyId equals cl.CompanyId
+                 where c.companyStatus == true
+                       && c.companyCode == cpCode
+                 select new CompagniePoco
+                 {
+                     CompagnieID = c.CompanyId,
+                     AddressID = a.AddressId,
+                     ContactID = cl.clientID,
+                     CompagnieName = c.companyName,
+                     CompagnieStatus = c.companyStatus,
+                     CompagnieCode = c.companyCode,
+                     Compagniecountry = a.country,
+                     CompagnieState = a.state,
+                     Compagniecity = a.city,
+                     CompagnieZipCode = a.zipCode,
+                     CompagnieSuite = a.suite,
+                     CompagnieCivicNumber = a.civicNumber,
+                     CompagnieProvider = c.prividercode,
+                     TPSNumber = c.TPSNumber,
+                     TVQNumber = c.TVQNumber,
+                     ContactName = cl.name,
+                     ContactMail = cl.mail,
+                     ContactPhones = cl.phone,
+
+
+                     smtpServer = c.MailCredential.smtpServer,
+                     smtpPort = c.MailCredential.smtpPort,
+                     smtpUsername = c.MailCredential.smtpUsername,
+                     smtpPassword = c.MailCredential.smtpPassword,
+                 }).ToList().GroupBy(p => p.CompagnieCode)
+            .Select(g => g.First()).FirstOrDefault();
+
+            // 🔥 Si le résultat est null → retourner un objet vide (jamais null)
+            return result ?? new CompagniePoco();
+        }
+
         public void UpdateCompagnyInfo(CompagniePoco cmpPocoUp)
         {
             var companie = ramssisCleaningContex.Companies.Where(c => c.CompanyId == cmpPocoUp.CompagnieID).First();
@@ -414,7 +598,7 @@ namespace DataBridge
             companie.companyName = cmpPocoUp.CompagnieName;
             companie.companyCode = cmpPocoUp.CompagnieCode;
             companie.companyStatus = cmpPocoUp.CompagnieStatus;
-            companie.prividercode = cmpPocoUp.Compagnieprividercode;
+            companie.prividercode = cmpPocoUp.CompagnieProvider;
 
             Adresse.country = cmpPocoUp.Compagniecountry;
             Adresse.state = cmpPocoUp.CompagnieState;
@@ -448,7 +632,7 @@ namespace DataBridge
                         join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
                         join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
                         join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
-                        where C.companyStatus == "Active"
+                        where C.companyStatus == true
 
                         select new
                         {
@@ -458,6 +642,7 @@ namespace DataBridge
                             C.companyName,
                             C.companyStatus,
                             C.companyCode,
+                            C.prividercode,
                             A.country,
                             A.state,
                             A.city,
@@ -467,8 +652,14 @@ namespace DataBridge
                             CL.name,
                             CL.mail,
                             CL.phone,
-                            C.prividercode
-
+                            //C.TaxCredential.TVQNumber,
+                            //C.TaxCredential.TPSNumber,
+                            C.TPSNumber,
+                            C.TVQNumber,
+                            C.MailCredential.smtpUsername,
+                            C.MailCredential.smtpPassword,
+                            C.MailCredential.smtpServer,
+                            C.MailCredential.smtpPort
                         }
                         ).ToList();
 
@@ -478,30 +669,60 @@ namespace DataBridge
                 AddressID = cp.AddressId,
                 ContactID = cp.clientID,
 
-
                 CompagnieName = cp.companyName,
                 CompagnieStatus = cp.companyStatus,
                 CompagnieCode = cp.companyCode,
+                CompagnieProvider = cp.prividercode,
+
                 Compagniecountry = cp.country,
                 CompagnieState = cp.state,
                 Compagniecity = cp.city,
                 CompagnieZipCode = cp.zipCode,
                 CompagnieSuite = cp.suite,
                 CompagnieCivicNumber = cp.civicNumber,
+                TPSNumber = cp.TPSNumber,
+                TVQNumber = cp.TVQNumber,
+
                 ContactName = cp.name,
                 ContactMail = cp.mail,
                 ContactPhones = cp.phone,
-                Compagnieprividercode = cp.prividercode
 
+                smtpUsername = cp.smtpUsername,
+                smtpPassword = cp.smtpPassword,
+                smtpServer = cp.smtpServer,
+                smtpPort = cp.smtpPort
             }
-                         ).ToList();
+            ).ToList();
 
 
             //enlever les code doublons qui devrais aller dans la meme factuer
             return (copiedList.GroupBy(p => p.CompagnieCode)
-            .Select(g => g.First()).ToList());
+            .Select(g => g.First()).OrderBy(c => c.CompagnieName).ToList());
 
         }
 
+        public List<BillHistory> GetBillByBillNumber(BillSearchStatus BillSearchStatus)
+        {
+
+            if (BillSearchStatus == null)
+                return new List<BillHistory>();
+
+
+            var billhs = (from rcc in ramssisCleaningContex.BillHistories
+                          select rcc).AsQueryable();
+
+            if (!string.IsNullOrEmpty(BillSearchStatus.keysearch))
+            {
+                billhs = billhs.Where(s => s.BillNumber.ToString().Contains(BillSearchStatus.keysearch));
+            }
+
+            if (billhs == null)
+            {
+                List<BillHistory> bhs = new List<BillHistory>();
+                return bhs;
+            }
+
+            return billhs.ToList();
+        }
     }
 }
