@@ -37,7 +37,10 @@ namespace SendBillWF.Employee
             FillSourceCompagnyByUser();
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public List<CompagniePoco> GetCompagniesByUser()
         {
             return compagniManipulation.GetCompagieInfo();

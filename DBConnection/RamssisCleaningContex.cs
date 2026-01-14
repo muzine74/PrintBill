@@ -27,7 +27,8 @@ namespace DBConnection
         public DbSet<Client> Clients { get; set; }
         public DbSet<Provider> Providers { get; set; }
         public DbSet<CompanyEmployee> CompanyEmployees { get; set; }
-        public DbSet<CompanyAddress> CompanyAddresses { get; set; }
+        public DbSet<CompanyAddress> CompanyAddresses { get; set; }       
+        public DbSet<EmployeeAddress> EmployeeAddresses { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

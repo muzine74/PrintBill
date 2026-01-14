@@ -72,7 +72,9 @@ namespace DataBridge
 
 
             ramssisCleaningContex.Employees.Add(employee);
+            ramssisCleaningContex.EmployeeAddresses.Add(employeeAddress);
             ramssisCleaningContex.Addresses.Add(address);
+
             ramssisCleaningContex.CompanyEmployees.AddRange(companyEmployeeList);
 
             ramssisCleaningContex.SaveChanges();

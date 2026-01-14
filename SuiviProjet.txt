@@ -3,4 +3,24 @@ ajout de fichier de Log  <<.NET 8, vous pouvez utiliser Microsoft.Extensions.Log
 reste :  imprimer dans createbill il faut appeler enregistrer avant d'applere PrintPdfWithDialog(pdfPath);
 
 
+Pour des erreurs mineures : "Facture rectificative" ou "Facture corrective".
+
+Pour annuler et remplacer : "Facture d'annulation et remplacement".
+
+Pour un crédit/remboursement : "Avoir" ou "Note de crédit".
+
+"Credit Note - Reference: Original Invoice #123"
+
+"Revised Invoice (Replaces #456)"
+
+Context-Based Choice:
+For refunds/credits: Use Credit Note.
+
+For additional charges: Use Debit Note.
+
+Minor corrections: Revised Invoice or Corrective Invoice.
+
+Full replacement: Replacement Invoice.
+
+
 
