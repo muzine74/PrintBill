@@ -104,6 +104,12 @@ SELECT TOP (1000) [CompanyId]
 --FROM [RamssisCleaningDB_Bak].[dbo].BillDescriptions
 
 
+  INSERT INTO [RamssisCleaningDB].[dbo].Clients
+  SELECT *
+FROM [RamssisCleaningDB_Bak].[dbo].Clients
+go;
+
+
 
 
 

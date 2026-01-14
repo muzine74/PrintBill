@@ -27,16 +27,17 @@ namespace SendBillWF
             InitializeComponent(); 
 
             compagniePoco = new CompagniePoco();
-            addCompagnyusctr1 = new AddCompagnyusctr();
-            updateCmpUsctr = new UpdateCmpUsctr();
-            billHistoryUsctr = new BillHistoryUsctr();
-            pDFBillFromGDriveUsCtr = new PDFBillFromGDriveUsCtr();
-            createBillUsCtr = new CreateBillUsCtr();
-            creatEmployeeUsCtr = new CreatEmployeeUsCtr();
-            updateBillUsCtr = new UpdateBillUsCtr();
-            employeeSchedularUsCtr = new EmployeeSchedularUsCtr();
-            updateEmployeeUct = new UpdateEmployeeUct();
-            compagnySchedularUsCtr = new ComapgnySchedularUsCtr();
+            //addCompagnyusctr1 = new AddCompagnyusctr();
+            //updateCmpUsctr = new UpdateCmpUsctr();
+            //billHistoryUsctr = new BillHistoryUsctr();
+            //pDFBillFromGDriveUsCtr = new PDFBillFromGDriveUsCtr();
+            //createBillUsCtr = new CreateBillUsCtr();
+            //creatEmployeeUsCtr = new CreatEmployeeUsCtr();
+            //updateBillUsCtr = new UpdateBillUsCtr();
+            //updateEmployeeUct = new UpdateEmployeeUct();
+            //employeeSchedularUsCtr = new EmployeeSchedularUsCtr();
+            //compagnySchedularUsCtr = new ComapgnySchedularUsCtr();
+
 
 
             // updateCmpUsctr1.Hide();
@@ -56,6 +57,7 @@ namespace SendBillWF
             if (e.Node.Name == "UpdateBill")  //updateBillUsCtr
             {
                 RemoveControl();
+                updateBillUsCtr = new UpdateBillUsCtr();
 
                 updateBillUsCtr.Location = new Point(201, 33);
                 updateBillUsCtr.Name = "updateBillUsCtr";
@@ -69,6 +71,7 @@ namespace SendBillWF
             if (e.Node.Name == "AddNewCompagny")
             {
                 RemoveControl();
+                addCompagnyusctr1 = new AddCompagnyusctr();
 
                 addCompagnyusctr1.Location = new Point(201, 33);
                 addCompagnyusctr1.Name = "addCompagnyusctr1";
@@ -83,6 +86,7 @@ namespace SendBillWF
 
             {
                 RemoveControl();
+                updateCmpUsctr = new UpdateCmpUsctr();
 
                 updateCmpUsctr.Location = new Point(201, 33);
                 updateCmpUsctr.Name = "updateCmpUsctr";
@@ -96,6 +100,7 @@ namespace SendBillWF
             if (e.Node.Name == "BillHistory")
             {
                 RemoveControl();
+                billHistoryUsctr = new BillHistoryUsctr();
 
                 billHistoryUsctr.Location = new Point(201, 33);
                 billHistoryUsctr.Name = "billHistoryUsctr";
@@ -110,6 +115,7 @@ namespace SendBillWF
             if (e.Node.Name == "PDFBillFromGDrive")
             {
                 RemoveControl();
+                pDFBillFromGDriveUsCtr = new PDFBillFromGDriveUsCtr();
 
                 pDFBillFromGDriveUsCtr.Location = new Point(201, 33);
                 pDFBillFromGDriveUsCtr.Name = "pDFBillFromGDriveUsCtr";
@@ -124,6 +130,7 @@ namespace SendBillWF
             if (e.Node.Name == "CreateBill")  //CreateBill 
             {
                 RemoveControl();
+                createBillUsCtr = new CreateBillUsCtr();
 
                 createBillUsCtr.Location = new Point(201, 33);
                 createBillUsCtr.Name = "createBillUsCtr";
@@ -140,6 +147,7 @@ namespace SendBillWF
             if (e.Node.Name == "CreateEmployee")
             {
                 RemoveControl();
+                creatEmployeeUsCtr = new CreatEmployeeUsCtr();
 
                 creatEmployeeUsCtr.Location = new Point(201, 33);
                 creatEmployeeUsCtr.Name = "createEmployeeUsCtr";
@@ -151,23 +159,13 @@ namespace SendBillWF
 
             }
 
-            if (e.Node.Name == "EmployeeSchedular")  //updateBillUsCtr
+
+
+
+            if (e.Node.Name == "UpdateEmployee")  //UpdateEmployee   updateEmployeeUct
             {
                 RemoveControl();
-
-                employeeSchedularUsCtr.Location = new Point(201, 33);
-                employeeSchedularUsCtr.Name = "employeeSchedularUsCtr";
-                employeeSchedularUsCtr.Size = new Size(1750, 900);
-                employeeSchedularUsCtr.TabIndex = 1;
-
-                Controls.Add(employeeSchedularUsCtr);
-                employeeSchedularUsCtr.Show();
-            }
-
-
-            if (e.Node.Name == "UpdateEmployee")  //updateBillUsCtr
-            {
-                RemoveControl();
+                updateEmployeeUct = new UpdateEmployeeUct();
 
                 updateEmployeeUct.Location = new Point(201, 33);
                 updateEmployeeUct.Name = "updateEmployeeUct";
@@ -179,12 +177,27 @@ namespace SendBillWF
             }
 
 
-            if (e.Node.Name == "CompagnySchedular")  //CompagnyShedular
+            if (e.Node.Name == "EmployeeSchedular")  //EmployeeSchedular  employeeSchedularUsCtr
             {
                 RemoveControl();
+                employeeSchedularUsCtr = new EmployeeSchedularUsCtr();
+
+                employeeSchedularUsCtr.Location = new Point(201, 33);
+                employeeSchedularUsCtr.Name = "employeeSchedularUsCtr";
+                employeeSchedularUsCtr.Size = new Size(1750, 900);
+                employeeSchedularUsCtr.TabIndex = 1;
+
+                Controls.Add(employeeSchedularUsCtr);
+                employeeSchedularUsCtr.Show();
+            }
+
+            if (e.Node.Name == "CompagnySchedular")  //CompagnySchedular    compagnySchedularUsCtr
+            {
+                RemoveControl();
+                compagnySchedularUsCtr = new ComapgnySchedularUsCtr();
 
                 compagnySchedularUsCtr.Location = new Point(201, 33);
-                compagnySchedularUsCtr.Name = "compagnyShedularUsCtr";
+                compagnySchedularUsCtr.Name = "compagnySchedularUsCtr";
                 compagnySchedularUsCtr.Size = new Size(1750, 900);
                 compagnySchedularUsCtr.TabIndex = 1;
 
