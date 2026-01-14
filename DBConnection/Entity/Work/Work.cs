@@ -2,7 +2,7 @@
 
 namespace DBConnection.Entity
 {
-    public enum WorkType
+    public enum WorkType1
     {
         Visit,      // Paid per visit
         Hourly,     // Paid per hour
@@ -13,7 +13,7 @@ namespace DBConnection.Entity
 
         public Guid WorkId { get; set; }   
         public string Description { get; set; }
-        public WorkType WorkType { get; set; }
+        public WorkType1 WorkType1 { get; set; }
         public string? Workdate { get; set; }
         public decimal ClientPrice { get; set; }
 

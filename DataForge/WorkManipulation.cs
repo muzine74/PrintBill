@@ -104,7 +104,7 @@ namespace DataBridge
                 {
                     w.WorkId,
                     w.Description,
-                    w.WorkType,
+                    w.WorkType1,
                     w.Workdate,
                     w.ClientPrice,
                     w.BeginWorkDate,
@@ -121,7 +121,7 @@ namespace DataBridge
                 {
                     WorkId = item.WorkId,
                     Description = item.Description,
-                    WorkType = item.WorkType,
+                    WorkType1 = item.WorkType1,
                     Workdate = item.Workdate,
                     ClientPrice = item.ClientPrice,
                     BeginWorkDate = item.BeginWorkDate,
