@@ -1,9 +1,10 @@
-﻿using System;
+﻿using DBConnection.Entity;
+using GDTOSQL.Entity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GDTOSQL.Entity;
 
 namespace DataBridge.Entity
 {
@@ -39,6 +40,8 @@ namespace DataBridge.Entity
 
 
         public List<WorkBillInfo> _workBillInfoList;
+
+        public ICollection<CompanyWork> CompanyWorks { get; set; } = new List<CompanyWork>();
 
         public CompagniePoco()
         {

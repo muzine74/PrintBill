@@ -459,7 +459,7 @@ namespace DataBridge
 
 
             //Fill Contact Client to Last Compagny
-            ClientTemp.clientID = ClientGuid;
+            ClientTemp.ClientID = ClientGuid;
             ClientTemp.name = cmpPoco.ContactName;
             ClientTemp.mail = cmpPoco.ContactMail;
             ClientTemp.phone = cmpPoco.ContactPhones;
@@ -495,7 +495,7 @@ namespace DataBridge
                 {
                     C.CompanyId,
                     A.AddressId,
-                    CL.clientID,
+                    CL.ClientID,
                     C.companyName,
                     C.companyStatus,
                     C.companyCode,
@@ -518,7 +518,7 @@ namespace DataBridge
             {
                 CompagnieID = cp.CompanyId,
                 AddressID = cp.AddressId,
-                ContactID = cp.clientID,
+                ContactID = cp.ClientID,
                 CompagnieName = cp.companyName,
                 CompagnieStatus = cp.companyStatus,
                 CompagnieCode = cp.companyCode,
@@ -558,7 +558,7 @@ namespace DataBridge
                  {
                      CompagnieID = c.CompanyId,
                      AddressID = a.AddressId,
-                     ContactID = cl.clientID,
+                     ContactID = cl.ClientID,
                      CompagnieName = c.companyName,
                      CompagnieStatus = c.companyStatus,
                      CompagnieCode = c.companyCode,
@@ -591,7 +591,7 @@ namespace DataBridge
         {
             var companie = ramssisCleaningContex.Companies.Where(c => c.CompanyId == cmpPocoUp.CompagnieID).First();
             var Adresse = ramssisCleaningContex.Addresses.Where(c => c.AddressId == cmpPocoUp.AddressID).First();
-            var client = ramssisCleaningContex.Clients.Where(c => c.clientID == cmpPocoUp.ContactID).First();
+            var client = ramssisCleaningContex.Clients.Where(c => c.ClientID == cmpPocoUp.ContactID).First();
 
 
 
@@ -638,7 +638,7 @@ namespace DataBridge
                         {
                             C.CompanyId,
                             A.AddressId,
-                            CL.clientID,
+                            CL.ClientID,
                             C.companyName,
                             C.companyStatus,
                             C.companyCode,
@@ -667,7 +667,7 @@ namespace DataBridge
             {
                 CompagnieID = cp.CompanyId,
                 AddressID = cp.AddressId,
-                ContactID = cp.clientID,
+                ContactID = cp.ClientID,
 
                 CompagnieName = cp.companyName,
                 CompagnieStatus = cp.companyStatus,

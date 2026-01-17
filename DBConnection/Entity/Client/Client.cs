@@ -9,7 +9,7 @@ namespace DBConnection.Entity
     public class Client 
     {
  
-        public Guid clientID { get; set; }
+        public Guid ClientID { get; set; }
         public string name { get; set; }
         public string? mail { get; set; }
         public string? phone { get; set; }
