@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DBConnection.Migrations
 {
     /// <inheritdoc />
-    public partial class ajouterLesTableWork : Migration
+    public partial class revertWork : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -294,100 +294,6 @@ namespace DBConnection.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "CompanyWorks",
-                columns: table => new
-                {
-                    CompanyWorkId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    WorkTypeId = table.Column<int>(type: "int", nullable: false),
-                    HourlyRate = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    WeeklyRate = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    MonthlyRate = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CompanyWorks", x => x.CompanyWorkId);
-                    table.ForeignKey(
-                        name: "FK_CompanyWorks_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
-                        principalColumn: "CompanyId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CompanyWorks_WorkTypes_WorkTypeId",
-                        column: x => x.WorkTypeId,
-                        principalTable: "WorkTypes",
-                        principalColumn: "WorkTypeId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EmployeeCompanyWorks",
-                columns: table => new
-                {
-                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CompanyWorkId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EmployeeCompanyWorks", x => new { x.EmployeeId, x.CompanyWorkId });
-                    table.ForeignKey(
-                        name: "FK_EmployeeCompanyWorks_CompanyWorks_CompanyWorkId",
-                        column: x => x.CompanyWorkId,
-                        principalTable: "CompanyWorks",
-                        principalColumn: "CompanyWorkId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EmployeeCompanyWorks_Employees_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "Employees",
-                        principalColumn: "EmployeeId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WorkHours",
-                columns: table => new
-                {
-                    WorkHourId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CompanyWorkId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkHours", x => x.WorkHourId);
-                    table.ForeignKey(
-                        name: "FK_WorkHours_CompanyWorks_CompanyWorkId",
-                        column: x => x.CompanyWorkId,
-                        principalTable: "CompanyWorks",
-                        principalColumn: "CompanyWorkId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WorkSchedules",
-                columns: table => new
-                {
-                    WorkScheduleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CompanyWorkId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DayOfWeek = table.Column<byte>(type: "tinyint", nullable: false),
-                    DayOfMonth = table.Column<byte>(type: "tinyint", nullable: true),
-                    WeekCycle = table.Column<byte>(type: "tinyint", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkSchedules", x => x.WorkScheduleId);
-                    table.ForeignKey(
-                        name: "FK_WorkSchedules_CompanyWorks_CompanyWorkId",
-                        column: x => x.CompanyWorkId,
-                        principalTable: "CompanyWorks",
-                        principalColumn: "CompanyWorkId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.InsertData(
                 table: "WorkTypes",
                 columns: new[] { "WorkTypeId", "Name" },
@@ -423,16 +329,6 @@ namespace DBConnection.Migrations
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompanyWorks_CompanyId",
-                table: "CompanyWorks",
-                column: "CompanyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CompanyWorks_WorkTypeId",
-                table: "CompanyWorks",
-                column: "WorkTypeId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_EmployeeAddresses_AddressId",
                 table: "EmployeeAddresses",
                 column: "AddressId");
@@ -443,20 +339,10 @@ namespace DBConnection.Migrations
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeCompanyWorks_CompanyWorkId",
-                table: "EmployeeCompanyWorks",
-                column: "CompanyWorkId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MailCredentials_CompanyId",
                 table: "MailCredentials",
                 column: "CompanyId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkHours_CompanyWorkId",
-                table: "WorkHours",
-                column: "CompanyWorkId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Works_CompanyId",
@@ -467,11 +353,6 @@ namespace DBConnection.Migrations
                 name: "IX_Works_EmployeeId",
                 table: "Works",
                 column: "EmployeeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkSchedules_CompanyWorkId",
-                table: "WorkSchedules",
-                column: "CompanyWorkId");
         }
 
         /// <inheritdoc />
@@ -493,22 +374,16 @@ namespace DBConnection.Migrations
                 name: "EmployeeCompanies");
 
             migrationBuilder.DropTable(
-                name: "EmployeeCompanyWorks");
-
-            migrationBuilder.DropTable(
                 name: "MailCredentials");
 
             migrationBuilder.DropTable(
                 name: "Providers");
 
             migrationBuilder.DropTable(
-                name: "WorkHours");
-
-            migrationBuilder.DropTable(
                 name: "Works");
 
             migrationBuilder.DropTable(
-                name: "WorkSchedules");
+                name: "WorkTypes");
 
             migrationBuilder.DropTable(
                 name: "BillHistories");
@@ -517,16 +392,10 @@ namespace DBConnection.Migrations
                 name: "Addresses");
 
             migrationBuilder.DropTable(
-                name: "Employees");
-
-            migrationBuilder.DropTable(
-                name: "CompanyWorks");
-
-            migrationBuilder.DropTable(
                 name: "Companies");
 
             migrationBuilder.DropTable(
-                name: "WorkTypes");
+                name: "Employees");
         }
     }
 }

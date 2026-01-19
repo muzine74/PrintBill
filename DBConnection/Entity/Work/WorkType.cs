@@ -11,6 +11,6 @@ namespace DBConnection.Entity
         public int WorkTypeId { get; set; }
         public string Name { get; set; } = null!;
 
-        public ICollection<CompanyWork> CompanyWorks { get; set; } = new List<CompanyWork>();
+       
     }
 }

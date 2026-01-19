@@ -18,6 +18,5 @@ namespace DBConnection.Entity
 
         public decimal Price { get; set; }
 
-        public CompanyWork CompanyWork { get; set; } = null!;
     }
 }

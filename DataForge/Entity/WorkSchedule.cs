@@ -22,7 +22,6 @@ namespace DataBridge.Entity
         public WorkType WorkType { get; set; } = null!;
 
         public ICollection<WorkSchedule> WorkSchedules { get; set; } = new List<WorkSchedule>();
-        public ICollection<WorkHour> WorkHours { get; set; } = new List<WorkHour>();
 
 
     }

@@ -250,36 +250,6 @@ namespace DBConnection.Migrations
                     b.ToTable("CompanyAddresses", (string)null);
                 });
 
-            modelBuilder.Entity("DBConnection.Entity.CompanyWork", b =>
-                {
-                    b.Property<Guid>("CompanyWorkId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal?>("HourlyRate")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("MonthlyRate")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("WeeklyRate")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("WorkTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CompanyWorkId");
-
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("WorkTypeId");
-
-                    b.ToTable("CompanyWorks");
-                });
-
             modelBuilder.Entity("DBConnection.Entity.Employee", b =>
                 {
                     b.Property<Guid>("EmployeeId")
@@ -433,56 +403,6 @@ namespace DBConnection.Migrations
                     b.ToTable("Works");
                 });
 
-            modelBuilder.Entity("DBConnection.Entity.WorkHour", b =>
-                {
-                    b.Property<Guid>("WorkHourId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CompanyWorkId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time");
-
-                    b.HasKey("WorkHourId");
-
-                    b.HasIndex("CompanyWorkId");
-
-                    b.ToTable("WorkHours");
-                });
-
-            modelBuilder.Entity("DBConnection.Entity.WorkSchedule", b =>
-                {
-                    b.Property<Guid>("WorkScheduleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CompanyWorkId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<byte?>("DayOfMonth")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("DayOfWeek")
-                        .HasColumnType("tinyint");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<byte?>("WeekCycle")
-                        .HasColumnType("tinyint");
-
-                    b.HasKey("WorkScheduleId");
-
-                    b.HasIndex("CompanyWorkId");
-
-                    b.ToTable("WorkSchedules");
-                });
-
             modelBuilder.Entity("DBConnection.Entity.WorkType", b =>
                 {
                     b.Property<int>("WorkTypeId")
@@ -532,21 +452,6 @@ namespace DBConnection.Migrations
                         });
                 });
 
-            modelBuilder.Entity("EmployeeCompanyWork", b =>
-                {
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CompanyWorkId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("EmployeeId", "CompanyWorkId");
-
-                    b.HasIndex("CompanyWorkId");
-
-                    b.ToTable("EmployeeCompanyWorks", (string)null);
-                });
-
             modelBuilder.Entity("DBConnection.Entity.BillDescription", b =>
                 {
                     b.HasOne("DBConnection.Entity.BillHistory", "BillHistoris")
@@ -586,25 +491,6 @@ namespace DBConnection.Migrations
                     b.Navigation("Address");
 
                     b.Navigation("Company");
-                });
-
-            modelBuilder.Entity("DBConnection.Entity.CompanyWork", b =>
-                {
-                    b.HasOne("DBConnection.Entity.Company", "Company")
-                        .WithMany("CompanyWorks")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DBConnection.Entity.WorkType", "WorkType")
-                        .WithMany("CompanyWorks")
-                        .HasForeignKey("WorkTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Company");
-
-                    b.Navigation("WorkType");
                 });
 
             modelBuilder.Entity("DBConnection.Entity.EmployeeAddress", b =>
@@ -673,43 +559,6 @@ namespace DBConnection.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("DBConnection.Entity.WorkHour", b =>
-                {
-                    b.HasOne("DBConnection.Entity.CompanyWork", "CompanyWork")
-                        .WithMany("WorkHours")
-                        .HasForeignKey("CompanyWorkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CompanyWork");
-                });
-
-            modelBuilder.Entity("DBConnection.Entity.WorkSchedule", b =>
-                {
-                    b.HasOne("DBConnection.Entity.CompanyWork", "CompanyWork")
-                        .WithMany("WorkSchedules")
-                        .HasForeignKey("CompanyWorkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CompanyWork");
-                });
-
-            modelBuilder.Entity("EmployeeCompanyWork", b =>
-                {
-                    b.HasOne("DBConnection.Entity.CompanyWork", null)
-                        .WithMany()
-                        .HasForeignKey("CompanyWorkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DBConnection.Entity.Employee", null)
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("DBConnection.Entity.BillHistory", b =>
                 {
                     b.Navigation("BillDescriptions");
@@ -719,8 +568,6 @@ namespace DBConnection.Migrations
                 {
                     b.Navigation("Clients");
 
-                    b.Navigation("CompanyWorks");
-
                     b.Navigation("EmployeeCompanies");
 
                     b.Navigation("MailCredential")
@@ -729,23 +576,11 @@ namespace DBConnection.Migrations
                     b.Navigation("Works");
                 });
 
-            modelBuilder.Entity("DBConnection.Entity.CompanyWork", b =>
-                {
-                    b.Navigation("WorkHours");
-
-                    b.Navigation("WorkSchedules");
-                });
-
             modelBuilder.Entity("DBConnection.Entity.Employee", b =>
                 {
                     b.Navigation("EmployeeCompanies");
 
                     b.Navigation("Works");
-                });
-
-            modelBuilder.Entity("DBConnection.Entity.WorkType", b =>
-                {
-                    b.Navigation("CompanyWorks");
                 });
 #pragma warning restore 612, 618
         }

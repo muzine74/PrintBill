@@ -32,9 +32,9 @@ namespace DBConnection
         public DbSet<MailCredential> MailCredentials { get; set; }
 
         public DbSet<WorkType> WorkTypes => Set<WorkType>();
-        public DbSet<CompanyWork> CompanyWorks => Set<CompanyWork>();
-        public DbSet<WorkSchedule> WorkSchedules => Set<WorkSchedule>();
-        public DbSet<WorkHour> WorkHours => Set<WorkHour>();
+        
+
+      
 
         #endregion
 
@@ -46,8 +46,7 @@ namespace DBConnection
             ConfigureBilling(modelBuilder);
             ConfigureCredentials(modelBuilder);
             SeedWorkTypes(modelBuilder);
-            ConfigureCompanyWorkEmployee(modelBuilder);
-            ConfigureWorkPlanning(modelBuilder);
+            
         }
 
         #region Configurations
@@ -158,53 +157,6 @@ namespace DBConnection
                 new WorkType { WorkTypeId = 5, Name = "Mensuel" },
                 new WorkType { WorkTypeId = 6, Name = "Horaire" }
             );
-        }
-
-        private static void ConfigureCompanyWorkEmployee(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<CompanyWork>()
-                .HasMany(cw => cw.Employees)
-                .WithMany(e => e.CompanyWorks)
-                .UsingEntity<Dictionary<string, object>>(
-                    "EmployeeCompanyWork",
-                    j => j.HasOne<Employee>()
-                          .WithMany()
-                          .HasForeignKey("EmployeeId")
-                          .OnDelete(DeleteBehavior.Cascade),
-
-                    j => j.HasOne<CompanyWork>()
-                          .WithMany()
-                          .HasForeignKey("CompanyWorkId")
-                          .OnDelete(DeleteBehavior.Cascade),
-
-                    j =>
-                    {
-                        j.HasKey("EmployeeId", "CompanyWorkId");
-                        j.ToTable("EmployeeCompanyWorks");
-                    });
-        }
-
-        private static void ConfigureWorkPlanning(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<WorkSchedule>(entity =>
-            {
-                entity.HasKey(ws => ws.WorkScheduleId);
-
-                entity.HasOne(ws => ws.CompanyWork)
-                      .WithMany(cw => cw.WorkSchedules)
-                      .HasForeignKey(ws => ws.CompanyWorkId)
-                      .OnDelete(DeleteBehavior.Cascade);
-            });
-
-            modelBuilder.Entity<WorkHour>(entity =>
-            {
-                entity.HasKey(wh => wh.WorkHourId);
-
-                entity.HasOne(wh => wh.CompanyWork)
-                      .WithMany(cw => cw.WorkHours)
-                      .HasForeignKey(wh => wh.CompanyWorkId)
-                      .OnDelete(DeleteBehavior.Cascade);
-            });
         }
 
         #endregion

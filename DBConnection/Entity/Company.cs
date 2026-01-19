@@ -38,6 +38,7 @@ namespace DBConnection.Entity
         // Navigation property for works  
         public virtual ICollection<Work> Works { get; set; } = new List<Work>();
 
-        public ICollection<CompanyWork> CompanyWorks { get; set; } = new List<CompanyWork>();
+        public virtual ICollection<CompanyPricingCalendar> CompanyPricingCalendars { get; set; } = new List<CompanyPricingCalendar>();
+        
     }
 }
