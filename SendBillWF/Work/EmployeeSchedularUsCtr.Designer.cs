@@ -89,6 +89,7 @@
             UsersTreeView.Name = "UsersTreeView";
             UsersTreeView.Size = new Size(225, 670);
             UsersTreeView.TabIndex = 10;
+            UsersTreeView.AfterSelect += UsersTreeView_AfterSelect;
             // 
             // panel1
             // 

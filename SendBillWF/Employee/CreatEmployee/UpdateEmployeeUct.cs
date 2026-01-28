@@ -303,7 +303,7 @@ namespace SendBillWF.Employee.CreatEmployee
 
 
 
-            sourceCompagnyForUser = AllCompagnList.Where(c => !ids.Contains(c.CompagnieID.Value)).ToList();
+            sourceCompagnyForUser = AllCompagnList.Where(c => !ids.Contains(c.CompagnieID)).ToList();//.Value
             employeeInfoUpDateUsCtr1.FillSourceCompagnyByUser(sourceCompagnyForUser, destinationCompagnirByUserList);
         }
 

@@ -65,8 +65,9 @@ namespace DataBridge
                     CL.name,
                     CL.mail,
                     CL.phone,
-                    C.prividercode
-
+                    C.prividercode,
+                    C.PaymentFrequency,
+                    C.WorkFrequency
                 }
                 ).ToList();
 
@@ -85,7 +86,9 @@ namespace DataBridge
                 ContactName = cp.name,
                 ContactMail = cp.mail,
                 ContactPhones = cp.phone,
-                CompagnieProvider = cp.prividercode
+                CompagnieProvider = cp.prividercode,
+                PaymentFrequency = cp.PaymentFrequency,
+                WorkFrequency = cp.WorkFrequency
             }
             ).ToList();
 
@@ -429,28 +432,30 @@ namespace DataBridge
         }
 
         public void SaveCompagnyInfo(CompagniePoco cmpPoco)
-        {
+        {   
             Company CompagnyTemp = new Company();
             Address AdressTemp = new Address();
             Client ClientTemp = new Client();
             CompanyAddress CompagnyAdress = new CompanyAddress();
 
-            Guid CompagnyGuid = Guid.NewGuid();
-            Guid AdressGuid = Guid.NewGuid();
-            Guid ClientGuid = Guid.NewGuid();
+            CompagnyTemp.WorkTypeId = GetWorkTypeId(cmpPoco.WorkFrequency); //default work type id
+            DesactivateOldWorkType(cmpPoco.CompagnieID); 
+
 
             // Fill Compagny Info
-            CompagnyTemp.CompanyId = CompagnyGuid;
+            CompagnyTemp.CompanyId = cmpPoco.CompagnieID;
             CompagnyTemp.companyName = cmpPoco.CompagnieName;
             CompagnyTemp.companyCode = cmpPoco.CompagnieCode;
             CompagnyTemp.companyStatus = cmpPoco.CompagnieStatus;
             CompagnyTemp.prividercode = cmpPoco.CompagnieProvider;
             CompagnyTemp.TPSNumber = cmpPoco.TPSNumber;
-            CompagnyTemp.TVQNumber = cmpPoco.TVQNumber; 
-            
+            CompagnyTemp.TVQNumber = cmpPoco.TVQNumber;
+            CompagnyTemp.PaymentFrequency = cmpPoco.PaymentFrequency;
+            CompagnyTemp.WorkFrequency = cmpPoco.WorkFrequency;
+
 
             //Fill Address to last Company
-            AdressTemp.AddressId = AdressGuid;
+            AdressTemp.AddressId = cmpPoco.AddressID;
             AdressTemp.civicNumber = cmpPoco.CompagnieCivicNumber;
             AdressTemp.suite = cmpPoco.CompagnieSuite;
             AdressTemp.zipCode = cmpPoco.CompagnieZipCode;
@@ -459,17 +464,21 @@ namespace DataBridge
 
 
             //Fill Contact Client to Last Compagny
-            ClientTemp.clientID = ClientGuid;
+            ClientTemp.clientID = cmpPoco.CompagnieID;
             ClientTemp.name = cmpPoco.ContactName;
             ClientTemp.mail = cmpPoco.ContactMail;
             ClientTemp.phone = cmpPoco.ContactPhones;
 
             
-            ClientTemp.CompanyId = CompagnyGuid;
+            ClientTemp.CompanyId = cmpPoco.CompagnieID;
 
-            CompagnyAdress.AddressId = AdressGuid;
-            CompagnyAdress.CompanyId = CompagnyGuid;
+            CompagnyAdress.AddressId = cmpPoco.AddressID;
+            CompagnyAdress.CompanyId = cmpPoco.CompagnieID;
             ramssisCleaningContex.CompanyAddresses.Add(CompagnyAdress);
+
+            CompagnyTemp.CompanyPricingCalendars = cmpPoco._companyPricingCalendar;
+
+
 
             ramssisCleaningContex.Companies.Add(CompagnyTemp);
             ramssisCleaningContex.Addresses.Add(AdressTemp);
@@ -477,8 +486,8 @@ namespace DataBridge
 
 
             ramssisCleaningContex.SaveChanges();
-
         }
+
 
         public List<CompagniePoco> GetCompagnyByName(string searchKey)
         {
@@ -502,6 +511,8 @@ namespace DataBridge
                     C.prividercode,
                     C.TPSNumber,
                     C.TVQNumber,
+                    C.PaymentFrequency,
+                    C.WorkFrequency,
                     A.country,
                     A.state,
                     A.city,
@@ -511,6 +522,7 @@ namespace DataBridge
                     CL.name,
                     CL.mail,
                     CL.phone
+                    
                 }
                 ).ToList();
 
@@ -533,7 +545,10 @@ namespace DataBridge
                 TVQNumber = cp.TVQNumber,
                 ContactName = cp.name,
                 ContactMail = cp.mail,
-                ContactPhones = cp.phone
+                ContactPhones = cp.phone,
+                PaymentFrequency = cp.PaymentFrequency,
+                WorkFrequency = cp.WorkFrequency,
+                
 
             }
             ).ToList();
@@ -569,6 +584,8 @@ namespace DataBridge
                      CompagnieSuite = a.suite,
                      CompagnieCivicNumber = a.civicNumber,
                      CompagnieProvider = c.prividercode,
+                     PaymentFrequency = c.PaymentFrequency,
+                     WorkFrequency = c.WorkFrequency,
                      TPSNumber = c.TPSNumber,
                      TVQNumber = c.TVQNumber,
                      ContactName = cl.name,
@@ -599,6 +616,9 @@ namespace DataBridge
             companie.companyCode = cmpPocoUp.CompagnieCode;
             companie.companyStatus = cmpPocoUp.CompagnieStatus;
             companie.prividercode = cmpPocoUp.CompagnieProvider;
+            companie.PaymentFrequency = cmpPocoUp.PaymentFrequency;
+            companie.WorkFrequency = cmpPocoUp.WorkFrequency;
+            companie.CompanyPricingCalendars = cmpPocoUp._companyPricingCalendar;
 
             Adresse.country = cmpPocoUp.Compagniecountry;
             Adresse.state = cmpPocoUp.CompagnieState;
@@ -643,6 +663,8 @@ namespace DataBridge
                             C.companyStatus,
                             C.companyCode,
                             C.prividercode,
+                            C.PaymentFrequency,
+                            C.WorkFrequency,
                             A.country,
                             A.state,
                             A.city,
@@ -680,6 +702,8 @@ namespace DataBridge
                 CompagnieZipCode = cp.zipCode,
                 CompagnieSuite = cp.suite,
                 CompagnieCivicNumber = cp.civicNumber,
+                PaymentFrequency = cp.PaymentFrequency,
+                WorkFrequency = cp.WorkFrequency,
                 TPSNumber = cp.TPSNumber,
                 TVQNumber = cp.TVQNumber,
 
@@ -723,6 +747,56 @@ namespace DataBridge
             }
 
             return billhs.ToList();
+        }
+
+        public void DesactivateOldWorkType(Guid _CompagnyId)
+        {
+            // Corrected the LINQ query to properly filter and retrieve the work types
+            var workTypes = ramssisCleaningContex.CompanyPricingCalendars
+                .Where(wt => wt.CompanyId.Equals(_CompagnyId))
+                .ToList();
+
+
+            foreach (var wt in workTypes)
+            {
+                wt.IsActive = false;
+            }
+
+            ramssisCleaningContex.SaveChanges();
+        }
+        private int GetWorkTypeId(string workType)
+        {
+            int workTypeId = ramssisCleaningContex.WorkTypes
+                .Where(wt => wt.Name == workType)
+                .Select(wt => wt.WorkTypeId)
+                .FirstOrDefault();
+            return workTypeId;
+        }
+
+        public List<CompanyPricingCalendarPoco> GetCompanyPricingCalendars(Guid CompanyId) 
+        {
+            List<CompanyPricingCalendarPoco> companyPricingCalendarPocoLSt = new List<CompanyPricingCalendarPoco>();
+
+            List<CompanyPricingCalendar> companyPricingCalendarLst =  ramssisCleaningContex.CompanyPricingCalendars
+                .Where(cpc => cpc.CompanyId == CompanyId && cpc.IsActive ==true )
+                .ToList();
+
+            foreach (var wt in companyPricingCalendarLst) 
+            {
+                companyPricingCalendarPocoLSt.Add(new CompanyPricingCalendarPoco
+                {
+                    Days = wt.Days,
+                    DaysStatus = wt.DaysStatus,
+                    CopagnyBenifictPrice = wt.CopagnyBenifictPrice,
+                    Emplyeepaiment = wt.Emplyeepaiment,
+                    IsActive = wt.IsActive
+
+                });
+            }
+
+            return companyPricingCalendarPocoLSt;
+
+
         }
     }
 }

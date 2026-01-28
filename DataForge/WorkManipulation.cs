@@ -15,6 +15,7 @@ namespace DataBridge
 {
     public class WorkManipulation
     {
+        public WorkTypePoco WorkTypePoco;
         public WorkPoco workPoco = new WorkPoco();
         RamssisCleaningContex ramssisCleaningContex;
         DbContextOptions<RamssisCleaningContex> options;
@@ -27,6 +28,8 @@ namespace DataBridge
           .Options;
 
             ramssisCleaningContex = new RamssisCleaningContex(options);
+
+            WorkTypePoco = new WorkTypePoco();
         }
 
         public void GetEmployeeList(EmployeePoco employeePoco)
@@ -36,62 +39,51 @@ namespace DataBridge
             if (employeePoco.EmployeeId == Guid.Empty)
                 return;
             workPoco.employeeLst.Clear();
-            var foundEmployeeLst = ramssisCleaningContex.Employees.Where(a => a.EmployeeId ==employeePoco.EmployeeId).ToList();
+            var foundEmployeeLst = ramssisCleaningContex.Employees.Where(a => a.EmployeeId == employeePoco.EmployeeId).ToList();
 
 
             if (foundEmployeeLst.Count() > 0)
             {
-                workPoco.employeeLst = foundEmployeeLst.ToList();                
+                workPoco.employeeLst = foundEmployeeLst.ToList();
             }
-         
+
         }
 
+        //public void GetCompagnyListByID(Guid guid)
+        //{
+        //    workPoco.companyLst.Clear();
+        //    var foundCompany = ramssisCleaningContex.Companies.Where(a => a.CompanyId.Equals(guid));
 
-
-        public void GetCompagnyListByID(Guid guid)
-        {
-            workPoco.companyLst.Clear();
-            var foundCompany = ramssisCleaningContex.Companies.Where(a => a.CompanyId.Equals(guid));
-
-            if (foundCompany.Count() > 0) // Check if the collection has any elements
-            {
-                workPoco.companyLst = foundCompany.ToList();
-            }
-            else
-            {
-                //throw new InvalidOperationException($"Company with ID {guid} not found.");
-            }
-        }
+        //    if (foundCompany.Count() > 0) // Check if the collection has any elements
+        //    {
+        //        workPoco.companyLst = foundCompany.ToList();
+        //    }
+        //    else
+        //    {
+        //        //throw new InvalidOperationException($"Company with ID {guid} not found.");
+        //    }
+        //}
 
 
 
-        public void GetWorkListById(Guid WorkId)
-        {
-            workPoco.workLst.Clear();
+        //public void GetWorkListById(Guid WorkId)
+        //{
+        //    workPoco.workLst.Clear();
 
-            var foundWorkLst = ramssisCleaningContex.Works.Where(a => a.WorkId == WorkId);
-            if (foundWorkLst.Any())
-            {
-                workPoco.workLst = foundWorkLst.ToList();               
-            }
-            else
-            {
-                //throw new InvalidOperationException($"Work with ID {id} not found.");
-            }            
-        }
+        //    var foundWorkLst = ramssisCleaningContex.Works.Where(a => a.WorkId == WorkId);
+        //    if (foundWorkLst.Any())
+        //    {
+        //        workPoco.workLst = foundWorkLst.ToList();               
+        //    }
+        //    else
+        //    {
+        //        //throw new InvalidOperationException($"Work with ID {id} not found.");
+        //    }            
+        //}
 
         public void GetWorkListByCompagnyEmployeeId()
         {
             workPoco.workLst.Clear();
-
-            //var t  = ramssisCleaningContex.Employees.Join(ramssisCleaningContex.EmployeeCompanies).Where(a => a.EmployeeId.Equals(employeePoco.EmployeeId));
-            //var t = from e in ramssisCleaningContex.Employees
-            //             join ec in ramssisCleaningContex.EmployeeCompanies
-            //                 on e.EmployeeId equals ec.EmployeeId
-            //             join c in ramssisCleaningContex.Companies
-            //                 on ec.CompanyId equals c.CompanyId
-            //             where e.EmployeeId == employeePoco.EmployeeId
-            //             select c;
 
             var companyIds = workPoco.companyLst.Select(c => c.CompanyId).ToList();
             var employeeIds = workPoco.employeeLst.Select(c => c.EmployeeId).ToList();
@@ -111,7 +103,7 @@ namespace DataBridge
                     w.EndWorkDate,
                     w.CompanyId,
                     w.EmployeeId
-                    
+
                 })
                 .ToList();
 
@@ -131,23 +123,10 @@ namespace DataBridge
                 };
                 workPoco.workLst.Add(work);
             }
-                       
+
         }
         public void GetEmployeeAssinedToCompanyList()
         {
-            //workPoco.employeeCompanyLst.Clear();
-            //if (workPoco.employeeLst.Count() > 0)
-            //{
-            //    var foundEmployeeCompanyLst = ramssisCleaningContex.EmployeeCompanies.Where(ce => ce.CompanyId.Equals(workPoco.companyLst[0].CompanyId)).ToList();
-            //    if (foundEmployeeCompanyLst.Count() > 0)
-            //    {
-            //        workPoco.employeeCompanyLst = foundEmployeeCompanyLst;
-            //    }
-            //    else
-            //    {
-            //        //throw new InvalidOperationException("No EmployeeCompany records found.");
-            //    }
-            //}
 
 
             workPoco.employeeCompanyLst.Clear();
@@ -228,12 +207,9 @@ namespace DataBridge
             GetWorkListByCompagnyEmployeeId();
         }
 
-        
-
-
         public void initValuefromCompagnyId(CompagniePoco compagniePoco)
         {
-            
+
             ClearAllObjectList();
             GetCompagnyList(compagniePoco);
             GetEmployeeAssinedToCompanyList();
@@ -241,11 +217,9 @@ namespace DataBridge
             GetWorkListByCompagnyEmployeeId();
         }
 
-       
-
         //private void GetCompagnyAssinedEmployeeList()
         //{
-            
+
 
         //    workPoco.employeeCompanyLst.Clear();
         //    if (workPoco.companyLst.Count() > 0)
@@ -265,7 +239,7 @@ namespace DataBridge
 
         private void GetCompagnyList(CompagniePoco compagniePoco)
         {
-           
+
 
             if (compagniePoco == null)
                 return;
@@ -280,13 +254,6 @@ namespace DataBridge
                 workPoco.companyLst = foundECompagnyLst.ToList();
             }
         }
-
-
-
-
-
-
-
 
         public void SaveWorkLstChanege(List<DtvToWorkManipPoco> dtvToWorkManipPoco)
         {
@@ -332,16 +299,16 @@ namespace DataBridge
                 if (companyId == Guid.Empty)
                     continue;
 
-                    Work wk = new Work
-                    {
-                        WorkId = Guid.NewGuid(),
-                        Description = "",
-                        Workdate = dtv.workdate,
-                        CompanyId = companyId,
-                        EmployeeId = workPoco.employeeLst[0].EmployeeId
-                    };
+                Work wk = new Work
+                {
+                    WorkId = Guid.NewGuid(),
+                    Description = "",
+                    Workdate = dtv.workdate,
+                    CompanyId = companyId,
+                    EmployeeId = workPoco.employeeLst[0].EmployeeId
+                };
 
-                    ramssisCleaningContex.Works.Add(wk);
+                ramssisCleaningContex.Works.Add(wk);
             }
             ramssisCleaningContex.SaveChanges();
         }
@@ -359,6 +326,12 @@ namespace DataBridge
             {
                 jours.Add(date.Date);
             }
+        }
+
+        public void GetAllWorkTypes()
+        {
+            WorkTypePoco.WorkTypesLst =  ramssisCleaningContex.WorkTypes.ToList();
+
         }
     }
 }

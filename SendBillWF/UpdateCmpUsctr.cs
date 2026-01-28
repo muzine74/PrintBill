@@ -1,4 +1,8 @@
-﻿using System;
+﻿using DataBridge;
+using DataBridge.Entity;
+using DBConnection.Entity;
+using SendBillWF.BL;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,22 +11,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataBridge;
-using DataBridge.Entity;
-using DBConnection.Entity;
 
 namespace SendBillWF
 {
     public partial class UpdateCmpUsctr : UserControl
     {
         CompagniManipulation compagniManipulation = new CompagniManipulation();
-        List<CompagniePoco> compagniesByName;
+        List<CompagniePoco> CompagniePocoLst;
         CompagniePoco compagniePoco;
 
         public UpdateCmpUsctr()
         {
             InitializeComponent();
-            compagniesByName = new List<CompagniePoco>();
+            CompagniePocoLst = new List<CompagniePoco>();
             compagniePoco = new CompagniePoco();
             CmpUsCtr.OnCompanySelected += CompagnyUsCtr1_CompanySelected;
         }
@@ -214,20 +215,30 @@ namespace SendBillWF
             CompagnyProvider.DataPropertyName = "CompagnieProvider"; // Propriété de la source de données à lier
             compagniesGrid.Columns.Add(CompagnyProvider);
 
+            DataGridViewTextBoxColumn PaymentFrequency = new DataGridViewTextBoxColumn();
+            PaymentFrequency.HeaderText = "Payment Frequency"; // Texte d'en-tête de la colonne
+            PaymentFrequency.DataPropertyName = "PaymentFrequency"; // Propriété de la source de données à lier
+            compagniesGrid.Columns.Add(PaymentFrequency);
+
+            DataGridViewTextBoxColumn WorkFrequency = new DataGridViewTextBoxColumn();
+            WorkFrequency.HeaderText = "Work Frequency"; // Texte d'en-tête de la colonne
+            WorkFrequency.DataPropertyName = "WorkFrequency"; // Propriété de la source de données à lier
+            compagniesGrid.Columns.Add(WorkFrequency);
+
             SearchUp();
 
         }
 
         private void SearchUp()
         {
-            compagniesByName = compagniManipulation.GetCompagnyByName(SearchTxtUp.Text);
+            CompagniePocoLst = compagniManipulation.GetCompagnyByName(SearchTxtUp.Text);
 
             // Désactiver la génération automatique des colonnes
 
 
 
             // Lier les données au DataGridView
-            compagniesGrid.DataSource = compagniesByName;
+            compagniesGrid.DataSource = CompagniePocoLst;
             compagniesGrid.Refresh();
         }
 
@@ -235,11 +246,13 @@ namespace SendBillWF
         {
             string st = string.Empty;
 
+
+
+
             if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
                 DataGridViewCell selectedCell = compagniesGrid.Rows[e.RowIndex].Cells[0];
-                // st = $"Ligne : {e.RowIndex}, Colonne : {e.ColumnIndex}, Valeur : {selectedCell.Value}";
-
+               
                 compagniePoco.CompagnieID = (Guid)compagniesGrid.Rows[e.RowIndex].Cells[0].Value;
                 compagniePoco.AddressID = (Guid)compagniesGrid.Rows[e.RowIndex].Cells[1].Value;
                 compagniePoco.ContactID = (Guid)compagniesGrid.Rows[e.RowIndex].Cells[2].Value;
@@ -270,12 +283,53 @@ namespace SendBillWF
                 //CmpUsCtr.FillProviderCBX(string)compagniesGrid.Rows[e.RowIndex].Cells[14].Value);
 
 
+
+                //////////////////////////////////////////////////////////////////
+                ///
+
+                compagniePoco.PaymentFrequency = (string)compagniesGrid.Rows[e.RowIndex].Cells[15].Value;
+                compagniePoco.WorkFrequency = (string)compagniesGrid.Rows[e.RowIndex].Cells[16].Value;
+
+                var CompanyPricingCalendars = compagniManipulation.GetCompanyPricingCalendars(compagniePoco.CompagnieID);
+
+
+                foreach (var cpc in CompanyPricingCalendars)
+                {
+                    compagniePoco._companyPricingCalendar.Add(new CompanyPricingCalendar
+                    {
+                        Days = cpc.Days,
+                        DaysStatus = cpc.DaysStatus,
+                        CopagnyBenifictPrice = cpc.CopagnyBenifictPrice,
+                        Emplyeepaiment = cpc.Emplyeepaiment,
+                        IsActive = cpc.IsActive
+                    });
+
+                }
+
+
                 LoadCompanies();
 
             }
         }
 
         private void UpddateCmp_Click(object sender, EventArgs e)
+        {
+
+            if (FieldValidation())
+            {
+                //appeler la fonction pour la mise a jours
+                UpdatevisitFrequencyPricing();
+                compagniManipulation.UpdateCompagnyInfo(compagniePoco);
+                SearchUp();
+
+            }
+            else
+            {
+                MessageBox.Show("Aucun champs n'a ete changè");
+            }
+        }
+
+        private bool FieldValidation()
         {
             bool isChanged = false;
 
@@ -356,30 +410,22 @@ namespace SendBillWF
                 isChanged = true;
             }
 
-            if (isChanged)
-            {
-                //appeler la fonction pour la mise a jours
-                compagniManipulation.UpdateCompagnyInfo(compagniePoco);
-                SearchUp();
-
-            }
-            else
-            {
-                MessageBox.Show("Aucun champs n'a ete changè");
-            }
+            return isChanged;
         }
-
 
         private void LoadCompanies()
         {
-            var companies = compagniManipulation.getActiveCompagnies();
 
+            var companies = compagniManipulation.getActiveCompagnies();
 
             //get provider compagny info
 
             CompagniePoco providerCPY = companies.FirstOrDefault(p => p.CompagnieCode == compagniePoco.CompagnieProvider);
 
             CmpUsCtr.FillProviderCBX(companies, providerCPY);
+            visitFrequencyPricingUctrUpdate.FillVisitFrequencyUct(compagniePoco);
+
+            //visitFrequencyPricingUctrUpdate.
         }
 
         private void CompagnyUsCtr1_CompanySelected(object sender, CompagniePoco selectedCompany)
@@ -391,5 +437,44 @@ namespace SendBillWF
                 // MessageBox.Show($"Société sélectionnée : {selectedCompany.CompagnieName}");
             }
         }
+
+        private void UpdatevisitFrequencyPricing()
+        {
+            Guid CompagnyGuid = Guid.NewGuid();
+            Guid AdressGuid = Guid.NewGuid();
+            Guid ClientGuid = Guid.NewGuid();
+
+            List<VisittFreqPri> visittFreqPri = new List<VisittFreqPri>();
+
+            compagniePoco._companyPricingCalendar = visitFrequencyPricingUctrUpdate.GetUpdatedVisitFrequencyPricingList(compagniePoco);
+          
+
+            //if (CheckValidField() == true){
+
+            //foreach (var item in compagniePoco._companyPricingCalendar)
+            //    {
+            //        //compagniePoco._companyPricingCalendar.Add(new CompanyPricingCalendar
+            //       // {
+            //            CompanyPricingCalendarId = Guid.NewGuid(),
+            //            CompanyId = CompagnyGuid,
+            //            Days = item.Days,
+            //            CopagnyBenifictPrice = item.CopagnyBenifictPrice,
+            //            Emplyeepaiment = item.Emplyeepaiment,
+            //            ApplicatedDate = DateTime.Now,
+            //            IsActive = true
+            //       // });
+            //    }
+
+            for (int i = 0; i < compagniePoco._companyPricingCalendar.Count; i++)
+            {
+                compagniePoco._companyPricingCalendar[i].CompanyId = compagniePoco.CompagnieID;
+            }
+
+
+                compagniManipulation.UpdateCompagnyInfo(compagniePoco);
+
+
+        }
+
     }
 }

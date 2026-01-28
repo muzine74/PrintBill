@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Employee\EmployeeBase\EmployeeVisitPricingUctr.cs" />
+    <Compile Remove="Employee\EmployeeBase\EmployeeVisitPricingUctr.Designer.cs" />
     <Compile Remove="Work\AddWorkUsCtr.cs" />
     <Compile Remove="Work\AddWorkUsCtr.Designer.cs" />
     <Compile Remove="Work\WorkTypeUsCtr.cs" />
@@ -16,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Employee\EmployeeBase\EmployeeVisitPricingUctr.resx" />
     <EmbeddedResource Remove="Work\AddWorkUsCtr.resx" />
     <EmbeddedResource Remove="Work\WorkTypeUsCtr.resx" />
   </ItemGroup>
@@ -31,10 +34,6 @@
     <ProjectReference Include="..\Helpers\Helpers.csproj" />
     <ProjectReference Include="..\PrintPDF\PrintPDF.csproj" />
     <ProjectReference Include="..\SendBillBL\SendBillBL.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Compagny\Compagny\" />
   </ItemGroup>
 
 </Project>

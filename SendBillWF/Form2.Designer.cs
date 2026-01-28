@@ -150,7 +150,7 @@ namespace SendBillWF
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1523, 999);
+            ClientSize = new Size(1647, 999);
             Controls.Add(panel1);
             Name = "Form2";
             Text = "Form2";

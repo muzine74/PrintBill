@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DBConnection.Migrations
 {
     /// <inheritdoc />
-    public partial class revertWork : Migration
+    public partial class addrelationcompagnyWorkType2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,26 +59,6 @@ namespace DBConnection.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BillHistories", x => x.billIdentifier);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Companies",
-                columns: table => new
-                {
-                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    companyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    companyCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    companyStatus = table.Column<bool>(type: "bit", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Notes2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    prividercode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IdMailCredentiel = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    TPSNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TVQNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Companies", x => x.CompanyId);
                 });
 
             migrationBuilder.CreateTable(
@@ -148,6 +128,56 @@ namespace DBConnection.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EmployeeAddresses",
+                columns: table => new
+                {
+                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeAddresses", x => new { x.EmployeeId, x.AddressId });
+                    table.ForeignKey(
+                        name: "FK_EmployeeAddresses_Addresses_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "Addresses",
+                        principalColumn: "AddressId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EmployeeAddresses_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Companies",
+                columns: table => new
+                {
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    companyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    companyCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    companyStatus = table.Column<bool>(type: "bit", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Notes2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    prividercode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdMailCredentiel = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TPSNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TVQNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkTypeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Companies", x => x.CompanyId);
+                    table.ForeignKey(
+                        name: "FK_Companies_WorkTypes_WorkTypeId",
+                        column: x => x.WorkTypeId,
+                        principalTable: "WorkTypes",
+                        principalColumn: "WorkTypeId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Clients",
                 columns: table => new
                 {
@@ -195,46 +225,25 @@ namespace DBConnection.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MailCredentials",
+                name: "CompanyPricingCalendar",
                 columns: table => new
                 {
+                    CompanyPricingCalendarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    smtpServer = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    smtpPort = table.Column<int>(type: "int", nullable: true),
-                    smtpUsername = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    smtpPassword = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Days = table.Column<bool>(type: "bit", nullable: false),
+                    CopagnyBenifictPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Emplyeepaiment = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ApplicatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MailCredentials", x => x.CompanyId);
+                    table.PrimaryKey("PK_CompanyPricingCalendar", x => x.CompanyPricingCalendarId);
                     table.ForeignKey(
-                        name: "FK_MailCredentials_Companies_CompanyId",
+                        name: "FK_CompanyPricingCalendar_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
-                        principalColumn: "CompanyId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EmployeeAddresses",
-                columns: table => new
-                {
-                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EmployeeAddresses", x => new { x.EmployeeId, x.AddressId });
-                    table.ForeignKey(
-                        name: "FK_EmployeeAddresses_Addresses_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "Addresses",
-                        principalColumn: "AddressId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EmployeeAddresses_Employees_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "Employees",
-                        principalColumn: "EmployeeId",
+                        principalColumn: "CompanyId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -261,6 +270,26 @@ namespace DBConnection.Migrations
                         principalTable: "Employees",
                         principalColumn: "EmployeeId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MailCredentials",
+                columns: table => new
+                {
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    smtpServer = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    smtpPort = table.Column<int>(type: "int", nullable: true),
+                    smtpUsername = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    smtpPassword = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MailCredentials", x => x.CompanyId);
+                    table.ForeignKey(
+                        name: "FK_MailCredentials_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "CompanyId");
                 });
 
             migrationBuilder.CreateTable(
@@ -324,9 +353,19 @@ namespace DBConnection.Migrations
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Companies_WorkTypeId",
+                table: "Companies",
+                column: "WorkTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CompanyAddresses_AddressId",
                 table: "CompanyAddresses",
                 column: "AddressId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompanyPricingCalendar_CompanyId",
+                table: "CompanyPricingCalendar",
+                column: "CompanyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeAddresses_AddressId",
@@ -368,6 +407,9 @@ namespace DBConnection.Migrations
                 name: "CompanyAddresses");
 
             migrationBuilder.DropTable(
+                name: "CompanyPricingCalendar");
+
+            migrationBuilder.DropTable(
                 name: "EmployeeAddresses");
 
             migrationBuilder.DropTable(
@@ -383,9 +425,6 @@ namespace DBConnection.Migrations
                 name: "Works");
 
             migrationBuilder.DropTable(
-                name: "WorkTypes");
-
-            migrationBuilder.DropTable(
                 name: "BillHistories");
 
             migrationBuilder.DropTable(
@@ -396,6 +435,9 @@ namespace DBConnection.Migrations
 
             migrationBuilder.DropTable(
                 name: "Employees");
+
+            migrationBuilder.DropTable(
+                name: "WorkTypes");
         }
     }
 }

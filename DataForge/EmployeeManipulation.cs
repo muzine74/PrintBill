@@ -315,7 +315,7 @@ namespace DataBridge
                 .ToList();
 
             var newCompanyIds = emplPoco.EmployeeCompagnies
-                .Select(c => c.CompagnieID.Value)
+                    .Select(c => c.CompagnieID) // Removed '.Value' as CompagnieID is already of type Guid
                 .ToList();
 
             context.EmployeeCompanies.RemoveRange(

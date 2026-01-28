@@ -34,6 +34,7 @@
             customUsCtr1 = new CustomUsCtr();
             CancelCompBtn = new Button();
             taxUsCtr1 = new TaxUsCtr();
+            visitFrequencyPricingUctr1 = new SendBillWF.Compagny.CompagnyBase.VisitFrequencyPricingUctr();
             SuspendLayout();
             // 
             // AddCompagny
@@ -65,7 +66,7 @@
             addressUsctr1.Location = new Point(16, 215);
             addressUsctr1.Name = "addressUsctr1";
             addressUsctr1.noteAdress = "";
-            addressUsctr1.Size = new Size(827, 235);
+            addressUsctr1.Size = new Size(703, 235);
             addressUsctr1.stateAdress = "";
             addressUsctr1.suiteAdress = "";
             addressUsctr1.TabIndex = 2;
@@ -93,15 +94,27 @@
             // 
             // taxUsCtr1
             // 
+            taxUsCtr1.compagnyTPSCompagny = "";
+            taxUsCtr1.compagnyTVQCompagny = "";
             taxUsCtr1.Location = new Point(46, 632);
             taxUsCtr1.Name = "taxUsCtr1";
             taxUsCtr1.Size = new Size(350, 106);
             taxUsCtr1.TabIndex = 6;
             // 
+            // visitFrequencyPricingUctr1
+            // 
+            visitFrequencyPricingUctr1.Location = new Point(725, 179);
+            visitFrequencyPricingUctr1.Name = "visitFrequencyPricingUctr1";
+            visitFrequencyPricingUctr1.PaimentFrequencySelectedItem = "visite";
+            visitFrequencyPricingUctr1.Size = new Size(486, 474);
+            visitFrequencyPricingUctr1.TabIndex = 7;
+            visitFrequencyPricingUctr1.WorkFrequencySelectedItem = "visite";
+            // 
             // AddCompagnyusctr
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(visitFrequencyPricingUctr1);
             Controls.Add(taxUsCtr1);
             Controls.Add(CancelCompBtn);
             Controls.Add(customUsCtr1);
@@ -109,7 +122,7 @@
             Controls.Add(compagnyUsCtr1);
             Controls.Add(AddCompagny);
             Name = "AddCompagnyusctr";
-            Size = new Size(1005, 847);
+            Size = new Size(1232, 827);
             ResumeLayout(false);
         }
 
@@ -121,5 +134,6 @@
         private CustomUsCtr customUsCtr1;
         private Button CancelCompBtn;
         private TaxUsCtr taxUsCtr1;
+        private Compagny.CompagnyBase.VisitFrequencyPricingUctr visitFrequencyPricingUctr1;
     }
 }

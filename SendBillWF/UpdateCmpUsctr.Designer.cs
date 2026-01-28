@@ -37,6 +37,7 @@
             SearchTxtUp = new TextBox();
             SearchbtnUp = new Button();
             compagniesGrid = new DataGridView();
+            visitFrequencyPricingUctrUpdate = new SendBillWF.Compagny.CompagnyBase.VisitFrequencyPricingUctr();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)compagniesGrid).BeginInit();
             SuspendLayout();
@@ -74,7 +75,7 @@
             custUsCtr.CustomPhoneCustom = "";
             custUsCtr.Location = new Point(39, 618);
             custUsCtr.Name = "custUsCtr";
-            custUsCtr.Size = new Size(642, 163);
+            custUsCtr.Size = new Size(613, 163);
             custUsCtr.TabIndex = 2;
             // 
             // UpddateCmp
@@ -133,10 +134,20 @@
             compagniesGrid.TabIndex = 8;
             compagniesGrid.CellClick += compagniesGrid_CellClick;
             // 
+            // visitFrequencyPricingUctrUpdate
+            // 
+            visitFrequencyPricingUctrUpdate.Location = new Point(698, 392);
+            visitFrequencyPricingUctrUpdate.Name = "visitFrequencyPricingUctrUpdate";
+            visitFrequencyPricingUctrUpdate.PaimentFrequencySelectedItem = "Par visite";
+            visitFrequencyPricingUctrUpdate.Size = new Size(486, 474);
+            visitFrequencyPricingUctrUpdate.TabIndex = 9;
+            visitFrequencyPricingUctrUpdate.WorkFrequencySelectedItem = "Par visite";
+            // 
             // UpdateCmpUsctr
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(visitFrequencyPricingUctrUpdate);
             Controls.Add(compagniesGrid);
             Controls.Add(SearchbtnUp);
             Controls.Add(SearchTxtUp);
@@ -147,7 +158,7 @@
             Controls.Add(addUsctr);
             Controls.Add(CmpUsCtr);
             Name = "UpdateCmpUsctr";
-            Size = new Size(1139, 840);
+            Size = new Size(1191, 876);
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ((System.ComponentModel.ISupportInitialize)compagniesGrid).EndInit();
             ResumeLayout(false);
@@ -165,5 +176,6 @@
         private TextBox SearchTxtUp;
         private Button SearchbtnUp;
         private DataGridView compagniesGrid;
+        private Compagny.CompagnyBase.VisitFrequencyPricingUctr visitFrequencyPricingUctrUpdate;
     }
 }

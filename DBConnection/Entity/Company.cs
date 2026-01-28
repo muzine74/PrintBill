@@ -31,6 +31,10 @@ namespace DBConnection.Entity
 
         public string? TPSNumber { get; set; }
         public string? TVQNumber { get; set; }
+
+        public string? WorkFrequency { get; set; }
+        public string? PaymentFrequency { get; set; }
+
         public virtual ICollection<Client> Clients { get; set; }
         // Navigation property for many-to-many with Employee
         public virtual ICollection<EmployeeCompany> EmployeeCompanies { get; set; } = new List<EmployeeCompany>();
@@ -39,6 +43,9 @@ namespace DBConnection.Entity
         public virtual ICollection<Work> Works { get; set; } = new List<Work>();
 
         public virtual ICollection<CompanyPricingCalendar> CompanyPricingCalendars { get; set; } = new List<CompanyPricingCalendar>();
-        
+
+        public int WorkTypeId { get; set; }
+        public WorkType WorkType { get; set; }
+
     }
 }

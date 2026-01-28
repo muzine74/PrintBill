@@ -31,10 +31,14 @@ namespace DBConnection
 
         public DbSet<MailCredential> MailCredentials { get; set; }
 
-        public DbSet<WorkType> WorkTypes => Set<WorkType>();
-        
+        public DbSet<WorkType> WorkTypes  { get; set; }
 
-      
+        public DbSet<CompanyPricingCalendar> CompanyPricingCalendars { get; set; }
+
+
+
+
+
 
         #endregion
 
@@ -75,7 +79,7 @@ namespace DBConnection
 
         private static void ConfigureCompany(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Company>(entity =>
+            modelBuilder.Entity<Company>(static entity =>
             {
                 entity.HasMany(c => c.EmployeeCompanies)
                       .WithOne(ec => ec.Company)
@@ -97,16 +101,32 @@ namespace DBConnection
                       .WithOne(m => m.Company)
                       .HasForeignKey<MailCredential>(m => m.CompanyId)
                       .IsRequired(false);
+
+                //////// Configure the one-to-one relationship between Company and WorkType
+                entity.HasOne(c => c.WorkType)
+                      .WithMany(m => m.Companies)
+                      .HasForeignKey(m => m.WorkTypeId)
+                      .IsRequired(false);  // Relation optionnelle;
+
             });
 
-            modelBuilder.Entity<Client>()
+
+        modelBuilder.Entity<Client>()
                         .HasOne(c => c.Company)
                         .WithMany(co => co.Clients)
                         .HasForeignKey(c => c.CompanyId);
 
             modelBuilder.Entity<EmployeeCompany>()
                         .HasKey(ec => new { ec.EmployeeId, ec.CompanyId });
+
+
+            
         }
+
+
+
+
+
 
         private static void ConfigureWork(ModelBuilder modelBuilder)
         {

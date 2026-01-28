@@ -1,27 +1,42 @@
-﻿using System;
+﻿
+using DataBridge;
+using DataBridge.Entity;
+using DBConnection.Entity;
+using SendBillWF.BL;
+using SendBillWF.Compagny.CompagnyBase;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataBridge.Entity;
-using DataBridge;
-using DBConnection.Entity;
+
 
 namespace SendBillWF
 {
     public partial class AddCompagnyusctr : UserControl
     {
+
         CompagniePoco compagniePoco;
         CompagniManipulation compagniManipulation;
+        VisitFrequencyPricingUctr visittFreqPriceUsctr;
+
+
         public AddCompagnyusctr()
         {
             InitializeComponent();
             compagniePoco = new CompagniePoco();
             compagniManipulation = new CompagniManipulation();
+            visittFreqPriceUsctr = new VisitFrequencyPricingUctr();
+
+
+
+
             LoadCompanies();
             compagnyUsCtr1.OnCompanySelected += CompagnyUsCtr1_CompanySelected;
 
@@ -160,8 +175,59 @@ namespace SendBillWF
 
         private void AddCompagny_Click(object sender, EventArgs e)
         {
+            Guid CompagnyGuid = Guid.NewGuid();
+            Guid AdressGuid = Guid.NewGuid();
+            Guid ClientGuid = Guid.NewGuid();
+
+            List<VisittFreqPri> visittFreqPri = new List<VisittFreqPri>();
+
+
+            switch (visitFrequencyPricingUctr1.WorkFrequencySelectedItem)
+            {
+                case "visite":
+                case "Hebdomadaire":
+                    visittFreqPri = visitFrequencyPricingUctr1.GetWeeklyVisitFrequencyPricing();
+                    break;
+
+                case "Bi-hebdomadaire":
+                case "Bi-mensuel":
+                    visittFreqPri = visitFrequencyPricingUctr1.GetBi_WeeklyVisitFrequencyPricing();
+                    break;
+
+                case "Mensuel":
+
+                    break;
+
+                default:
+                    break;
+            }
+
+
+
+
             if (CheckValidField() == true)
             {
+                foreach (var item in visittFreqPri)
+                {
+                    compagniePoco._companyPricingCalendar.Add(new CompanyPricingCalendar
+                    {
+                        CompanyPricingCalendarId = Guid.NewGuid(),
+                        CompanyId = CompagnyGuid,
+                        Days = item.Days,
+                        CopagnyBenifictPrice = item.CopagnyBenifictPrice,
+                        Emplyeepaiment = item.Emplyeepaiment,
+                        ApplicatedDate = DateTime.Now,
+                        IsActive = true
+                    });
+                }
+
+
+
+
+                compagniePoco.CompagnieID = CompagnyGuid;
+                compagniePoco.AddressID = AdressGuid;
+                compagniePoco.ContactID = ClientGuid;
+
                 compagniePoco.CompagnieName = compagnyNameSaisie;
                 compagniePoco.CompagnieCode = CompagnieCodeSaisie;
                 compagniePoco.CompagnieStatus = compagnieStatusSaisie;
@@ -175,15 +241,18 @@ namespace SendBillWF
                 compagniePoco.ContactMail = CustomMailSaisie;
                 compagniePoco.ContactPhones = CustomPhoneSaisie;
                 compagniePoco.CompagnieProvider = compagnyProviderSelected;
-
                 compagniePoco.TPSNumber = compagnyTPSSaisi;
                 compagniePoco.TVQNumber = compagnyTVQCompagny;
+
+
+                compagniePoco.WorkFrequency = visitFrequencyPricingUctr1.WorkFrequencySelectedItem;
+                compagniePoco.PaymentFrequency = visitFrequencyPricingUctr1.PaimentFrequencySelectedItem;
 
                 compagniManipulation.SaveCompagnyInfo(compagniePoco);
             }
             else
             {
-                MessageBox.Show("il faut remplir tous les champs en etoile");
+                //MessageBox.Show("il faut remplir tous les champs en etoile");
             }
 
         }
@@ -202,5 +271,10 @@ namespace SendBillWF
                 MessageBox.Show($"Société sélectionnée : {selectedCompany.CompagnieName}");
             }
         }
+
+
+
+
+
     }
 }

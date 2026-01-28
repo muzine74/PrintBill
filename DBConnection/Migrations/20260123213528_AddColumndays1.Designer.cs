@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DBConnection.Migrations
 {
     [DbContext(typeof(RamssisCleaningContex))]
-    [Migration("20260119022806_revertWork")]
-    partial class revertWork
+    [Migration("20260123213528_AddColumndays1")]
+    partial class AddColumndays1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -216,6 +216,9 @@ namespace DBConnection.Migrations
                     b.Property<string>("TVQNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("WorkTypeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("companyCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -231,6 +234,8 @@ namespace DBConnection.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CompanyId");
+
+                    b.HasIndex("WorkTypeId");
 
                     b.ToTable("Companies");
                 });
@@ -251,6 +256,41 @@ namespace DBConnection.Migrations
                     b.HasIndex("AddressId");
 
                     b.ToTable("CompanyAddresses", (string)null);
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.CompanyPricingCalendar", b =>
+                {
+                    b.Property<Guid>("CompanyPricingCalendarId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ApplicatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("CopagnyBenifictPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Days")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("DaysStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Emplyeepaiment")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.HasKey("CompanyPricingCalendarId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("CompanyPricingCalendars");
                 });
 
             modelBuilder.Entity("DBConnection.Entity.Employee", b =>
@@ -477,6 +517,15 @@ namespace DBConnection.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("DBConnection.Entity.Company", b =>
+                {
+                    b.HasOne("DBConnection.Entity.WorkType", "WorkType")
+                        .WithMany("Companies")
+                        .HasForeignKey("WorkTypeId");
+
+                    b.Navigation("WorkType");
+                });
+
             modelBuilder.Entity("DBConnection.Entity.CompanyAddress", b =>
                 {
                     b.HasOne("DBConnection.Entity.Address", "Address")
@@ -492,6 +541,17 @@ namespace DBConnection.Migrations
                         .IsRequired();
 
                     b.Navigation("Address");
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.CompanyPricingCalendar", b =>
+                {
+                    b.HasOne("DBConnection.Entity.Company", "Company")
+                        .WithMany("CompanyPricingCalendars")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Company");
                 });
@@ -571,6 +631,8 @@ namespace DBConnection.Migrations
                 {
                     b.Navigation("Clients");
 
+                    b.Navigation("CompanyPricingCalendars");
+
                     b.Navigation("EmployeeCompanies");
 
                     b.Navigation("MailCredential")
@@ -584,6 +646,11 @@ namespace DBConnection.Migrations
                     b.Navigation("EmployeeCompanies");
 
                     b.Navigation("Works");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.WorkType", b =>
+                {
+                    b.Navigation("Companies");
                 });
 #pragma warning restore 612, 618
         }

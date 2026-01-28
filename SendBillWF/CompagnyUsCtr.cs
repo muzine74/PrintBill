@@ -41,7 +41,7 @@ namespace SendBillWF
             get { return compagnieNoteTxt.Text; }
             set { compagnieNoteTxt.Text = value; }
         }
-
+         
         public bool compagnieStatusCompagny
         {
             get { return CompagnyStatusTxt.Checked; }

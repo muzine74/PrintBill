@@ -4,6 +4,7 @@ using DBConnection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DBConnection.Migrations
 {
     [DbContext(typeof(RamssisCleaningContex))]
-    partial class RamssisCleaningContexModelSnapshot : ModelSnapshot
+    [Migration("20260123203901_AddColumndays")]
+    partial class AddColumndays
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -207,16 +210,10 @@ namespace DBConnection.Migrations
                     b.Property<string>("Notes2")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PaymentFrequency")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("TPSNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TVQNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WorkFrequency")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WorkTypeId")
@@ -293,7 +290,7 @@ namespace DBConnection.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("CompanyPricingCalendars");
+                    b.ToTable("CompanyPricingCalendar");
                 });
 
             modelBuilder.Entity("DBConnection.Entity.Employee", b =>
