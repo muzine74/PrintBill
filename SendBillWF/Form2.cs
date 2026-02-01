@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
+using SendBillWF.Compagny.Compagny;
 
 namespace SendBillWF
 {
@@ -37,6 +38,7 @@ namespace SendBillWF
             employeeSchedularUsCtr = new EmployeeSchedularUsCtr();
             updateEmployeeUct = new UpdateEmployeeUct();
             compagnySchedularUsCtr = new ComapgnySchedularUsCtr();
+            assignedEmployeePriceToCompagny = new AssignedEmployeePriceToCompagny();
 
 
             // updateCmpUsctr1.Hide();
@@ -192,6 +194,22 @@ namespace SendBillWF
                 compagnySchedularUsCtr.Show();
             }
 
+
+            if (e.Node.Name == "AssignedEmployeePriceTOCompagny")  //CompagnyShedular
+            {
+                RemoveControl();
+
+                assignedEmployeePriceToCompagny.Location = new Point(201, 33);
+                assignedEmployeePriceToCompagny.Name = "assignedEmployeePriceToCompagny";
+                assignedEmployeePriceToCompagny.Size = new Size(1750, 900);
+                assignedEmployeePriceToCompagny.TabIndex = 1;
+
+                Controls.Add(assignedEmployeePriceToCompagny);
+                assignedEmployeePriceToCompagny.Show();
+            }
+
+            //assignedEmployeePriceToCompagny
+
         } //updateEmployeeUct
 
 
@@ -207,6 +225,7 @@ namespace SendBillWF
             Controls.Remove(employeeSchedularUsCtr);
             Controls.Remove(updateEmployeeUct);
             Controls.Remove(compagnySchedularUsCtr);
+            Controls.Remove(assignedEmployeePriceToCompagny);
         }
     }
 }

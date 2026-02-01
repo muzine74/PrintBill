@@ -330,8 +330,31 @@ namespace DataBridge
 
         public void GetAllWorkTypes()
         {
-            WorkTypePoco.WorkTypesLst =  ramssisCleaningContex.WorkTypes.ToList();
+            WorkTypePoco.WorkTypesLst = ramssisCleaningContex.WorkTypes.ToList();
 
+        }
+
+        public List<CompanyPricingCalendar> GetCompanyPricingCalendarsList(List<CompagniePoco> EmployeCompagny)
+        {
+            if (EmployeCompagny == null || !EmployeCompagny.Any())
+            {
+                return new List<CompanyPricingCalendar>();
+            }
+
+            var companyIds = EmployeCompagny
+                .Where(ec => ec != null)
+                .Select(ec => ec.CompagnieID)
+                .Distinct()
+                .ToList();
+
+            if (!companyIds.Any())
+            {
+                return new List<CompanyPricingCalendar>();
+            }
+
+            return ramssisCleaningContex.CompanyPricingCalendars
+                .Where(cpc => cpc.IsActive && companyIds.Contains(cpc.CompanyId))
+                .ToList();
         }
     }
 }

@@ -162,17 +162,17 @@ namespace DataBridge
 
             billSearchStatus.keysearch = _billHistoryPocoLst[0].BillNumber;
             ;//_billHistoryPocoLst[0].BillNumber;
-                                                       //var bhs = GetBillByBillNumber(billSearchStatus).FirstOrDefault();
+             //var bhs = GetBillByBillNumber(billSearchStatus).FirstOrDefault();
 
 
 
-           // var bhst = (from rcc in ramssisCleaningContex.BillHistories
-             //             select rcc).AsQueryable();
+            // var bhst = (from rcc in ramssisCleaningContex.BillHistories
+            //             select rcc).AsQueryable();
 
 
-               var bhs = ramssisCleaningContex.BillHistories
-                        .Include(b => b.BillDescriptions)
-                        .FirstOrDefault(bhs => bhs.BillNumber == billSearchStatus.keysearch);
+            var bhs = ramssisCleaningContex.BillHistories
+                     .Include(b => b.BillDescriptions)
+                     .FirstOrDefault(bhs => bhs.BillNumber == billSearchStatus.keysearch);
             //select rcc).Where(s => s.BillNumber.ToString().Contains("")).FirstOrDefault();
 
 
@@ -432,14 +432,14 @@ namespace DataBridge
         }
 
         public void SaveCompagnyInfo(CompagniePoco cmpPoco)
-        {   
+        {
             Company CompagnyTemp = new Company();
             Address AdressTemp = new Address();
             Client ClientTemp = new Client();
             CompanyAddress CompagnyAdress = new CompanyAddress();
 
             CompagnyTemp.WorkTypeId = GetWorkTypeId(cmpPoco.WorkFrequency); //default work type id
-            DesactivateOldWorkType(cmpPoco.CompagnieID); 
+            DesactivateOldWorkType(cmpPoco.CompagnieID);
 
 
             // Fill Compagny Info
@@ -469,7 +469,7 @@ namespace DataBridge
             ClientTemp.mail = cmpPoco.ContactMail;
             ClientTemp.phone = cmpPoco.ContactPhones;
 
-            
+
             ClientTemp.CompanyId = cmpPoco.CompagnieID;
 
             CompagnyAdress.AddressId = cmpPoco.AddressID;
@@ -522,7 +522,7 @@ namespace DataBridge
                     CL.name,
                     CL.mail,
                     CL.phone
-                    
+
                 }
                 ).ToList();
 
@@ -548,7 +548,7 @@ namespace DataBridge
                 ContactPhones = cp.phone,
                 PaymentFrequency = cp.PaymentFrequency,
                 WorkFrequency = cp.WorkFrequency,
-                
+
 
             }
             ).ToList();
@@ -603,6 +603,7 @@ namespace DataBridge
             // 🔥 Si le résultat est null → retourner un objet vide (jamais null)
             return result ?? new CompagniePoco();
         }
+
 
         public void UpdateCompagnyInfo(CompagniePoco cmpPocoUp)
         {
@@ -773,15 +774,15 @@ namespace DataBridge
             return workTypeId;
         }
 
-        public List<CompanyPricingCalendarPoco> GetCompanyPricingCalendars(Guid CompanyId) 
+        public List<CompanyPricingCalendarPoco> GetCompanyPricingCalendars(Guid CompanyId)
         {
             List<CompanyPricingCalendarPoco> companyPricingCalendarPocoLSt = new List<CompanyPricingCalendarPoco>();
 
-            List<CompanyPricingCalendar> companyPricingCalendarLst =  ramssisCleaningContex.CompanyPricingCalendars
-                .Where(cpc => cpc.CompanyId == CompanyId && cpc.IsActive ==true )
+            List<CompanyPricingCalendar> companyPricingCalendarLst = ramssisCleaningContex.CompanyPricingCalendars
+                .Where(cpc => cpc.CompanyId == CompanyId && cpc.IsActive == true)
                 .ToList();
 
-            foreach (var wt in companyPricingCalendarLst) 
+            foreach (var wt in companyPricingCalendarLst)
             {
                 companyPricingCalendarPocoLSt.Add(new CompanyPricingCalendarPoco
                 {
@@ -798,5 +799,79 @@ namespace DataBridge
 
 
         }
+
+        public List<CompagniePoco> GetCompagnyByEmployee(Guid EmployeeId)
+        {
+            var companiesQuery =
+                from company in ramssisCleaningContex.Companies
+                join companyAddress in ramssisCleaningContex.CompanyAddresses
+                    on company.CompanyId equals companyAddress.CompanyId
+                join address in ramssisCleaningContex.Addresses
+                    on companyAddress.AddressId equals address.AddressId
+                join client in ramssisCleaningContex.Clients
+                    on company.CompanyId equals client.CompanyId
+                    join employeeCompany in ramssisCleaningContex.EmployeeCompanies
+                    on company.CompanyId equals employeeCompany.CompanyId
+                where employeeCompany.EmployeeId == EmployeeId  //&& company.companyStatus == true
+                //   || company.CompanyCode.Contains(searchKey)
+                select new CompanyInfoDto
+                {
+                    CompanyId = company.CompanyId,
+                    AddressId = address.AddressId,
+                    ClientId = client.clientID,
+
+                    CompanyName = company.companyName,
+                    CompanyStatus = company.companyStatus,
+                    CompanyCode = company.companyCode,
+                    ProviderCode = company.prividercode,
+                    TPSNumber = company.TPSNumber,
+                    TVQNumber = company.TVQNumber,
+                    PaymentFrequency = company.PaymentFrequency,
+                    WorkFrequency = company.WorkFrequency,
+                    Country = address.country,
+                    State = address.state,
+                    City = address.city,
+                    ZipCode = address.zipCode,
+                    Suite = address.suite,
+                    CivicNumber = address.civicNumber,
+                    ContactName = client.name,
+                    ContactEmail = client.mail,
+                    ContactPhone = client.phone
+                };
+
+            var companies = companiesQuery.ToList();
+
+            return companies.Select(MapToPoco).ToList();
+
+
+        }
+
+        private CompagniePoco MapToPoco(CompanyInfoDto dto)
+        {
+            return new CompagniePoco
+            {
+                CompagnieID = dto.CompanyId,
+                AddressID = dto.AddressId,
+                ContactID = dto.ClientId,
+                CompagnieName = dto.CompanyName,
+                CompagnieStatus = dto.CompanyStatus,
+                CompagnieCode = dto.CompanyCode,
+                Compagniecountry = dto.Country,
+                CompagnieState = dto.State,
+                Compagniecity = dto.City,
+                CompagnieZipCode = dto.ZipCode,
+                CompagnieSuite = dto.Suite,
+                CompagnieCivicNumber = dto.CivicNumber,
+                CompagnieProvider = dto.ProviderCode,
+                TPSNumber = dto.TPSNumber,
+                TVQNumber = dto.TVQNumber,
+                ContactName = dto.ContactName,
+                ContactMail = dto.ContactEmail,
+                ContactPhones = dto.ContactPhone,
+                PaymentFrequency = dto.PaymentFrequency,
+                WorkFrequency = dto.WorkFrequency
+            };
+        }
+
     }
 }

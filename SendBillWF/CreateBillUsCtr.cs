@@ -399,11 +399,11 @@ namespace SendBillWF
 
             billSearchStatus.keysearch = BillNbrLbl.Text;
             var bhs = compagniManipulation.GetBillByBillNumber(billSearchStatus).FirstOrDefault();
-            HeadersBill.BillPath = bhs.BillPath;
+            
 
             if (!HeadersBill.IsUpdate)
             {
-                HeadersBill._jobDate = bhs.BilledDate;
+                
                 //HeadersBill.BillHeadersidentifier = bhs.billIdentifier;
 
                 HeadersBill._jobDate = billDate.Value;
@@ -416,7 +416,9 @@ namespace SendBillWF
             }
             else
             {
-               
+                HeadersBill.BillPath = bhs.BillPath;
+                HeadersBill._jobDate = bhs.BilledDate;
+
             }
 
 

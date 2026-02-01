@@ -31,8 +31,11 @@
             panel1 = new Panel();
             EmployeetreeView = new TreeView();
             SearchEmployeeTxt = new TextBox();
-            CompagnyByEmployeeUctr1 = new VisitWorkSheetUctr();
+            WeeklyDtg = new DataGridView();
+            BiWeeklyDtg = new DataGridView();
             panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)WeeklyDtg).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)BiWeeklyDtg).BeginInit();
             SuspendLayout();
             // 
             // panel1
@@ -59,23 +62,35 @@
             SearchEmployeeTxt.Size = new Size(254, 23);
             SearchEmployeeTxt.TabIndex = 0;
             // 
-            // CompagnyByEmployeeUctr1
+            // WeeklyDtg
             // 
-            CompagnyByEmployeeUctr1.Location = new Point(286, 172);
-            CompagnyByEmployeeUctr1.Name = "CompagnyByEmployeeUctr1";
-            CompagnyByEmployeeUctr1.Size = new Size(990, 365);
-            CompagnyByEmployeeUctr1.TabIndex = 6;
+            WeeklyDtg.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            WeeklyDtg.Location = new Point(333, 198);
+            WeeklyDtg.Name = "WeeklyDtg";
+            WeeklyDtg.Size = new Size(876, 200);
+            WeeklyDtg.TabIndex = 2;
+            // 
+            // BiWeeklyDtg
+            // 
+            BiWeeklyDtg.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            BiWeeklyDtg.Location = new Point(333, 433);
+            BiWeeklyDtg.Name = "BiWeeklyDtg";
+            BiWeeklyDtg.Size = new Size(876, 200);
+            BiWeeklyDtg.TabIndex = 3;
             // 
             // AssignedEmployeePriceToCompagny
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(CompagnyByEmployeeUctr1);
+            Controls.Add(BiWeeklyDtg);
+            Controls.Add(WeeklyDtg);
             Controls.Add(panel1);
             Name = "AssignedEmployeePriceToCompagny";
             Size = new Size(1311, 808);
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)WeeklyDtg).EndInit();
+            ((System.ComponentModel.ISupportInitialize)BiWeeklyDtg).EndInit();
             ResumeLayout(false);
         }
 
@@ -87,6 +102,7 @@
         private VisitWorkSheetUctr visitWorkSheetUctr1;
         private TreeView EmployeetreeView;
         private TextBox SearchEmployeeTxt;
-        private VisitWorkSheetUctr CompagnyByEmployeeUctr1;
+        private DataGridView WeeklyDtg;
+        private DataGridView BiWeeklyDtg;
     }
 }
