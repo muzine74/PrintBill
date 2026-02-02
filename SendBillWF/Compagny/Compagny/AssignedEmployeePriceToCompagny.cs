@@ -85,61 +85,9 @@ namespace SendBillWF.Compagny.Compagny
                 EmployeePoco employeePoco = employeeManipulation.GetEmployeeById(e.Node.Tag.ToString());
                 EmployeCompagny = compagniManipulation.GetCompagnyByEmployee(employeePoco.EmployeeId);
 
-
-                //visitWorkSheetUctr1.employeePoco = employeePoco;
-                //WeekToFillData();
-
-                //employeeUsSchedulair.NameEmployee = employeePoco.EmployeeName;
-                //employeeUsSchedulair.MailEmployee = employeePoco.EmployeeMail;
-                //employeeUsSchedulair.PhoneEmployee = employeePoco.EmployeePhone;
-
             }
 
-            //EmployeCompagnyWekly    = EmployeCompagny.Where(c => c.WorkFrequency == "Par visite"|| c.WorkFrequency == "Hebdomadaire").ToList();
-            //EmployeCompagnyBiweekly = EmployeCompagny.Where(c => c.WorkFrequency == "Bi-hebdomadaire" || c.WorkFrequency == "Bi-mensuel").ToList();
-
-
-            //// contient tous les prix active pour tous les compagny  relier a ce emplyè
-            //var t = workManipulation.GetCompanyPricingCalendarsList(EmployeCompagny);
-
-
-            EmployeCompagnyWekly = EmployeCompagny.Where(c => c.WorkFrequency == "Par visite" || c.WorkFrequency == "Hebdomadaire").ToList();
-            EmployeCompagnyBiweekly = EmployeCompagny.Where(c => c.WorkFrequency == "Bi-hebdomadaire" || c.WorkFrequency == "Bi-mensuel").ToList();
-
-
-            // contient tous les prix active pour tous les compagny  relier a ce emplyè
-            var EmployeCompagnyWeekly = workManipulation.GetCompanyPricingCalendarsList(EmployeCompagnyWekly);
-            var EmployeCompagnyBiwekly = workManipulation.GetCompanyPricingCalendarsList(EmployeCompagnyBiweekly);
-
-
-            //il faut creer une class pour permet la fluidité des donnèes
-            employeeCompagnyPricingWekklyDto = (from c in EmployeCompagnyWekly
-                                                join p in EmployeCompagnyWeekly on c.CompagnieID equals p.CompanyId
-                                                select new EmployeeCompagnyPricingDto
-                                                {
-                                                    CompanyId = c.CompagnieID,
-                                                    CompagnyCode = c.CompagnieCode,
-                                                    CompagnyName = c.CompagnieName,
-                                                    EmployeeId = employeePoco.EmployeeId,
-                                                    Emplyeepaiment = p.Emplyeepaiment,
-                                                    DaysStatus = p.DaysStatus,
-                                                    Days = p.Days
-                                                }).ToList();
-
-
-            employeeCompagnyPricingBiWeeklyDto = (from c in EmployeCompagnyBiweekly
-                                                  join p in EmployeCompagnyBiwekly on c.CompagnieID equals p.CompanyId
-                                                  select new EmployeeCompagnyPricingDto
-                                                  {
-                                                      CompanyId = c.CompagnieID,
-                                                      CompagnyCode = c.CompagnieCode,
-                                                      CompagnyName = c.CompagnieName,
-                                                      EmployeeId = employeePoco.EmployeeId,
-                                                      Emplyeepaiment = p.Emplyeepaiment,
-                                                      DaysStatus = p.DaysStatus,
-                                                      Days = p.Days
-                                                  }).ToList();
-
+          
             employeeCompagnyPricingBiWeeklyDtoTest = (from c in EmployeCompagny
                                                       join p in workManipulation.GetCompanyPricingCalendarsList(EmployeCompagny) on c.CompagnieID equals p.CompanyId
                                                       select new EmployeeCompagnyPricingDto
@@ -155,25 +103,6 @@ namespace SendBillWF.Compagny.Compagny
 
             LoadWeeklyDataGrid(employeeCompagnyPricingBiWeeklyDtoTest);
 
-            //WeeklyDtg.Refresh();
-            //BiWeeklyDtg.Refresh();
-
-
-
-
-
-
-
-
-        }
-
-        private void WeekToFillData()
-        {
-            //List<DateTime> jours = new List<DateTime>();
-            //DateTime selectedDate = WeekToFill.Value;
-
-            //visitWorkSheetUctr1.FillDaysDateWeek(selectedDate);
-            //visitWorkSheetUctr1.initValueEmployeeSchedular();
         }
 
         private void SaveOriginalTree()
@@ -210,7 +139,7 @@ namespace SendBillWF.Compagny.Compagny
             {
                 var item = new WeeklyDisplayItem
                 {
-                    CompanyId = group.First().CompanyId.ToString(),  // ICI: Conversion en string
+                    CompanyId = group.First().CompanyId.ToString(),
                     CompanyName = group.First().CompagnyName
                 };
 
@@ -253,7 +182,7 @@ namespace SendBillWF.Compagny.Compagny
             {
                 var item = new BiWeeklyDisplayItem
                 {
-                    CompanyId = group.First().CompanyId.ToString(),  // ICI: Conversion en string
+                    //CompanyId = group.First().CompanyId.ToString(),
                     CompanyName = group.First().CompagnyName
                 };
 
@@ -266,27 +195,70 @@ namespace SendBillWF.Compagny.Compagny
                     // Map des noms de colonnes
                     switch (dayKey)
                     {
-                        case "BiWeek1_Monday": item.BiWeek1_Monday = value; break;
-                        case "BiWeek1_Tuesday": item.BiWeek1_Tuesday = value; break;
-                        case "BiWeek1_Wednesday": item.BiWeek1_Wednesday = value; break;
-                        case "BiWeek1_Thursday": item.BiWeek1_Thursday = value; break;
-                        case "BiWeek1_Friday": item.BiWeek1_Friday = value; break;
-                        case "BiWeek1_Saturday": item.BiWeek1_Saturday = value; break;
-                        case "BiWeek1_Sunday": item.BiWeek1_Sunday = value; break;
-                        case "BiWeek2_Monday": item.BiWeek2_Monday = value; break;
-                        case "BiWeek2_Tuesday": item.BiWeek2_Tuesday = value; break;
-                        case "BiWeek2_Wednesday": item.BiWeek2_Wednesday = value; break;
-                        case "BiWeek2_Thursday": item.BiWeek2_Thursday = value; break;
-                        case "BiWeek2_Friday": item.BiWeek2_Friday = value; break;
-                        case "BiWeek2_Saturday": item.BiWeek2_Saturday = value; break;
-                        case "BiWeek2_Sunday": item.BiWeek2_Sunday = value; break;
+                        case "BiWeek1_Monday":
+                            item.BiWeek1_Monday = value;
+                            item.IsBiWeek1_MondayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek1_Tuesday":
+                            item.BiWeek1_Tuesday = value;
+                            item.IsBiWeek1_TuesdayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek1_Wednesday":
+                            item.BiWeek1_Wednesday = value;
+                            item.IsBiWeek1_WednesdayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek1_Thursday":
+                            item.BiWeek1_Thursday = value;
+                            item.IsBiWeek1_ThursdayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek1_Friday":
+                            item.BiWeek1_Friday = value;
+                            item.IsBiWeek1_FridayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek1_Saturday":
+                            item.BiWeek1_Saturday = value;
+                            item.IsBiWeek1_SaturdayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek1_Sunday":
+                            item.BiWeek1_Sunday = value;
+                            item.IsBiWeek1_SundayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek2_Monday":
+                            item.BiWeek2_Monday = value;
+                            item.IsBiWeek2_MondayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek2_Tuesday":
+                            item.BiWeek2_Tuesday = value;
+                            item.IsBiWeek2_TuesdayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek2_Wednesday":
+                            item.BiWeek2_Wednesday = value;
+                            item.IsBiWeek2_WednesdayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek2_Thursday":
+                            item.BiWeek2_Thursday = value;
+                            item.IsBiWeek2_ThursdayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek2_Friday":
+                            item.BiWeek2_Friday = value;
+                            item.IsBiWeek2_FridayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek2_Saturday":
+                            item.BiWeek2_Saturday = value;
+                            item.IsBiWeek2_SaturdayEditable = record.DaysStatus;
+                            break;
+                        case "BiWeek2_Sunday":
+                            item.BiWeek2_Sunday = value;
+                            item.IsBiWeek2_SundayEditable = record.DaysStatus;
+                            break;
                     }
                 }
 
                 biWeeklyList.Add(item);
             }
 
-            ConfigureDataGridDisplay();
+            
+
             // Définir les DataSource
             WeeklyDtg.DataSource = null;
             WeeklyDtg.DataSource = weeklyList;
@@ -294,9 +266,10 @@ namespace SendBillWF.Compagny.Compagny
             BiWeeklyDtg.DataSource = null;
             BiWeeklyDtg.DataSource = biWeeklyList;
 
-            // Configurer l'affichage des colonnes
+            // Ajouter les événements pour gérer l'édition
             
-
+            ConfigureDataGridDisplay();
+            AddCellEditEvents();
             // Rafraîchir
             WeeklyDtg.Refresh();
             BiWeeklyDtg.Refresh();
@@ -304,17 +277,16 @@ namespace SendBillWF.Compagny.Compagny
 
         private void ConfigureDataGridDisplay()
         {
-            // Pour afficher CompanyId
+            ConfigureWeeklyGrid();
+            ConfigureBiWeeklyGrid();
+        }
+
+        private void ConfigureWeeklyGrid()
+        {
             WeeklyDtg.AutoGenerateColumns = false;
             WeeklyDtg.Columns.Clear();
 
-            // CHOIX: Afficher ou masquer CompanyId
-
-
-            // Option B: Masquer CompanyId - ne pas ajouter cette colonne
-            // OU l'ajouter et la masquer:
-            // WeeklyDtg.Columns["colCompanyId"].Visible = false;
-
+            // Colonne Company Name
             WeeklyDtg.Columns.Add(new DataGridViewTextBoxColumn
             {
                 HeaderText = "Company Name",
@@ -324,42 +296,35 @@ namespace SendBillWF.Compagny.Compagny
                 ReadOnly = true
             });
 
-            // Ajouter les jours
-            string[] days = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-            foreach (var day in days)
-            {
-                var column = new DataGridViewTextBoxColumn
-                {
-                    HeaderText = day,
-                    DataPropertyName = day,
-                    Name = "col" + day,
-                    Width = 100
-                };
-                WeeklyDtg.Columns.Add(column);
-            }
+            // Ajouter les colonnes avec template pour contrôler l'édition
+            AddWeeklyColumn("Monday", "Monday", "IsMondayEditable");
+            AddWeeklyColumn("Tuesday", "Tuesday", "IsTuesdayEditable");
+            AddWeeklyColumn("Wednesday", "Wednesday", "IsWednesdayEditable");
+            AddWeeklyColumn("Thursday", "Thursday", "IsThursdayEditable");
+            AddWeeklyColumn("Friday", "Friday", "IsFridayEditable");
+            AddWeeklyColumn("Saturday", "Saturday", "IsSaturdayEditable");
+            AddWeeklyColumn("Sunday", "Sunday", "IsSundayEditable");
+        }
 
-            // Configurer BiWeekly de la même manière
-            ConfigureBiWeeklyGrid();
+        private void AddWeeklyColumn(string dataPropertyName, string headerText, string editablePropertyName)
+        {
+            // Créer une colonne template pour contrôler l'édition
+            var column = new DataGridViewTextBoxColumn
+            {
+                HeaderText = headerText,
+                DataPropertyName = dataPropertyName,
+                Name = "col" + dataPropertyName,
+                Width = 100,
+                ReadOnly = false // Laisser false, on contrôlera via l'événement
+            };
+
+            WeeklyDtg.Columns.Add(column);
         }
 
         private void ConfigureBiWeeklyGrid()
         {
-            // Désactiver l'auto-génération pour contrôler manuellement
             BiWeeklyDtg.AutoGenerateColumns = false;
             BiWeeklyDtg.Columns.Clear();
-
-            // OPTION 1: Afficher CompanyId (décommentez si nécessaire)
-            /*
-            BiWeeklyDtg.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                HeaderText = "Company ID",
-                DataPropertyName = "CompanyId",
-                Name = "colBiCompanyId",
-                Width = 150,
-                ReadOnly = true,
-                Visible = true // Changez à false pour masquer
-            });
-            */
 
             // Colonne Company Name
             BiWeeklyDtg.Columns.Add(new DataGridViewTextBoxColumn
@@ -367,50 +332,195 @@ namespace SendBillWF.Compagny.Compagny
                 HeaderText = "Company Name",
                 DataPropertyName = "CompanyName",
                 Name = "colBiCompanyName",
-                Width = 100,
+                Width = 150,
                 ReadOnly = true
             });
 
-            // Ajouter les colonnes pour BiWeek 1
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek1_Monday", "1 - Monday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek1_Tuesday", "1 - Tuesday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek1_Wednesday", "1 - Wednesday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek1_Thursday", "1 - Thursday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek1_Friday", "1 - Friday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek1_Saturday", "1 - Saturday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek1_Sunday", "1 - Sunday"));
+            // Ajouter les colonnes BiWeek avec template pour contrôler l'édition
+            AddBiWeeklyColumn("BiWeek1_Monday", "1 - Monday", "IsBiWeek1_MondayEditable");
+            AddBiWeeklyColumn("BiWeek1_Tuesday", "1 - Tuesday", "IsBiWeek1_TuesdayEditable");
+            AddBiWeeklyColumn("BiWeek1_Wednesday", "1 - Wednesday", "IsBiWeek1_WednesdayEditable");
+            AddBiWeeklyColumn("BiWeek1_Thursday", "1 - Thursday", "IsBiWeek1_ThursdayEditable");
+            AddBiWeeklyColumn("BiWeek1_Friday", "1 - Friday", "IsBiWeek1_FridayEditable");
+            AddBiWeeklyColumn("BiWeek1_Saturday", "1 - Saturday", "IsBiWeek1_SaturdayEditable");
+            AddBiWeeklyColumn("BiWeek1_Sunday", "1 - Sunday", "IsBiWeek1_SundayEditable");
 
-            // Ajouter les colonnes pour BiWeek 2
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek2_Monday", "2 - Monday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek2_Tuesday", "2 - Tuesday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek2_Wednesday", "2 - Wednesday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek2_Thursday", "2 - Thursday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek2_Friday", "2 - Friday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek2_Saturday", "2 - Saturday"));
-            BiWeeklyDtg.Columns.Add(CreateBiWeekColumn("BiWeek2_Sunday", "2 - Sunday"));
+            AddBiWeeklyColumn("BiWeek2_Monday", "2 - Monday", "IsBiWeek2_MondayEditable");
+            AddBiWeeklyColumn("BiWeek2_Tuesday", "2 - Tuesday", "IsBiWeek2_TuesdayEditable");
+            AddBiWeeklyColumn("BiWeek2_Wednesday", "2 - Wednesday", "IsBiWeek2_WednesdayEditable");
+            AddBiWeeklyColumn("BiWeek2_Thursday", "2 - Thursday", "IsBiWeek2_ThursdayEditable");
+            AddBiWeeklyColumn("BiWeek2_Friday", "2 - Friday", "IsBiWeek2_FridayEditable");
+            AddBiWeeklyColumn("BiWeek2_Saturday", "2 - Saturday", "IsBiWeek2_SaturdayEditable");
+            AddBiWeeklyColumn("BiWeek2_Sunday", "2 - Sunday", "IsBiWeek2_SundayEditable");
         }
 
-        private DataGridViewColumn CreateBiWeekColumn(string dataPropertyName, string headerText)
+        private void AddBiWeeklyColumn(string dataPropertyName, string headerText, string editablePropertyName)
         {
-            return new DataGridViewTextBoxColumn
+            var column = new DataGridViewTextBoxColumn
             {
                 HeaderText = headerText,
                 DataPropertyName = dataPropertyName,
                 Name = "col" + dataPropertyName,
-                Width = 50,
-                DefaultCellStyle = new DataGridViewCellStyle
+                Width = 80,
+                ReadOnly = false // Contrôlé via événement
+            };
+
+            BiWeeklyDtg.Columns.Add(column);
+        }
+
+        private void AddCellEditEvents()
+        {
+            // Pour le DataGrid Weekly
+            WeeklyDtg.CellBeginEdit += (sender, e) =>
+            {
+                var dgv = sender as DataGridView;
+                if (dgv != null && e.RowIndex >= 0 && e.ColumnIndex >= 0)
                 {
-                    Alignment = DataGridViewContentAlignment.MiddleRight,
-                    Format = "N2" // Format numérique avec 2 décimales
+                    var row = dgv.Rows[e.RowIndex];
+                    var item = row.DataBoundItem as WeeklyDisplayItem;
+
+                    if (item != null)
+                    {
+                        bool isEditable = false;
+                        string columnName = dgv.Columns[e.ColumnIndex].Name;
+
+                        // Déterminer si la cellule est éditable
+                        switch (columnName)
+                        {
+                            case "colMonday":
+                                isEditable = item.IsMondayEditable && !string.IsNullOrEmpty(item.Monday);
+                                break;
+                            case "colTuesday":
+                                isEditable = item.IsTuesdayEditable && !string.IsNullOrEmpty(item.Tuesday);
+                                break;
+                            case "colWednesday":
+                                isEditable = item.IsWednesdayEditable && !string.IsNullOrEmpty(item.Wednesday);
+                                break;
+                            case "colThursday":
+                                isEditable = item.IsThursdayEditable && !string.IsNullOrEmpty(item.Thursday);
+                                break;
+                            case "colFriday":
+                                isEditable = item.IsFridayEditable && !string.IsNullOrEmpty(item.Friday);
+                                break;
+                            case "colSaturday":
+                                isEditable = item.IsSaturdayEditable && !string.IsNullOrEmpty(item.Saturday);
+                                break;
+                            case "colSunday":
+                                isEditable = item.IsSundayEditable && !string.IsNullOrEmpty(item.Sunday);
+                                break;
+                        }
+
+                        // Annuler l'édition si non éditable
+                        if (!isEditable)
+                        {
+                            e.Cancel = true;
+                        }
+                    }
+                }
+            };
+
+            // Pour le DataGrid BiWeekly
+            BiWeeklyDtg.CellBeginEdit += (sender, e) =>
+            {
+                var dgv = sender as DataGridView;
+                if (dgv != null && e.RowIndex >= 0 && e.ColumnIndex >= 0)
+                {
+                    var row = dgv.Rows[e.RowIndex];
+                    var item = row.DataBoundItem as BiWeeklyDisplayItem;
+
+                    if (item != null)
+                    {
+                        bool isEditable = false;
+                        string columnName = dgv.Columns[e.ColumnIndex].Name;
+
+                        // Déterminer si la cellule est éditable
+                        switch (columnName)
+                        {
+                            case "colBiWeek1_Monday":
+                                isEditable = item.IsBiWeek1_MondayEditable && !string.IsNullOrEmpty(item.BiWeek1_Monday);
+                                break;
+                            case "colBiWeek1_Tuesday":
+                                isEditable = item.IsBiWeek1_TuesdayEditable && !string.IsNullOrEmpty(item.BiWeek1_Tuesday);
+                                break;
+                            case "colBiWeek1_Wednesday":
+                                isEditable = item.IsBiWeek1_WednesdayEditable && !string.IsNullOrEmpty(item.BiWeek1_Wednesday);
+                                break;
+                            case "colBiWeek1_Thursday":
+                                isEditable = item.IsBiWeek1_ThursdayEditable && !string.IsNullOrEmpty(item.BiWeek1_Thursday);
+                                break;
+                            case "colBiWeek1_Friday":
+                                isEditable = item.IsBiWeek1_FridayEditable && !string.IsNullOrEmpty(item.BiWeek1_Friday);
+                                break;
+                            case "colBiWeek1_Saturday":
+                                isEditable = item.IsBiWeek1_SaturdayEditable && !string.IsNullOrEmpty(item.BiWeek1_Saturday);
+                                break;
+                            case "colBiWeek1_Sunday":
+                                isEditable = item.IsBiWeek1_SundayEditable && !string.IsNullOrEmpty(item.BiWeek1_Sunday);
+                                break;
+                            case "colBiWeek2_Monday":
+                                isEditable = item.IsBiWeek2_MondayEditable && !string.IsNullOrEmpty(item.BiWeek2_Monday);
+                                break;
+                            case "colBiWeek2_Tuesday":
+                                isEditable = item.IsBiWeek2_TuesdayEditable && !string.IsNullOrEmpty(item.BiWeek2_Tuesday);
+                                break;
+                            case "colBiWeek2_Wednesday":
+                                isEditable = item.IsBiWeek2_WednesdayEditable && !string.IsNullOrEmpty(item.BiWeek2_Wednesday);
+                                break;
+                            case "colBiWeek2_Thursday":
+                                isEditable = item.IsBiWeek2_ThursdayEditable && !string.IsNullOrEmpty(item.BiWeek2_Thursday);
+                                break;
+                            case "colBiWeek2_Friday":
+                                isEditable = item.IsBiWeek2_FridayEditable && !string.IsNullOrEmpty(item.BiWeek2_Friday);
+                                break;
+                            case "colBiWeek2_Saturday":
+                                isEditable = item.IsBiWeek2_SaturdayEditable && !string.IsNullOrEmpty(item.BiWeek2_Saturday);
+                                break;
+                            case "colBiWeek2_Sunday":
+                                isEditable = item.IsBiWeek2_SundayEditable && !string.IsNullOrEmpty(item.BiWeek2_Sunday);
+                                break;
+                        }
+
+                        // Annuler l'édition si non éditable
+                        if (!isEditable)
+                        {
+                            e.Cancel = true;
+                        }
+                    }
+                }
+            };
+
+            // Optionnel: Changer l'apparence des cellules non éditables
+            WeeklyDtg.CellFormatting += (sender, e) =>
+            {
+                var dgv = sender as DataGridView;
+                if (dgv != null && e.RowIndex >= 0 && e.ColumnIndex >= 0)
+                {
+                    var row = dgv.Rows[e.RowIndex];
+                    var item = row.DataBoundItem as WeeklyDisplayItem;
+
+                    if (item != null)
+                    {
+                        bool isEditable = true;
+                        string columnName = dgv.Columns[e.ColumnIndex].Name;
+
+                        // Même logique que pour CellBeginEdit
+                        switch (columnName)
+                        {
+                            case "colMonday":
+                                isEditable = item.IsMondayEditable && !string.IsNullOrEmpty(item.Monday);
+                                break;
+                                // ... autres jours
+                        }
+
+                        if (!isEditable)
+                        {
+                            e.CellStyle.BackColor = Color.Red;
+                            e.CellStyle.ForeColor = Color.Green;
+                        }
+                    }
                 }
             };
         }
 
-
-
-
     }
-
-
-
 }
