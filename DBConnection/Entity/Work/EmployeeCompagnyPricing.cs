@@ -17,5 +17,3 @@ namespace DBConnection.Entity
     }
 }
 
-
-//ecole
