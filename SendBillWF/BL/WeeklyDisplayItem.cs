@@ -9,7 +9,7 @@ namespace SendBillWF.BL
     public class WeeklyDisplayItem
     {
         public string CompanyName { get; set; }
-        public string CompanyId { get; set; }
+        public Guid CompanyId { get; set; }
         public string Monday { get; set; }
         public string Tuesday { get; set; }
         public string Wednesday { get; set; }

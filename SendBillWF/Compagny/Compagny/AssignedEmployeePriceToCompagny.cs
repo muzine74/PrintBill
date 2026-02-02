@@ -27,6 +27,9 @@ namespace SendBillWF.Compagny.Compagny
         List<CompagniePoco> EmployeCompagnyBiweekly;
         WorkManipulation workManipulation;
 
+        private Dictionary<(Guid CompanyId, string Day), decimal> weeklyChanges = new Dictionary<(Guid CompanyId, string Day), decimal>();
+        private Dictionary<(Guid CompanyId, string Day), decimal> biWeeklyChanges = new Dictionary<(Guid CompanyId, string Day), decimal>();
+
         public AssignedEmployeePriceToCompagny()
         {
             InitializeComponent();
@@ -87,7 +90,7 @@ namespace SendBillWF.Compagny.Compagny
 
             }
 
-          
+
             employeeCompagnyPricingBiWeeklyDtoTest = (from c in EmployeCompagny
                                                       join p in workManipulation.GetCompanyPricingCalendarsList(EmployeCompagny) on c.CompagnieID equals p.CompanyId
                                                       select new EmployeeCompagnyPricingDto
@@ -139,7 +142,7 @@ namespace SendBillWF.Compagny.Compagny
             {
                 var item = new WeeklyDisplayItem
                 {
-                    CompanyId = group.First().CompanyId.ToString(),
+                    CompanyId = group.First().CompanyId, // Fix: Use the Guid directly
                     CompanyName = group.First().CompagnyName
                 };
 
@@ -182,7 +185,7 @@ namespace SendBillWF.Compagny.Compagny
             {
                 var item = new BiWeeklyDisplayItem
                 {
-                    //CompanyId = group.First().CompanyId.ToString(),
+                    CompanyId = group.First().CompanyId,
                     CompanyName = group.First().CompagnyName
                 };
 
@@ -257,7 +260,7 @@ namespace SendBillWF.Compagny.Compagny
                 biWeeklyList.Add(item);
             }
 
-            
+
 
             // Définir les DataSource
             WeeklyDtg.DataSource = null;
@@ -271,6 +274,8 @@ namespace SendBillWF.Compagny.Compagny
 
             ConfigureDataGridDisplay();
             AddCellEditEvents();
+            AddCellValueChangedEvents();
+
             // Rafraîchir
             WeeklyDtg.Refresh();
             BiWeeklyDtg.Refresh();
@@ -327,6 +332,15 @@ namespace SendBillWF.Compagny.Compagny
             BiWeeklyDtg.AutoGenerateColumns = false;
             BiWeeklyDtg.Columns.Clear();
 
+            //BiWeeklyDtg.Columns.Add(new DataGridViewTextBoxColumn
+            //{
+            //    HeaderText = "Company ID",
+            //    DataPropertyName = "CompanyId",
+            //    Name = "colBiCompanyId",
+            //    Width = 150,
+            //    ReadOnly = true,
+            //    Visible = false // Changez à false pour masquer
+            //}); 
             // Colonne Company Name
             BiWeeklyDtg.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -794,5 +808,353 @@ namespace SendBillWF.Compagny.Compagny
                 }
             }
         }
+
+
+        private void AddCellValueChangedEvents()
+        {
+            // Pour le DataGrid Weekly
+            WeeklyDtg.CellValueChanged += (sender, e) =>
+            {
+                if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+                {
+                    HandleWeeklyCellValueChanged(e.RowIndex, e.ColumnIndex);
+                }
+            };
+
+            // Pour le DataGrid BiWeekly
+            BiWeeklyDtg.CellValueChanged += (sender, e) =>
+            {
+                if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+                {
+                    HandleBiWeeklyCellValueChanged(e.RowIndex, e.ColumnIndex);
+                }
+            };
+
+            // Pour gérer la validation de l'entrée
+            WeeklyDtg.CellValidating += (sender, e) =>
+            {
+                ValidateCellInput(WeeklyDtg, e.RowIndex, e.ColumnIndex, e);
+            };
+
+            BiWeeklyDtg.CellValidating += (sender, e) =>
+            {
+                ValidateCellInput(BiWeeklyDtg, e.RowIndex, e.ColumnIndex, e);
+            };
+        }
+
+        private void ValidateCellInput(DataGridView dgv, int rowIndex, int columnIndex, DataGridViewCellValidatingEventArgs e)
+        {
+            if (columnIndex  != 0 && dgv.Columns[columnIndex].Name.StartsWith("col") &&
+                dgv.Columns[columnIndex].Name != "colCompanyName")
+            {
+                if (!string.IsNullOrEmpty(e.FormattedValue?.ToString()))
+                {
+                    if (!decimal.TryParse(e.FormattedValue.ToString(), out decimal value))
+                    {
+                        MessageBox.Show("Veuillez entrer une valeur numérique valide.",
+                            "Erreur de saisie",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                        e.Cancel = true;
+                    }
+                    else if (value < 0)
+                    {
+                        MessageBox.Show("La valeur ne peut pas être négative.",
+                            "Erreur de saisie",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                        e.Cancel = true;
+                    }
+                }
+            }
+        }
+
+        private void HandleWeeklyCellValueChanged(int rowIndex, int columnIndex)
+        {
+            var row = WeeklyDtg.Rows[rowIndex];
+            var column = WeeklyDtg.Columns[columnIndex];
+
+            if (row.DataBoundItem is WeeklyDisplayItem item && column.Name != "colCompanyName")
+            {
+                string dayColumn = column.Name.Replace("col", "");
+                string newValue = row.Cells[columnIndex].Value?.ToString() ?? "";
+
+                if (Guid.TryParse(item.CompanyId.ToString(), out Guid companyId))
+                {
+                    string dayKey = "";
+
+                    // Mapper le nom de colonne au nom du jour
+                    switch (dayColumn)
+                    {
+                        case "Monday": dayKey = "Weekly_Monday"; break;
+                        case "Tuesday": dayKey = "Weekly_Tuesday"; break;
+                        case "Wednesday": dayKey = "Weekly_Wednesday"; break;
+                        case "Thursday": dayKey = "Weekly_Thursday"; break;
+                        case "Friday": dayKey = "Weekly_Friday"; break;
+                        case "Saturday": dayKey = "Weekly_Saturday"; break;
+                        case "Sunday": dayKey = "Weekly_Sunday"; break;
+                    }
+
+                    if (!string.IsNullOrEmpty(dayKey))
+                    {
+                        if (decimal.TryParse(newValue, out decimal decimalValue))
+                        {
+                            // Convert Guid to int for compatibility with the dictionary key
+                            var key = (companyId, dayKey);
+                            weeklyChanges[key] = decimalValue;
+
+                            // Mettre à jour la couleur pour indiquer un changement
+                            row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
+
+                            Console.WriteLine($"Changement enregistré - CompanyId: {companyId}, Day: {dayKey}, Value: {decimalValue}");
+                        }
+                        else if (string.IsNullOrEmpty(newValue))
+                        {
+                            // Si la valeur est vidée, marquer pour suppression
+                            var key = (companyId, dayKey);
+                            weeklyChanges[key] = 0; // ou une valeur spéciale pour indiquer la suppression
+
+                            // Mettre à jour la couleur
+                            row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
+                        }
+                    }
+                }
+
+                // Récupérer le CompanyId
+                //if (Guid.TryParse(item.CompanyId.ToString(), out Guid companyId))
+                //{
+                //    string dayKey = "";
+
+                //    // Mapper le nom de colonne au nom du jour
+                //    switch (dayColumn)
+                //    {
+                //        case "Monday": dayKey = "Weekly_Monday"; break;
+                //        case "Tuesday": dayKey = "Weekly_Tuesday"; break;
+                //        case "Wednesday": dayKey = "Weekly_Wednesday"; break;
+                //        case "Thursday": dayKey = "Weekly_Thursday"; break;
+                //        case "Friday": dayKey = "Weekly_Friday"; break;
+                //        case "Saturday": dayKey = "Weekly_Saturday"; break;
+                //        case "Sunday": dayKey = "Weekly_Sunday"; break;
+                //    }
+
+                //    if (!string.IsNullOrEmpty(dayKey))
+                //    {
+                //        if (decimal.TryParse(newValue, out decimal decimalValue))
+                //        {
+                //            // Ajouter ou mettre à jour le changement
+                //            var key = (companyId, dayKey);
+                //            weeklyChanges[key] = decimalValue;
+
+                //            // Mettre à jour la couleur pour indiquer un changement
+                //            row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
+
+                //            Console.WriteLine($"Changement enregistré - CompanyId: {companyId}, Day: {dayKey}, Value: {decimalValue}");
+                //        }
+                //        else if (string.IsNullOrEmpty(newValue))
+                //        {
+                //            // Si la valeur est vidée, marquer pour suppression
+                //            var key = (companyId, dayKey);
+                //            weeklyChanges[key] = 0; // ou une valeur spéciale pour indiquer la suppression
+
+                //            // Mettre à jour la couleur
+                //            row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
+                //        }
+                //    }
+                //}
+            }
+        }
+
+        private void HandleBiWeeklyCellValueChanged(int rowIndex, int columnIndex)
+        {
+            var row = BiWeeklyDtg.Rows[rowIndex];
+            var column = BiWeeklyDtg.Columns[columnIndex];
+
+            if (row.DataBoundItem is BiWeeklyDisplayItem item && column.Name.StartsWith("colBiWeek"))
+            {
+                string columnName = column.Name.Replace("col", "");
+                string newValue = row.Cells[columnIndex].Value?.ToString() ?? "";
+
+                // Note: Vous aurez besoin d'un moyen de récupérer le CompanyId pour BiWeeklyDisplayItem
+                // Si ce n'est pas disponible, vous devrez l'ajouter à la classe BiWeeklyDisplayItem
+
+                // Pour l'instant, supposons que CompanyId soit disponible ou trouvé d'une autre manière
+                Guid companyId = GetCompanyIdForBiWeeklyItem(item);
+
+                if (companyId != Guid.Empty)
+                {
+                    string dayKey = columnName; // Ex: "BiWeek1_Monday"
+
+                    if (decimal.TryParse(newValue, out decimal decimalValue))
+                    {
+                        // Ajouter ou mettre à jour le changement
+                        var key = (companyId, dayKey);
+                        biWeeklyChanges[key] = decimalValue;
+
+                        // Mettre à jour la couleur pour indiquer un changement
+                        row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
+
+                        Console.WriteLine($"Changement BiWeekly enregistré - CompanyId: {companyId}, Day: {dayKey}, Value: {decimalValue}");
+                    }
+                    else if (string.IsNullOrEmpty(newValue))
+                    {
+                        // Si la valeur est vidée
+                        var key = (companyId, dayKey);
+                        biWeeklyChanges[key] = 0;
+
+                        row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
+                    }
+                }
+            }
+        }
+
+        // Méthode pour obtenir le CompanyId pour un item BiWeekly
+        private Guid GetCompanyIdForBiWeeklyItem(BiWeeklyDisplayItem item)
+        {
+            // Implémentez la logique pour récupérer le CompanyId
+            // Cela dépend de comment vos données sont structurées
+            // Vous pourriez avoir besoin d'un dictionnaire de mapping ou d'une autre méthode
+
+            // Exemple temporaire - vous devrez adapter ceci
+            return item.CompanyId; // À remplacer par la logique appropriée
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            SaveChanges();
+        }
+        private void SaveChanges()
+        {
+            try
+            {
+                bool hasChanges = weeklyChanges.Count > 0 || biWeeklyChanges.Count > 0;
+
+                if (!hasChanges)
+                {
+                    MessageBox.Show("Aucun changement à sauvegarder.",
+                        "Information",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                    return;
+                }
+
+                var result = MessageBox.Show($"Voulez-vous sauvegarder {weeklyChanges.Count + biWeeklyChanges.Count} changement(s)?",
+                    "Confirmation",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    // Désactiver le bouton de sauvegarde pendant l'opération
+                    btnSave.Enabled = false;
+                    Cursor.Current = Cursors.WaitCursor;
+
+                    // Sauvegarder les changements Weekly
+                    if (weeklyChanges.Count > 0)
+                    {
+                        SaveWeeklyChangesAsync();
+                    }
+
+                    // Sauvegarder les changements BiWeekly
+                    if (biWeeklyChanges.Count > 0)
+                    {
+                        SaveBiWeeklyChangesAsync();
+                    }
+
+                    // Réinitialiser les dictionnaires de changements
+                    weeklyChanges.Clear();
+                    biWeeklyChanges.Clear();
+
+                    // Recharger les données si nécessaire
+                    // await LoadDataAsync();
+
+                    MessageBox.Show("Les changements ont été sauvegardés avec succès!",
+                        "Succès",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    // Réappliquer les styles pour enlever la couleur jaune
+                    AppliquerStylesCellules();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors de la sauvegarde: {ex.Message}",
+                    "Erreur",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            finally
+            {
+                btnSave.Enabled = true;
+                Cursor.Current = Cursors.Default;
+            }
+        }
+
+        private void SaveWeeklyChangesAsync()
+        {
+            // Implémentez la logique de sauvegarde pour les données Weekly
+            // Exemple avec Entity Framework (adaptez à votre contexte)
+
+            /*
+            using (var context = new YourDbContext())
+            {
+                foreach (var change in weeklyChanges)
+                {
+                    var (companyId, day) = change.Key;
+                    var newValue = change.Value;
+
+                    // Trouver l'enregistrement existant
+                    var record = await context.EmployeeCompagnyPricing
+                        .FirstOrDefaultAsync(r => r.CompanyId == companyId && r.Days == day);
+
+                    if (record != null)
+                    {
+                        // Mettre à jour la valeur
+                        record.Emplyeepaiment = newValue;
+                        record.ModifiedDate = DateTime.Now;
+                        // Ajoutez d'autres champs de suivi si nécessaire
+                    }
+                }
+
+                await context.SaveChangesAsync();
+            }
+            */
+
+            // Pour l'instant, simulez la sauvegarde
+            Console.WriteLine($"Sauvegarde de {weeklyChanges.Count} changements Weekly...");
+
+        }
+
+        private async Task SaveBiWeeklyChangesAsync()
+        {
+            // Implémentez la logique de sauvegarde pour les données BiWeekly
+
+            /*
+            using (var context = new YourDbContext())
+            {
+                foreach (var change in biWeeklyChanges)
+                {
+                    var (companyId, day) = change.Key;
+                    var newValue = change.Value;
+
+                    var record = await context.EmployeeCompagnyPricing
+                        .FirstOrDefaultAsync(r => r.CompanyId == companyId && r.Days == day);
+
+                    if (record != null)
+                    {
+                        record.Emplyeepaiment = newValue;
+                        record.ModifiedDate = DateTime.Now;
+                    }
+                }
+
+                await context.SaveChangesAsync();
+            }
+            */
+
+            Console.WriteLine($"Sauvegarde de {biWeeklyChanges.Count} changements BiWeekly...");
+
+        }
+
+
     }
 }

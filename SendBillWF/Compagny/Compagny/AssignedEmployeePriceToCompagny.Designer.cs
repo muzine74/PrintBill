@@ -33,6 +33,7 @@
             SearchEmployeeTxt = new TextBox();
             WeeklyDtg = new DataGridView();
             BiWeeklyDtg = new DataGridView();
+            btnSave = new Button();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)WeeklyDtg).BeginInit();
             ((System.ComponentModel.ISupportInitialize)BiWeeklyDtg).BeginInit();
@@ -78,10 +79,21 @@
             BiWeeklyDtg.Size = new Size(876, 200);
             BiWeeklyDtg.TabIndex = 3;
             // 
+            // btnSave
+            // 
+            btnSave.Location = new Point(368, 701);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(75, 23);
+            btnSave.TabIndex = 4;
+            btnSave.Text = "Sauvegarder";
+            btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += btnSave_Click;
+            // 
             // AssignedEmployeePriceToCompagny
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(btnSave);
             Controls.Add(BiWeeklyDtg);
             Controls.Add(WeeklyDtg);
             Controls.Add(panel1);
@@ -104,5 +116,6 @@
         private TextBox SearchEmployeeTxt;
         private DataGridView WeeklyDtg;
         private DataGridView BiWeeklyDtg;
+        private Button btnSave;
     }
 }
