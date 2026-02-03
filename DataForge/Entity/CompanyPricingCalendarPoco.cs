@@ -8,6 +8,7 @@ namespace DataBridge.Entity
 {
     public class CompanyPricingCalendarPoco
     {
+        public Guid CompanyPricingCalendarId { get; set; }
         public string Days { get; set; }
         public bool DaysStatus { get; set; }
         public decimal CopagnyBenifictPrice { get; set; }

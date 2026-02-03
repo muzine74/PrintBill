@@ -49,38 +49,6 @@ namespace DataBridge
 
         }
 
-        //public void GetCompagnyListByID(Guid guid)
-        //{
-        //    workPoco.companyLst.Clear();
-        //    var foundCompany = ramssisCleaningContex.Companies.Where(a => a.CompanyId.Equals(guid));
-
-        //    if (foundCompany.Count() > 0) // Check if the collection has any elements
-        //    {
-        //        workPoco.companyLst = foundCompany.ToList();
-        //    }
-        //    else
-        //    {
-        //        //throw new InvalidOperationException($"Company with ID {guid} not found.");
-        //    }
-        //}
-
-
-
-        //public void GetWorkListById(Guid WorkId)
-        //{
-        //    workPoco.workLst.Clear();
-
-        //    var foundWorkLst = ramssisCleaningContex.Works.Where(a => a.WorkId == WorkId);
-        //    if (foundWorkLst.Any())
-        //    {
-        //        workPoco.workLst = foundWorkLst.ToList();               
-        //    }
-        //    else
-        //    {
-        //        //throw new InvalidOperationException($"Work with ID {id} not found.");
-        //    }            
-        //}
-
         public void GetWorkListByCompagnyEmployeeId()
         {
             workPoco.workLst.Clear();

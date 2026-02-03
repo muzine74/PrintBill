@@ -27,8 +27,8 @@ namespace SendBillWF.Compagny.Compagny
         List<CompagniePoco> EmployeCompagnyBiweekly;
         WorkManipulation workManipulation;
 
-        private Dictionary<(Guid CompanyId, string Day), decimal> weeklyChanges = new Dictionary<(Guid CompanyId, string Day), decimal>();
-        private Dictionary<(Guid CompanyId, string Day), decimal> biWeeklyChanges = new Dictionary<(Guid CompanyId, string Day), decimal>();
+        private Dictionary<(Guid CompanyPricingCalendarId,Guid EmployeeId, string Day), decimal> weeklyChanges = new Dictionary<(Guid CompanyPricingCalendarId, Guid EmployeeId, string Day), decimal>();
+        private Dictionary<(Guid CompanyPricingCalendarId, Guid EmployeeId, string Day), decimal> biWeeklyChanges = new Dictionary<(Guid CompanyPricingCalendarId, Guid EmployeeId, string Day), decimal>();
 
         public AssignedEmployeePriceToCompagny()
         {
@@ -76,6 +76,7 @@ namespace SendBillWF.Compagny.Compagny
         private void EmployeetreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             List<CompagniePoco> EmployeCompagny = new List<CompagniePoco>();
+            EmployeePoco employeePoco = new EmployeePoco();
             List<EmployeeCompagnyPricingDto> employeeCompagnyPricingWekklyDto = new List<EmployeeCompagnyPricingDto>();
             List<EmployeeCompagnyPricingDto> employeeCompagnyPricingBiWeeklyDto = new List<EmployeeCompagnyPricingDto>();
             List<EmployeeCompagnyPricingDto> employeeCompagnyPricingBiWeeklyDtoTest = new List<EmployeeCompagnyPricingDto>();
@@ -85,7 +86,7 @@ namespace SendBillWF.Compagny.Compagny
                 var employeeId = new Guid(e.Node.Tag.ToString());
 
                 //visitWorkSheetUctr1.updateCompagnyList();
-                EmployeePoco employeePoco = employeeManipulation.GetEmployeeById(e.Node.Tag.ToString());
+                employeePoco = employeeManipulation.GetEmployeeById(e.Node.Tag.ToString());
                 EmployeCompagny = compagniManipulation.GetCompagnyByEmployee(employeePoco.EmployeeId);
 
             }
@@ -95,6 +96,7 @@ namespace SendBillWF.Compagny.Compagny
                                                       join p in workManipulation.GetCompanyPricingCalendarsList(EmployeCompagny) on c.CompagnieID equals p.CompanyId
                                                       select new EmployeeCompagnyPricingDto
                                                       {
+                                                          CompanyPricingCalendarId = p.CompanyPricingCalendarId,
                                                           CompanyId = c.CompagnieID,
                                                           CompagnyCode = c.CompagnieCode,
                                                           CompagnyName = c.CompagnieName,
@@ -135,13 +137,15 @@ namespace SendBillWF.Compagny.Compagny
             // Convertir en listes pour DataGrid
             var weeklyList = new List<WeeklyDisplayItem>();
             var biWeeklyList = new List<BiWeeklyDisplayItem>();
-
+            
             // Traitement des données Weekly
             var weeklyGroups = weeklyData.GroupBy(d => d.CompanyId);
             foreach (var group in weeklyGroups)
             {
                 var item = new WeeklyDisplayItem
                 {
+                    CompanyPricingCalendarId = group.First().CompanyPricingCalendarId,
+                    EmployeeId = group.First().EmployeeId,
                     CompanyId = group.First().CompanyId, // Fix: Use the Guid directly
                     CompanyName = group.First().CompagnyName
                 };
@@ -185,6 +189,8 @@ namespace SendBillWF.Compagny.Compagny
             {
                 var item = new BiWeeklyDisplayItem
                 {
+                    CompanyPricingCalendarId = group.First().CompanyPricingCalendarId,
+                    EmployeeId = group.First().EmployeeId,
                     CompanyId = group.First().CompanyId,
                     CompanyName = group.First().CompagnyName
                 };
@@ -900,7 +906,7 @@ namespace SendBillWF.Compagny.Compagny
                         if (decimal.TryParse(newValue, out decimal decimalValue))
                         {
                             // Convert Guid to int for compatibility with the dictionary key
-                            var key = (companyId, dayKey);
+                            var key = (item.CompanyPricingCalendarId, item.EmployeeId, dayKey);
                             weeklyChanges[key] = decimalValue;
 
                             // Mettre à jour la couleur pour indiquer un changement
@@ -911,7 +917,7 @@ namespace SendBillWF.Compagny.Compagny
                         else if (string.IsNullOrEmpty(newValue))
                         {
                             // Si la valeur est vidée, marquer pour suppression
-                            var key = (companyId, dayKey);
+                            var key = (item.CompanyPricingCalendarId, item.EmployeeId, dayKey);
                             weeklyChanges[key] = 0; // ou une valeur spéciale pour indiquer la suppression
 
                             // Mettre à jour la couleur
@@ -987,7 +993,7 @@ namespace SendBillWF.Compagny.Compagny
                     if (decimal.TryParse(newValue, out decimal decimalValue))
                     {
                         // Ajouter ou mettre à jour le changement
-                        var key = (companyId, dayKey);
+                        var key = (item.CompanyPricingCalendarId, item.EmployeeId, dayKey);
                         biWeeklyChanges[key] = decimalValue;
 
                         // Mettre à jour la couleur pour indiquer un changement
@@ -998,7 +1004,7 @@ namespace SendBillWF.Compagny.Compagny
                     else if (string.IsNullOrEmpty(newValue))
                     {
                         // Si la valeur est vidée
-                        var key = (companyId, dayKey);
+                        var key = (item.CompanyPricingCalendarId, item.EmployeeId, dayKey);
                         biWeeklyChanges[key] = 0;
 
                         row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
@@ -1120,6 +1126,8 @@ namespace SendBillWF.Compagny.Compagny
             }
             */
 
+            throw new NotImplementedException();
+
             // Pour l'instant, simulez la sauvegarde
             Console.WriteLine($"Sauvegarde de {weeklyChanges.Count} changements Weekly...");
 
@@ -1150,7 +1158,7 @@ namespace SendBillWF.Compagny.Compagny
                 await context.SaveChangesAsync();
             }
             */
-
+            throw new NotImplementedException();
             Console.WriteLine($"Sauvegarde de {biWeeklyChanges.Count} changements BiWeekly...");
 
         }

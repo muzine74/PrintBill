@@ -786,6 +786,7 @@ namespace DataBridge
             {
                 companyPricingCalendarPocoLSt.Add(new CompanyPricingCalendarPoco
                 {
+                    CompanyPricingCalendarId = wt.CompanyPricingCalendarId,
                     Days = wt.Days,
                     DaysStatus = wt.DaysStatus,
                     CopagnyBenifictPrice = wt.CopagnyBenifictPrice,

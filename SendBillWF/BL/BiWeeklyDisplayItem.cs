@@ -10,6 +10,8 @@ namespace SendBillWF.BL
     {
         public string CompanyName { get; set; }
         public Guid CompanyId { get; set; }
+        public Guid CompanyPricingCalendarId { get; set; }
+        public Guid EmployeeId { get; set; }
         public string BiWeek1_Monday { get; set; }
         public string BiWeek1_Tuesday { get; set; }
         public string BiWeek1_Wednesday { get; set; }

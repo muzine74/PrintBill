@@ -9,6 +9,7 @@ namespace SendBillWF.Compagny
     internal class EmployeeCompagnyPricingDto
     {
         Guid Id { get; set; }
+        public Guid CompanyPricingCalendarId { get; set; }
         public Guid EmployeeId { get; set; } = Guid.Empty;
         public bool DaysStatus { get; set; }
         
