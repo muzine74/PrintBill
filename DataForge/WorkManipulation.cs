@@ -321,8 +321,30 @@ namespace DataBridge
             }
 
             return ramssisCleaningContex.CompanyPricingCalendars
-                .Where(cpc => cpc.IsActive && companyIds.Contains(cpc.CompanyId))
+                .Where(cpc => cpc.IsActive.Equals(true) && companyIds.Contains(cpc.CompanyId)) //cpc.IsActive == true &&
                 .ToList();
+        }
+
+        public EmployeeCompagnyPricing GetEmployeeCompagnyPricing(Guid cpcId, Guid empID)
+        {
+            return ramssisCleaningContex.EmployeeCompagnyPricings.Where(ecp => ecp.EmployeeId == empID &&
+                                       ecp.CompanyPricingCalendarId == cpcId &&
+                                       ecp.IsActive.Equals(true)).FirstOrDefault();
+
+            
+        }
+
+        public Guid GetCompanyPricingCalendarsByDaysKey(string daysKey)
+        {
+            if (string.IsNullOrEmpty(daysKey))
+            {
+                return Guid.NewGuid();
+            }
+
+            return ramssisCleaningContex.CompanyPricingCalendars
+                    .Where(cpc => cpc.IsActive && cpc.Days == daysKey)
+                    .Select(cpc => cpc.CompanyPricingCalendarId)
+                    .FirstOrDefault(); 
         }
     }
 }

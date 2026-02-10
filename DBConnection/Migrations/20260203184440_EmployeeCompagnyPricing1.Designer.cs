@@ -4,6 +4,7 @@ using DBConnection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DBConnection.Migrations
 {
     [DbContext(typeof(RamssisCleaningContex))]
-    partial class RamssisCleaningContexModelSnapshot : ModelSnapshot
+    [Migration("20260203184440_EmployeeCompagnyPricing1")]
+    partial class EmployeeCompagnyPricing1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -344,9 +347,6 @@ namespace DBConnection.Migrations
                     b.Property<Guid>("EmployeeCompagnyPricingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ApplicatedDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("CompanyPricingCalendarId")
                         .HasColumnType("uniqueidentifier");

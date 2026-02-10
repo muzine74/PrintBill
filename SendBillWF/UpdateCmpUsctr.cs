@@ -319,7 +319,7 @@ namespace SendBillWF
             {
                 //appeler la fonction pour la mise a jours
                 UpdatevisitFrequencyPricing();
-                compagniManipulation.UpdateCompagnyInfo(compagniePoco);
+                //compagniManipulation.UpdateCompagnyInfo(compagniePoco);
                 SearchUp();
 
             }
@@ -440,30 +440,14 @@ namespace SendBillWF
 
         private void UpdatevisitFrequencyPricing()
         {
-            Guid CompagnyGuid = Guid.NewGuid();
-            Guid AdressGuid = Guid.NewGuid();
-            Guid ClientGuid = Guid.NewGuid();
+            //Guid CompagnyGuid = Guid.NewGuid();
+            //Guid AdressGuid = Guid.NewGuid();
+            //Guid ClientGuid = Guid.NewGuid();
 
             List<VisittFreqPri> visittFreqPri = new List<VisittFreqPri>();
 
             compagniePoco._companyPricingCalendar = visitFrequencyPricingUctrUpdate.GetUpdatedVisitFrequencyPricingList(compagniePoco);
           
-
-            //if (CheckValidField() == true){
-
-            //foreach (var item in compagniePoco._companyPricingCalendar)
-            //    {
-            //        //compagniePoco._companyPricingCalendar.Add(new CompanyPricingCalendar
-            //       // {
-            //            CompanyPricingCalendarId = Guid.NewGuid(),
-            //            CompanyId = CompagnyGuid,
-            //            Days = item.Days,
-            //            CopagnyBenifictPrice = item.CopagnyBenifictPrice,
-            //            Emplyeepaiment = item.Emplyeepaiment,
-            //            ApplicatedDate = DateTime.Now,
-            //            IsActive = true
-            //       // });
-            //    }
 
             for (int i = 0; i < compagniePoco._companyPricingCalendar.Count; i++)
             {

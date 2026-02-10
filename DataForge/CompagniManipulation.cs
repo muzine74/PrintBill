@@ -607,8 +607,13 @@ namespace DataBridge
 
         public void UpdateCompagnyInfo(CompagniePoco cmpPocoUp)
         {
-            var companie = ramssisCleaningContex.Companies.Where(c => c.CompanyId == cmpPocoUp.CompagnieID).First();
-            var Adresse = ramssisCleaningContex.Addresses.Where(c => c.AddressId == cmpPocoUp.AddressID).First();
+            var companie = ramssisCleaningContex.Companies
+                            .Include(c => c.CompanyPricingCalendars)
+                            .Where(c => c.CompanyId == cmpPocoUp.CompagnieID)
+                            .First();
+            var Adresse = ramssisCleaningContex.Addresses
+                            .Where(c => c.AddressId == cmpPocoUp.AddressID)
+                            .First();
             var client = ramssisCleaningContex.Clients.Where(c => c.clientID == cmpPocoUp.ContactID).First();
 
 
@@ -619,7 +624,7 @@ namespace DataBridge
             companie.prividercode = cmpPocoUp.CompagnieProvider;
             companie.PaymentFrequency = cmpPocoUp.PaymentFrequency;
             companie.WorkFrequency = cmpPocoUp.WorkFrequency;
-            companie.CompanyPricingCalendars = cmpPocoUp._companyPricingCalendar;
+            //companie.CompanyPricingCalendars = cmpPocoUp._companyPricingCalendar;
 
             Adresse.country = cmpPocoUp.Compagniecountry;
             Adresse.state = cmpPocoUp.CompagnieState;
@@ -633,6 +638,116 @@ namespace DataBridge
             client.phone = cmpPocoUp.ContactPhones;
             Adresse.country = "Canada";
 
+
+            List<CompanyPricingCalendarPoco> CpcPOldList = new List<CompanyPricingCalendarPoco>();
+            List<CompanyPricingCalendarPoco> CpcPNewList = new List<CompanyPricingCalendarPoco>();
+
+
+            CpcPOldList = companie.CompanyPricingCalendars
+                .Where(x => x.IsActive == true)
+                .Select(x => 
+                    new CompanyPricingCalendarPoco
+                    {
+                        CompanyPricingCalendarId = x.CompanyPricingCalendarId,
+                        Days = x.Days,
+                        DaysStatus = x.DaysStatus,
+                        CopagnyBenifictPrice = x.CopagnyBenifictPrice,
+                        Emplyeepaiment = x.Emplyeepaiment,
+                        IsActive = x.IsActive
+                    }
+                ).ToList();
+
+            // ÉTAPE 1: Mettre à jour une propriété sur TOUS les calendriers existants
+            if (companie.CompanyPricingCalendars != null && companie.CompanyPricingCalendars.Any())
+            {
+                //foreach (var existingCalendar in companie.CompanyPricingCalendars)
+                //{
+                //    // Mettre à jour la propriété spécifique
+                //    // Exemple: mettre à jour le statut ou une autre propriété
+                //    //existingCalendar.Status = "Updated"; // Remplacez par la propriété réelle
+                //      existingCalendar.IsActive = false;
+                //                                         // Ou: existingCalendar.LastModified = DateTime.Now;
+
+                //    // Vous pouvez mettre à jour plusieurs propriétés si nécessaire
+                //    // existingCalendar.SomeProperty = newValue;
+                //}
+            }
+
+            // ÉTAPE 2: Réinsérer la nouvelle liste (ajouter de nouveaux)
+            // Supposons que cmpPocoUp._companyPricingCalendar est la nouvelle liste
+            if (cmpPocoUp._companyPricingCalendar != null && cmpPocoUp._companyPricingCalendar.Any())
+            {
+                companie.CompanyPricingCalendars.ToList().ForEach(item => item.IsActive = false);
+
+                foreach (var newCalendar in cmpPocoUp._companyPricingCalendar)
+                {
+                    // Vérifier si ce calendrier existe déjà (basé sur une clé unique)
+                    // Si vous avez un identifiant unique comme CalendarId ou une combinaison de propriétés
+                    //var exists = companie.CompanyPricingCalendars
+                    //    .Any(cpc => cpc.CompanyPricingCalendarId == newCalendar.CompanyPricingCalendarId); // Adaptez avec votre clé
+
+                    //if (!exists)
+                    //{
+                    // Ajouter comme nouveau
+                    newCalendar.CompanyId = companie.CompanyId; // S'assurer de la relation
+                    companie.CompanyPricingCalendars.Add(newCalendar);
+                    //}
+                    //else
+                    //{
+
+                    //    // Optionnel: Mettre à jour complètement l'existant si trouvé
+                    //    var existing = companie.CompanyPricingCalendars
+                    //        .First(cpc => cpc.CompanyPricingCalendarId == newCalendar.CompanyPricingCalendarId);
+
+                    //    existing.IsActive = false;
+                    //    // ramssisCleaningContex.Entry(existing).CurrentValues.SetValues(newCalendar);
+                    //}
+                }
+            }
+
+            ramssisCleaningContex.SaveChanges();
+
+
+            CpcPNewList = companie.CompanyPricingCalendars
+                .Where(x => x.IsActive == true)
+                .Select(x =>
+                    new CompanyPricingCalendarPoco
+                    {
+                        CompanyPricingCalendarId = x.CompanyPricingCalendarId,
+                        Days = x.Days,
+                        DaysStatus = x.DaysStatus,
+                        CopagnyBenifictPrice = x.CopagnyBenifictPrice,
+                        Emplyeepaiment = x.Emplyeepaiment,
+                        IsActive = x.IsActive
+                    }
+                ).ToList();
+
+
+
+
+            List<(Guid OldId, Guid NewId)> idsPairs = CpcPOldList.Join(
+                CpcPNewList,
+                o => o.Days,
+                n => n.Days,
+                (oldItem, newItem) => (OldId: oldItem.CompanyPricingCalendarId, NewId: newItem.CompanyPricingCalendarId)
+            ).ToList();
+
+
+            UpdateEmployeeCompagnyPricings(idsPairs);
+        }
+
+        private void UpdateEmployeeCompagnyPricings(List<(Guid OldId, Guid NewId)> idsPairs)
+        {
+            foreach (var (OldId, NewId) in idsPairs)
+            {
+                var empCompagnyPricings = ramssisCleaningContex.EmployeeCompagnyPricings
+                    .Where(ecp => ecp.CompanyPricingCalendarId == OldId)
+                    .ToList();
+                foreach (var ecp in empCompagnyPricings)
+                {
+                    ecp.CompanyPricingCalendarId = NewId;
+                }
+            }
             ramssisCleaningContex.SaveChanges();
         }
 
@@ -811,8 +926,8 @@ namespace DataBridge
                     on companyAddress.AddressId equals address.AddressId
                 join client in ramssisCleaningContex.Clients
                     on company.CompanyId equals client.CompanyId
-                    join employeeCompany in ramssisCleaningContex.EmployeeCompanies
-                    on company.CompanyId equals employeeCompany.CompanyId
+                join employeeCompany in ramssisCleaningContex.EmployeeCompanies
+                on company.CompanyId equals employeeCompany.CompanyId
                 where employeeCompany.EmployeeId == EmployeeId  //&& company.companyStatus == true
                 //   || company.CompanyCode.Contains(searchKey)
                 select new CompanyInfoDto
@@ -874,5 +989,37 @@ namespace DataBridge
             };
         }
 
+        public void SaveEmployeePriceChanged(Dictionary<(Guid CompanyPricingCalendarId, Guid EmployeeId, string Day), decimal> EmployeePriceChanged)
+        {
+               foreach (var change in EmployeePriceChanged)
+                {
+
+                EmployeeCompagnyPricing record = ramssisCleaningContex.EmployeeCompagnyPricings
+                            .FirstOrDefault(r => r.CompanyPricingCalendarId == change.Key.CompanyPricingCalendarId
+                            && r.EmployeeId == change.Key.EmployeeId
+                            );
+
+
+                    if (record != null)
+                    {
+                         record.IsActive = false;
+                        // record.ModifiedDate = DateTime.Now;
+                    }
+                    //else
+                    //{
+                        EmployeeCompagnyPricing employeeCompagnyPricing = new EmployeeCompagnyPricing
+                        {
+                            CompanyPricingCalendarId = change.Key.CompanyPricingCalendarId,
+                            EmployeeId = change.Key.EmployeeId,
+                            EmplyeePaiment = change.Value,
+                            IsActive = true,
+                            ApplicatedDate = DateTime.Now
+                        };
+
+                        ramssisCleaningContex.EmployeeCompagnyPricings.Add(employeeCompagnyPricing);
+                    //}              
+                }
+            ramssisCleaningContex.SaveChangesAsync();
+        }
     }
 }

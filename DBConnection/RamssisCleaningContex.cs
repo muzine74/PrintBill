@@ -34,7 +34,8 @@ namespace DBConnection
         public DbSet<WorkType> WorkTypes  { get; set; }
 
         public DbSet<CompanyPricingCalendar> CompanyPricingCalendars { get; set; }
-
+        
+            public DbSet<EmployeeCompagnyPricing> EmployeeCompagnyPricings { get; set; }
 
 
 

@@ -13,7 +13,7 @@ namespace DBConnection.Entity
         public Guid EmployeeId { get; set; }
         public decimal EmplyeePaiment { get; set; }
         public bool IsActive { get; set; }  = false;
-        DateTime ApplicatedDate { get; set; } = DateTime.Now;
+        public DateTime ApplicatedDate { get; set; } = DateTime.Now;
     }
 }
 

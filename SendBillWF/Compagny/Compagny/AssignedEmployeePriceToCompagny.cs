@@ -1,5 +1,6 @@
 ﻿using DataBridge;
 using DataBridge.Entity;
+using DBConnection.Entity;
 using SendBillWF.BL;
 using SendBillWF.Compagny;
 using System;
@@ -77,9 +78,9 @@ namespace SendBillWF.Compagny.Compagny
         {
             List<CompagniePoco> EmployeCompagny = new List<CompagniePoco>();
             EmployeePoco employeePoco = new EmployeePoco();
-            List<EmployeeCompagnyPricingDto> employeeCompagnyPricingWekklyDto = new List<EmployeeCompagnyPricingDto>();
-            List<EmployeeCompagnyPricingDto> employeeCompagnyPricingBiWeeklyDto = new List<EmployeeCompagnyPricingDto>();
-            List<EmployeeCompagnyPricingDto> employeeCompagnyPricingBiWeeklyDtoTest = new List<EmployeeCompagnyPricingDto>();
+            //List<EmployeeCompagnyPricingDto> employeeCompagnyPricingWekklyDto = new List<EmployeeCompagnyPricingDto>();
+            //List<EmployeeCompagnyPricingDto> employeeCompagnyPricingBiWeeklyDto = new List<EmployeeCompagnyPricingDto>();
+            List<EmployeeCompagnyPricingDto> employeeCompagnyPricingDto = new List<EmployeeCompagnyPricingDto>();
 
             if (e.Node.Tag != null)
             {
@@ -92,7 +93,7 @@ namespace SendBillWF.Compagny.Compagny
             }
 
 
-            employeeCompagnyPricingBiWeeklyDtoTest = (from c in EmployeCompagny
+            employeeCompagnyPricingDto = (from c in EmployeCompagny
                                                       join p in workManipulation.GetCompanyPricingCalendarsList(EmployeCompagny) on c.CompagnieID equals p.CompanyId
                                                       select new EmployeeCompagnyPricingDto
                                                       {
@@ -106,7 +107,21 @@ namespace SendBillWF.Compagny.Compagny
                                                           Days = p.Days
                                                       }).ToList();
 
-            LoadWeeklyDataGrid(employeeCompagnyPricingBiWeeklyDtoTest);
+
+            //IL faut aller cherché les paiment specilal pour les emplyéé 
+            EmployeeCompagnyPricing employeeCompagnyPricing ;
+            foreach (var item in employeeCompagnyPricingDto)
+            {
+                
+
+                employeeCompagnyPricing = workManipulation.GetEmployeeCompagnyPricing(item.CompanyPricingCalendarId, item.EmployeeId);
+                if (employeeCompagnyPricing != null)
+                {
+                    item.Emplyeepaiment = employeeCompagnyPricing.EmplyeePaiment;
+                }
+            }
+
+            LoadWeeklyDataGrid(employeeCompagnyPricingDto);
 
         }
 
@@ -144,7 +159,7 @@ namespace SendBillWF.Compagny.Compagny
             {
                 var item = new WeeklyDisplayItem
                 {
-                    CompanyPricingCalendarId = group.First().CompanyPricingCalendarId,
+                   // CompanyPricingCalendarId = group.First().CompanyPricingCalendarId,
                     EmployeeId = group.First().EmployeeId,
                     CompanyId = group.First().CompanyId, // Fix: Use the Guid directly
                     CompanyName = group.First().CompagnyName
@@ -153,6 +168,8 @@ namespace SendBillWF.Compagny.Compagny
                 // Remplir chaque jour séparément
                 foreach (var record in group)
                 {
+                    item.CompanyPricingCalendarId = record.CompanyPricingCalendarId;
+
                     string dayName = record.Days.Replace("Weekly_", "");
                     string value = record.DaysStatus ? record.Emplyeepaiment.ToString() : "";
 
@@ -905,8 +922,10 @@ namespace SendBillWF.Compagny.Compagny
                     {
                         if (decimal.TryParse(newValue, out decimal decimalValue))
                         {
-                            // Convert Guid to int for compatibility with the dictionary key
-                            var key = (item.CompanyPricingCalendarId, item.EmployeeId, dayKey);
+                            // Convert Guid to int for compatibility with the dictionary key  GetCompanyPricingCalendarsByDaysKey()
+
+                            Guid CPCId = workManipulation.GetCompanyPricingCalendarsByDaysKey(dayKey);
+                            var key = (CPCId, item.EmployeeId, dayKey);
                             weeklyChanges[key] = decimalValue;
 
                             // Mettre à jour la couleur pour indiquer un changement
@@ -926,47 +945,7 @@ namespace SendBillWF.Compagny.Compagny
                     }
                 }
 
-                // Récupérer le CompanyId
-                //if (Guid.TryParse(item.CompanyId.ToString(), out Guid companyId))
-                //{
-                //    string dayKey = "";
-
-                //    // Mapper le nom de colonne au nom du jour
-                //    switch (dayColumn)
-                //    {
-                //        case "Monday": dayKey = "Weekly_Monday"; break;
-                //        case "Tuesday": dayKey = "Weekly_Tuesday"; break;
-                //        case "Wednesday": dayKey = "Weekly_Wednesday"; break;
-                //        case "Thursday": dayKey = "Weekly_Thursday"; break;
-                //        case "Friday": dayKey = "Weekly_Friday"; break;
-                //        case "Saturday": dayKey = "Weekly_Saturday"; break;
-                //        case "Sunday": dayKey = "Weekly_Sunday"; break;
-                //    }
-
-                //    if (!string.IsNullOrEmpty(dayKey))
-                //    {
-                //        if (decimal.TryParse(newValue, out decimal decimalValue))
-                //        {
-                //            // Ajouter ou mettre à jour le changement
-                //            var key = (companyId, dayKey);
-                //            weeklyChanges[key] = decimalValue;
-
-                //            // Mettre à jour la couleur pour indiquer un changement
-                //            row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
-
-                //            Console.WriteLine($"Changement enregistré - CompanyId: {companyId}, Day: {dayKey}, Value: {decimalValue}");
-                //        }
-                //        else if (string.IsNullOrEmpty(newValue))
-                //        {
-                //            // Si la valeur est vidée, marquer pour suppression
-                //            var key = (companyId, dayKey);
-                //            weeklyChanges[key] = 0; // ou une valeur spéciale pour indiquer la suppression
-
-                //            // Mettre à jour la couleur
-                //            row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
-                //        }
-                //    }
-                //}
+        
             }
         }
 
@@ -992,8 +971,9 @@ namespace SendBillWF.Compagny.Compagny
 
                     if (decimal.TryParse(newValue, out decimal decimalValue))
                     {
-                        // Ajouter ou mettre à jour le changement
-                        var key = (item.CompanyPricingCalendarId, item.EmployeeId, dayKey);
+                        Guid CPCId = workManipulation.GetCompanyPricingCalendarsByDaysKey(dayKey);
+                        // Ajouter ou mettre à jour le changement    GetCompanyPricingCalendarsByDaysKey()
+                        var key = (CPCId, item.EmployeeId, dayKey);
                         biWeeklyChanges[key] = decimalValue;
 
                         // Mettre à jour la couleur pour indiquer un changement
@@ -1057,13 +1037,13 @@ namespace SendBillWF.Compagny.Compagny
                     // Sauvegarder les changements Weekly
                     if (weeklyChanges.Count > 0)
                     {
-                        SaveWeeklyChangesAsync();
+                        compagniManipulation.SaveEmployeePriceChanged(weeklyChanges);
                     }
 
                     // Sauvegarder les changements BiWeekly
                     if (biWeeklyChanges.Count > 0)
                     {
-                        SaveBiWeeklyChangesAsync();
+                        compagniManipulation.SaveEmployeePriceChanged(biWeeklyChanges);
                     }
 
                     // Réinitialiser les dictionnaires de changements
@@ -1096,72 +1076,72 @@ namespace SendBillWF.Compagny.Compagny
             }
         }
 
-        private void SaveWeeklyChangesAsync()
-        {
-            // Implémentez la logique de sauvegarde pour les données Weekly
-            // Exemple avec Entity Framework (adaptez à votre contexte)
+        //private void SaveWeeklyChangesAsync()
+        //{
+        //    // Implémentez la logique de sauvegarde pour les données Weekly
+        //    // Exemple avec Entity Framework (adaptez à votre contexte)
 
-            /*
-            using (var context = new YourDbContext())
-            {
-                foreach (var change in weeklyChanges)
-                {
-                    var (companyId, day) = change.Key;
-                    var newValue = change.Value;
+        //    /*
+        //    using (var context = new YourDbContext())
+        //    {
+        //        foreach (var change in weeklyChanges)
+        //        {
+        //            var (companyId, day) = change.Key;
+        //            var newValue = change.Value;
 
-                    // Trouver l'enregistrement existant
-                    var record = await context.EmployeeCompagnyPricing
-                        .FirstOrDefaultAsync(r => r.CompanyId == companyId && r.Days == day);
+        //            // Trouver l'enregistrement existant
+        //            var record = await context.EmployeeCompagnyPricing
+        //                .FirstOrDefaultAsync(r => r.CompanyId == companyId && r.Days == day);
 
-                    if (record != null)
-                    {
-                        // Mettre à jour la valeur
-                        record.Emplyeepaiment = newValue;
-                        record.ModifiedDate = DateTime.Now;
-                        // Ajoutez d'autres champs de suivi si nécessaire
-                    }
-                }
+        //            if (record != null)
+        //            {
+        //                // Mettre à jour la valeur
+        //                record.Emplyeepaiment = newValue;
+        //                record.ModifiedDate = DateTime.Now;
+        //                // Ajoutez d'autres champs de suivi si nécessaire
+        //            }
+        //        }
 
-                await context.SaveChangesAsync();
-            }
-            */
+        //        await context.SaveChangesAsync();
+        //    }
+        //    */
 
-            throw new NotImplementedException();
+        //    throw new NotImplementedException();
 
-            // Pour l'instant, simulez la sauvegarde
-            Console.WriteLine($"Sauvegarde de {weeklyChanges.Count} changements Weekly...");
+        //    // Pour l'instant, simulez la sauvegarde
+        //    Console.WriteLine($"Sauvegarde de {weeklyChanges.Count} changements Weekly...");
 
-        }
+        //}
 
-        private async Task SaveBiWeeklyChangesAsync()
-        {
-            // Implémentez la logique de sauvegarde pour les données BiWeekly
+        //private async Task SaveBiWeeklyChangesAsync()
+        //{
+        //    // Implémentez la logique de sauvegarde pour les données BiWeekly
 
-            /*
-            using (var context = new YourDbContext())
-            {
-                foreach (var change in biWeeklyChanges)
-                {
-                    var (companyId, day) = change.Key;
-                    var newValue = change.Value;
+        //    /*
+        //    using (var context = new YourDbContext())
+        //    {
+        //        foreach (var change in biWeeklyChanges)
+        //        {
+        //            var (companyId, day) = change.Key;
+        //            var newValue = change.Value;
 
-                    var record = await context.EmployeeCompagnyPricing
-                        .FirstOrDefaultAsync(r => r.CompanyId == companyId && r.Days == day);
+        //            var record = await context.EmployeeCompagnyPricing
+        //                .FirstOrDefaultAsync(r => r.CompanyId == companyId && r.Days == day);
 
-                    if (record != null)
-                    {
-                        record.Emplyeepaiment = newValue;
-                        record.ModifiedDate = DateTime.Now;
-                    }
-                }
+        //            if (record != null)
+        //            {
+        //                record.Emplyeepaiment = newValue;
+        //                record.ModifiedDate = DateTime.Now;
+        //            }
+        //        }
 
-                await context.SaveChangesAsync();
-            }
-            */
-            throw new NotImplementedException();
-            Console.WriteLine($"Sauvegarde de {biWeeklyChanges.Count} changements BiWeekly...");
+        //        await context.SaveChangesAsync();
+        //    }
+        //    */
+        //    throw new NotImplementedException();
+        //    Console.WriteLine($"Sauvegarde de {biWeeklyChanges.Count} changements BiWeekly...");
 
-        }
+        //}
 
 
     }
