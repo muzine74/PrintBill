@@ -6,6 +6,7 @@ using GDTOSQL.Entity;
 using Helpers.generalHelp;
 using Helpers.GoogleDrive;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Immutable;
 
 
 
@@ -994,20 +995,26 @@ namespace DataBridge
                foreach (var change in EmployeePriceChanged)
                 {
 
-                EmployeeCompagnyPricing record = ramssisCleaningContex.EmployeeCompagnyPricings
-                            .FirstOrDefault(r => r.CompanyPricingCalendarId == change.Key.CompanyPricingCalendarId
-                            && r.EmployeeId == change.Key.EmployeeId
-                            );
+                var record = ramssisCleaningContex.EmployeeCompagnyPricings
+                            .Where(r => r.CompanyPricingCalendarId == change.Key.CompanyPricingCalendarId
+                            && r.EmployeeId == change.Key.EmployeeId && r.IsActive == true
+                            ).ToList();
+                
 
+                foreach (var rec in record)
+                {
+                    rec.IsActive = false;
+                     //rec.ApplicatedDate = DateTime.Now;
+                }
 
-                    if (record != null)
-                    {
-                         record.IsActive = false;
-                        // record.ModifiedDate = DateTime.Now;
-                    }
+                    //if (record.Count > 0)
+                    //{
+                    //     //record.IsActive = false;
+                    //    // record.ModifiedDate = DateTime.Now;
+                    //}
                     //else
                     //{
-                        EmployeeCompagnyPricing employeeCompagnyPricing = new EmployeeCompagnyPricing
+                    EmployeeCompagnyPricing employeeCompagnyPricing = new EmployeeCompagnyPricing
                         {
                             CompanyPricingCalendarId = change.Key.CompanyPricingCalendarId,
                             EmployeeId = change.Key.EmployeeId,

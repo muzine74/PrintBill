@@ -342,7 +342,7 @@ namespace DataBridge
             }
 
             return ramssisCleaningContex.CompanyPricingCalendars
-                    .Where(cpc => cpc.IsActive && cpc.Days == daysKey)
+                    .Where(cpc => cpc.IsActive.Equals(true) && cpc.Days == daysKey)
                     .Select(cpc => cpc.CompanyPricingCalendarId)
                     .FirstOrDefault(); 
         }

@@ -974,7 +974,7 @@ namespace SendBillWF.Compagny.Compagny
                         Guid CPCId = workManipulation.GetCompanyPricingCalendarsByDaysKey(dayKey);
                         // Ajouter ou mettre à jour le changement    GetCompanyPricingCalendarsByDaysKey()
                         var key = (CPCId, item.EmployeeId, dayKey);
-                        biWeeklyChanges[key] = decimalValue;
+                        weeklyChanges[key] = decimalValue;
 
                         // Mettre à jour la couleur pour indiquer un changement
                         row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
@@ -985,7 +985,7 @@ namespace SendBillWF.Compagny.Compagny
                     {
                         // Si la valeur est vidée
                         var key = (item.CompanyPricingCalendarId, item.EmployeeId, dayKey);
-                        biWeeklyChanges[key] = 0;
+                        weeklyChanges[key] = 0;
 
                         row.Cells[columnIndex].Style.BackColor = Color.LightYellow;
                     }
@@ -1014,6 +1014,7 @@ namespace SendBillWF.Compagny.Compagny
             {
                 bool hasChanges = weeklyChanges.Count > 0 || biWeeklyChanges.Count > 0;
 
+
                 if (!hasChanges)
                 {
                     MessageBox.Show("Aucun changement à sauvegarder.",
@@ -1035,16 +1036,9 @@ namespace SendBillWF.Compagny.Compagny
                     Cursor.Current = Cursors.WaitCursor;
 
                     // Sauvegarder les changements Weekly
-                    if (weeklyChanges.Count > 0)
-                    {
                         compagniManipulation.SaveEmployeePriceChanged(weeklyChanges);
-                    }
 
-                    // Sauvegarder les changements BiWeekly
-                    if (biWeeklyChanges.Count > 0)
-                    {
-                        compagniManipulation.SaveEmployeePriceChanged(biWeeklyChanges);
-                    }
+
 
                     // Réinitialiser les dictionnaires de changements
                     weeklyChanges.Clear();
