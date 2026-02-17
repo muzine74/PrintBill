@@ -38,8 +38,8 @@ namespace DataBridge
                         CreateMap<Employee, EmployeePoco>()
                         .ForMember(dest => dest.EmployeeId, opt => opt.MapFrom(src => src.EmployeeId))
                         .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.name))
-                        .ForMember(dest => dest.EmployeeMail, opt => opt.MapFrom(src => src.mail))
-                        .ForMember(dest => dest.EmployeePhone, opt => opt.MapFrom(src => src.phone))
+                        .ForMember(dest => dest.EmployeeMail, opt => opt.MapFrom(src => src.EmployeeMail))
+                        .ForMember(dest => dest.EmployeePhone, opt => opt.MapFrom(src => src.EmployeePhone))
                         .ForMember(dest => dest.EmployeeNote, opt => opt.MapFrom(src => src.notes))
 
                         // Adresse (première)
@@ -118,8 +118,8 @@ namespace DataBridge
                 EmployeeId = employeeId,
                 NAS = emplPoco.NAS,
                 name = emplPoco.EmployeeName,
-                mail = emplPoco.EmployeeMail,
-                phone = emplPoco.EmployeePhone,
+                EmployeeMail = emplPoco.EmployeeMail,
+                EmployeePhone = emplPoco.EmployeePhone,
                 notes = emplPoco.EmployeeNote
             };
 
@@ -178,8 +178,8 @@ namespace DataBridge
                     EmployeeId = ea.Employee.EmployeeId,
                     NAS = ea.Employee.NAS,
                     EmployeeName = ea.Employee.name,
-                    EmployeeMail = ea.Employee.mail,
-                    EmployeePhone = ea.Employee.phone,
+                    EmployeeMail = ea.Employee.EmployeeMail,
+                    EmployeePhone = ea.Employee.EmployeePhone,
                     EmployeeNote = ea.Employee.notes,
 
                     AddressId = ea.Address.AddressId,
@@ -213,8 +213,8 @@ namespace DataBridge
                   EmployeeId = ea.Employee.EmployeeId,
                   NAS = ea.Employee.NAS,
                   EmployeeName = ea.Employee.name,
-                  EmployeeMail = ea.Employee.mail,
-                  EmployeePhone = ea.Employee.phone,
+                  EmployeeMail = ea.Employee.EmployeeMail,
+                  EmployeePhone = ea.Employee.EmployeePhone,
                   EmployeeNote = ea.Employee.notes,
 
                   AddressId = ea.Address.AddressId,
@@ -250,8 +250,8 @@ namespace DataBridge
                   EmployeeId = ea.Employee.EmployeeId,
                   NAS = ea.Employee.NAS,
                   EmployeeName = ea.Employee.name,
-                  EmployeeMail = ea.Employee.mail,
-                  EmployeePhone = ea.Employee.phone,
+                  EmployeeMail = ea.Employee.EmployeeMail,
+                  EmployeePhone = ea.Employee.EmployeePhone,
                   EmployeeNote = ea.Employee.notes,
 
                   AddressId = ea.Address.AddressId,
@@ -292,8 +292,8 @@ namespace DataBridge
 
             employee.NAS = emplPoco.NAS;
             employee.name = emplPoco.EmployeeName;
-            employee.mail = emplPoco.EmployeeMail;
-            employee.phone = emplPoco.EmployeePhone;
+            employee.EmployeeMail = emplPoco.EmployeeMail;
+            employee.EmployeePhone = emplPoco.EmployeePhone;
             employee.notes = emplPoco.EmployeeNote;
 
             var address = context.Addresses

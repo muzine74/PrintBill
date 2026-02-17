@@ -10,8 +10,8 @@ namespace DBConnection.Entity
         public Guid EmployeeId { get; set; }
         public string NAS { get; set; }
         public string name { get; set; }
-        public string? mail { get; set; }
-        public string? phone { get; set; }
+        public string? EmployeeMail { get; set; }
+        public string? EmployeePhone { get; set; }
         public string? notes { get; set; }
 
         public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();

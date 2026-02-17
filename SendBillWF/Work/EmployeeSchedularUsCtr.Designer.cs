@@ -53,7 +53,7 @@
             WeekToFill.Name = "WeekToFill";
             WeekToFill.Size = new Size(200, 23);
             WeekToFill.TabIndex = 1;
-            WeekToFill.ValueChanged += WeekToFill_ValueChanged;
+           // WeekToFill.ValueChanged += WeekToFill_ValueChanged;
             // 
             // label1
             // 
@@ -72,7 +72,7 @@
             SaveWork.TabIndex = 3;
             SaveWork.Text = "Save";
             SaveWork.UseVisualStyleBackColor = true;
-            SaveWork.Click += SaveWork_Click;
+            //SaveWork.Click += SaveWork_Click;
             // 
             // button2
             // 
@@ -89,7 +89,7 @@
             UsersTreeView.Name = "UsersTreeView";
             UsersTreeView.Size = new Size(225, 670);
             UsersTreeView.TabIndex = 10;
-            UsersTreeView.AfterSelect += UsersTreeView_AfterSelect;
+            //UsersTreeView.AfterSelect += UsersTreeView_AfterSelect;
             // 
             // panel1
             // 
@@ -107,7 +107,7 @@
             SearchUserTxt.Name = "SearchUserTxt";
             SearchUserTxt.Size = new Size(219, 23);
             SearchUserTxt.TabIndex = 11;
-            SearchUserTxt.TextChanged += txtSearch_TextChanged;
+            //SearchUserTxt.TextChanged += txtSearch_TextChanged;
             // 
             // employeeUsSchedulair
             // 

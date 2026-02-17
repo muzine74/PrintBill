@@ -276,18 +276,35 @@ namespace SendBillWF
             }
         }
 
+        public void initEmployee(EmployeePoco _employeePoco)
+        {
+            employeePoco = _employeePoco;
+        }
         public void FillDaysDateWeek(DateTime selectedDate)
         {
-
-
             ClearAllCheckBoxes();
+
+            
+            // 1. D'abord récupérer la semaine
             workManipulation.GetWeek(selectedDate);
 
-            initValueCompagnySchedular();
-
-            //workManipulation.initValuefromEmployeeId();
+            // 2. Pour l'affichage employé (vue compagnie)
+            if (employeePoco != null && employeePoco.EmployeeId != Guid.Empty)
+            {
+                workManipulation.initValuefromEmployeeId(employeePoco);
+                var horaire = LoadWorkedCompagyDate();
+                CreerCompagnyColonnes(workManipulation.jours);
+                ChargerCompagnies(workManipulation.jours, horaire);
+            }
+            // 3. Pour l'affichage compagnie (vue employé)
+            else if (compagniePoco != null && compagniePoco.CompagnieID != Guid.Empty)
+            {
+                workManipulation.initValuefromCompagnyId(compagniePoco);
+                var horaire = LoadWorkedEmployeeDate();
+                CreerEmployeeColonnes(workManipulation.jours);
+                ChargerEmployee(workManipulation.jours, horaire);
+            }
         }
-
         private void ClearAllCheckBoxes()
         {
             foreach (Control ctrl in this.Controls)
