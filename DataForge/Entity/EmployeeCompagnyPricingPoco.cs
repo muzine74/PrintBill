@@ -8,10 +8,15 @@ namespace DataBridge.Entity
 {
     public class EmployeeCompagnyPricingPoco
     {
-        public Guid EmployeeCompagnyPricingId { get; set; }
+        Guid Id { get; set; }
         public Guid CompanyPricingCalendarId { get; set; }
-        public Guid EmployeeId { get; set; }
-        public decimal EmplyeePaiment { get; set; }
-        public bool IsActive { get; set; } = false;
+        public Guid EmployeeId { get; set; } = Guid.Empty;
+        public bool DaysStatus { get; set; }
+
+        public decimal Emplyeepaiment { get; set; }
+        public string CompagnyName { get; set; }
+        public Guid CompanyId { get; set; }
+        public string CompagnyCode { get; set; }
+        public string Days { get; set; }
     }
 }

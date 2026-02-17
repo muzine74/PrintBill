@@ -10,6 +10,6 @@ namespace Helpers.PocoGrid
     {
         public string compagnyCode { get; set; }
         public string workdate { get; set; }
-        public int EmployeeID { get; set; }
+        public Guid EmployeeID { get; set; }
     }
 }

@@ -22,6 +22,7 @@ namespace SendBillWF
         //List<DateTime> jours = new List<DateTime>();
         System.Globalization.CultureInfo culture = new System.Globalization.CultureInfo("fr-FR");
         WorkManipulation workManipulation = new WorkManipulation();
+        CompagniManipulation compagniManipulation = new CompagniManipulation();
 
         public EmployeePoco employeePoco ;
         public CompagniePoco compagniePoco;
@@ -362,7 +363,7 @@ namespace SendBillWF
                 }
             }
 
-             workManipulation.SaveWorkLstChanege(dtvToWorkManipPoco);
+            workManipulation.SaveWorkLstChanege(dtvToWorkManipPoco);
 
         }
 

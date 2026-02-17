@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
+
 namespace SendBillWF.Compagny.Compagny
 {
     public partial class AssignedEmployeePriceToCompagny : UserControl
@@ -80,7 +81,7 @@ namespace SendBillWF.Compagny.Compagny
             EmployeePoco employeePoco = new EmployeePoco();
             //List<EmployeeCompagnyPricingDto> employeeCompagnyPricingWekklyDto = new List<EmployeeCompagnyPricingDto>();
             //List<EmployeeCompagnyPricingDto> employeeCompagnyPricingBiWeeklyDto = new List<EmployeeCompagnyPricingDto>();
-            List<EmployeeCompagnyPricingDto> employeeCompagnyPricingDto = new List<EmployeeCompagnyPricingDto>();
+            List<EmployeeCompagnyPricingPoco> employeeCompagnyPricingDto = new List<EmployeeCompagnyPricingPoco>();
 
             if (e.Node.Tag != null)
             {
@@ -95,7 +96,7 @@ namespace SendBillWF.Compagny.Compagny
 
             employeeCompagnyPricingDto = (from c in EmployeCompagny
                                                       join p in workManipulation.GetCompanyPricingCalendarsList(EmployeCompagny) on c.CompagnieID equals p.CompanyId
-                                                      select new EmployeeCompagnyPricingDto
+                                                      select new EmployeeCompagnyPricingPoco
                                                       {
                                                           CompanyPricingCalendarId = p.CompanyPricingCalendarId,
                                                           CompanyId = c.CompagnieID,
@@ -143,7 +144,7 @@ namespace SendBillWF.Compagny.Compagny
         }
 
 
-        private void LoadWeeklyDataGrid(List<EmployeeCompagnyPricingDto> allData)
+        private void LoadWeeklyDataGrid(List<EmployeeCompagnyPricingPoco> allData)
         {
             // Séparer les données
             var weeklyData = allData.Where(d => d.Days != null && d.Days.StartsWith("Weekly_")).ToList();

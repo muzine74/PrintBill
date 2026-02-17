@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Compagny\EmployeeCompagnyPricingDto.cs" />
     <Compile Remove="Employee\EmployeeBase\EmployeeVisitPricingUctr.cs" />
     <Compile Remove="Employee\EmployeeBase\EmployeeVisitPricingUctr.Designer.cs" />
     <Compile Remove="Work\AddWorkUsCtr.cs" />

@@ -28,22 +28,26 @@
         /// </summary>
         private void InitializeComponent()
         {
-            visitFrequencyPricingUctr1 = new SendBillWF.Compagny.CompagnyBase.VisitFrequencyPricingUctr();
+            employeeWorkRepUctr1 = new SendBillWF.Report.EmployeeWorkReport.EmployeeWorkRepUctr();
             SuspendLayout();
             // 
-            // visitFrequencyPricingUctr1
+            // employeeWorkRepUctr1
             // 
-            visitFrequencyPricingUctr1.Location = new Point(118, 58);
-            visitFrequencyPricingUctr1.Name = "visitFrequencyPricingUctr1";
-            visitFrequencyPricingUctr1.Size = new Size(1259, 865);
-            visitFrequencyPricingUctr1.TabIndex = 0;
+            employeeWorkRepUctr1.AutoScroll = true;
+            employeeWorkRepUctr1.BackColor = SystemColors.ActiveCaption;
+            employeeWorkRepUctr1.Dock = DockStyle.Fill;
+            employeeWorkRepUctr1.Location = new Point(0, 0);
+            employeeWorkRepUctr1.Margin = new Padding(0);
+            employeeWorkRepUctr1.Name = "employeeWorkRepUctr1";
+            employeeWorkRepUctr1.Size = new Size(1220, 756);
+            employeeWorkRepUctr1.TabIndex = 0;
             // 
             // test
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1220, 756);
-            Controls.Add(visitFrequencyPricingUctr1);
+            Controls.Add(employeeWorkRepUctr1);
             Name = "test";
             Text = "test";
             ResumeLayout(false);
@@ -51,6 +55,6 @@
 
         #endregion
 
-        private Compagny.CompagnyBase.VisitFrequencyPricingUctr visitFrequencyPricingUctr1;
+        private Report.EmployeeWorkReport.EmployeeWorkRepUctr employeeWorkRepUctr1;
     }
 }
