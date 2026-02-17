@@ -64,7 +64,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
             };
         }
 
-      
+
         private void RemplirPanelInformations(Panel panel)
         {
             panel.Controls.Clear();
@@ -76,46 +76,46 @@ namespace SendBillWF.Report.EmployeeWorkReport
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
                 AutoScroll = false,
-                Padding = new Padding(0)
+                Padding = new Padding(0),
             };
 
-            // Titre
+            // Titre (pas d'emoji, garder Segoe UI normal)
             Label lblTitre = new Label
             {
                 Text = "Rapport de travail des employés",
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                Font = new Font("Segoe UI Emoji", 14, FontStyle.Bold),
                 AutoSize = true,
                 ForeColor = Color.FromArgb(44, 62, 80),
                 Margin = new Padding(0, 0, 0, 10)
             };
             flowLayout.Controls.Add(lblTitre);
 
-            // Période
+            // Période avec emoji 📅
             Label lblPeriode = new Label
             {
                 Text = "📅 Période: Février 2026",
                 AutoSize = true,
-                Font = new Font("Segoe UI", 10),
+                Font = new Font("Segoe UI Emoji", 10), // Police avec support emoji
                 Margin = new Padding(0, 0, 0, 5)
             };
             flowLayout.Controls.Add(lblPeriode);
 
-            // Service
+            // Service avec emoji 🏢
             Label lblService = new Label
             {
                 Text = "🏢 Service: Développement",
                 AutoSize = true,
-                Font = new Font("Segoe UI", 10),
+                Font = new Font("Segoe UI Emoji", 10), // Police avec support emoji
                 Margin = new Padding(0, 0, 0, 5)
             };
             flowLayout.Controls.Add(lblService);
 
-            // Responsable
+            // Responsable avec emoji 👤
             Label lblResponsable = new Label
             {
                 Text = "👤 Responsable: M. Dupont",
                 AutoSize = true,
-                Font = new Font("Segoe UI", 10),
+                Font = new Font("Segoe UI Emoji", 10), // Police avec support emoji
                 Margin = new Padding(0, 0, 0, 5)
             };
             flowLayout.Controls.Add(lblResponsable);
@@ -157,9 +157,9 @@ namespace SendBillWF.Report.EmployeeWorkReport
             // Style du DataGridView
             dgvEmployes.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dgvEmployes.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            dgvEmployes.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+            dgvEmployes.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI Emoji", 10, FontStyle.Bold);
             dgvEmployes.ColumnHeadersHeight = 45;
-            dgvEmployes.DefaultCellStyle.Font = new Font("Segoe UI", 10);
+            dgvEmployes.DefaultCellStyle.Font = new Font("Segoe UI Emoji", 10);
             dgvEmployes.DefaultCellStyle.ForeColor = Color.FromArgb(44, 62, 80);
             dgvEmployes.DefaultCellStyle.Padding = new Padding(5);
             dgvEmployes.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 250);
@@ -193,7 +193,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 FlatAppearance = { BorderSize = 0 },
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Font = new Font("Segoe UI Emoji", 10, FontStyle.Bold),
                 Margin = new Padding(0, 0, 10, 0)
             };
             btnExporter.Click += BtnExporter_Click;
@@ -207,7 +207,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 FlatAppearance = { BorderSize = 0 },
-                Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                Font = new Font("Segoe UI Emoji", 10, FontStyle.Bold)
             };
             panelBoutons.Controls.Add(btnImprimer);
 
@@ -243,22 +243,22 @@ namespace SendBillWF.Report.EmployeeWorkReport
             }
 
             // Cartes de statistiques
-            Panel carte1 = CreerCarteStatistique("👥 Nombre Compagny", statistique.Nombrecompagny.ToString(), Color.FromArgb(20, 20, 50));
+            Panel carte1 = CreerCarteStatistique("🏢 Nombre Compagny", statistique.Nombrecompagny.ToString(), Color.FromArgb(20, 20, 50));
             tableLayout.Controls.Add(carte1, 0, 0);
 
-            Panel carte2 = CreerCarteStatistique("⏱️ Nbr Visites", statistique.NombrVIsites.ToString(), Color.FromArgb(46, 204, 40));
+            Panel carte2 = CreerCarteStatistique("👤 Nbr Visites effectuer", statistique.NombrVIsites.ToString(), Color.FromArgb(46, 204, 40));
             tableLayout.Controls.Add(carte2, 1, 0);
 
-            Panel carte3 = CreerCarteStatistique("💰 Total Paiment", statistique.Totalpaiment.ToString() +" $", Color.FromArgb(155, 89, 40));
+            Panel carte3 = CreerCarteStatistique("💰 Paiment employée", statistique.Totalpaiment.ToString() +" $", Color.FromArgb(46, 204, 40));
             tableLayout.Controls.Add(carte3, 2, 0);
 
-            Panel carte4 = CreerCarteStatistique("💰 Total revenus", "0 €", Color.FromArgb(155, 89, 182));
+            Panel carte4 = CreerCarteStatistique("🏦 Total revenus", "0 $", Color.FromArgb(46, 204, 40));
             tableLayout.Controls.Add(carte4, 3, 0);
 
-            Panel carte5 = CreerCarteStatistique("💰 rendement employé", "0 €", Color.FromArgb(155, 89, 182));
+            Panel carte5 = CreerCarteStatistique("📋 rendement employé", "0 $", Color.FromArgb(46, 204, 40));
             tableLayout.Controls.Add(carte5, 4, 0);
 
-            Panel carte6 = CreerCarteStatistique("💰 Rendement investisement", "0 €", Color.FromArgb(155, 89, 182));
+            Panel carte6 = CreerCarteStatistique("📈 Rendement investisement", "0 $", Color.FromArgb(46, 204, 40));
             tableLayout.Controls.Add(carte6, 5, 0);
 
             // Panel des totaux (prend toute la largeur)
@@ -320,7 +320,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
                 Location = new Point(15, 15),
                 AutoSize = true,
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 11)
+                Font = new Font("Segoe UI Emoji", 11)
             };
             carte.Controls.Add(lblTitre);
 
@@ -330,7 +330,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
                 Location = new Point(15, 45),
                 AutoSize = true,
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 20, FontStyle.Bold)
+                Font = new Font("Segoe UI  Emoji", 20, FontStyle.Bold)
             };
             carte.Controls.Add(lblValeur);
 
@@ -540,16 +540,16 @@ namespace SendBillWF.Report.EmployeeWorkReport
             // Style du DataGridView
             dgvPricing.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dgvPricing.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            dgvPricing.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+            dgvPricing.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI Emoji", 9, FontStyle.Bold);
             dgvPricing.ColumnHeadersHeight = 35;
-            dgvPricing.DefaultCellStyle.Font = new Font("Segoe UI", 9);
+            dgvPricing.DefaultCellStyle.Font = new Font("Segoe UI Emoji", 9);
             dgvPricing.DefaultCellStyle.ForeColor = Color.FromArgb(44, 62, 80);
             dgvPricing.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 250);
             dgvPricing.RowTemplate.Height = 30;
 
             // Ajouter des colonnes
             dgvPricing.Columns.Add("Workdate", "Date");
-            dgvPricing.Columns.Add("EmployePrice", "Prix (€)");
+            dgvPricing.Columns.Add("EmployePrice", "Prix ($)");
 
             // Formater les colonnes
             dgvPricing.Columns["Workdate"].DefaultCellStyle.Format = "dd/MM/yyyy";
@@ -594,7 +594,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
             {
                 Text = $"Nbre de visite : {Convert.ToInt32(pricingData.Count)} Visites",
                 AutoSize = true,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Font = new Font("Segoe UI Emoji", 9, FontStyle.Bold),
                 ForeColor = Color.FromArgb(44, 62, 80),
                 Margin = new Padding(0, 0, 15, 0)
             };
@@ -605,7 +605,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
             {
                 Text = $" Total: {totalPrix} $",
                 AutoSize = true,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Font = new Font("Segoe UI Emoji", 9, FontStyle.Bold),
                 ForeColor = Color.FromArgb(44, 62, 80),
                 Margin = new Padding(0, 0, 15, 0)
             };
@@ -637,7 +637,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
             {
                 Text = $" {pricingData.Count} périodes",
                 AutoSize = true,
-                Font = new Font("Segoe UI", 8),
+                Font = new Font("Segoe UI Emoji", 8),
                 ForeColor = Color.FromArgb(44, 62, 80),
                 Margin = new Padding(0, 0, 15, 0)
             };
@@ -652,7 +652,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
                 {
                     Text = $"📅 Début: {premiere.Workdate:dd/MM/yy}",
                     AutoSize = true,
-                    Font = new Font("Segoe UI", 8),
+                    Font = new Font("Segoe UI Emoji", 8),
                     ForeColor = Color.FromArgb(44, 62, 80),
                     Margin = new Padding(0, 0, 10, 0)
                 };
@@ -662,7 +662,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
                 {
                     Text = $"📅 Fin: {derniere.Workdate:dd/MM/yy}",
                     AutoSize = true,
-                    Font = new Font("Segoe UI", 8),
+                    Font = new Font("Segoe UI Emoji", 8),
                     ForeColor = Color.FromArgb(44, 62, 80)
                 };
                 infoPanel.Controls.Add(lblDateFin);
@@ -681,11 +681,14 @@ namespace SendBillWF.Report.EmployeeWorkReport
 
         private void ChargerDonnees()
         {
+            Guid empInf = ConvertStringToGuid("B7422A1B-3B10-4F2C-9367-59F10DD36D1F");
+            //reste l'intervalle de travaille
+
             WorkManipulation workManipulation = new WorkManipulation();
             CompagniManipulation compagniManipulation = new CompagniManipulation();
             List<EmployeeReport> employeeReports ;
 
-            Guid empInf = ConvertStringToGuid("B7422A1B-3B10-4F2C-9367-59F10DD36D1F");
+            
             List<CompagniePoco> compagniesLst = compagniManipulation.GetCompagnyByEmployee(empInf);
 
 

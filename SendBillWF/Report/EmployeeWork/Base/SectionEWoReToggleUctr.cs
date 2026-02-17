@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace SendBillWF.Report.EmployeeWork.Base
 {
-    public partial class SectionToggleUctr : UserControl  // ← PLUS DE "partial"
+    public partial class SectionToggleUctr : UserControl
     {
         private Button btnToggle;
         private Panel panelContenu;
@@ -13,12 +13,10 @@ namespace SendBillWF.Report.EmployeeWork.Base
 
         public SectionToggleUctr()
         {
-            // InitializeComponent();  // ← SUPPRIMEZ ou COMMENTEZ
-
             this.Height = 35;
             this.Width = 1000;
 
-            // Bouton toggle
+            // Bouton toggle - Version corrigée avec support des emojis
             btnToggle = new Button
             {
                 Dock = DockStyle.Top,
@@ -27,7 +25,7 @@ namespace SendBillWF.Report.EmployeeWork.Base
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 FlatAppearance = { BorderSize = 0 },
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Font = new Font("Segoe UI Emoji", 10, FontStyle.Bold), // Police avec support emoji
                 TextAlign = ContentAlignment.MiddleLeft,
                 Padding = new Padding(15, 0, 0, 0),
                 UseVisualStyleBackColor = false
