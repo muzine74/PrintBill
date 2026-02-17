@@ -42,63 +42,59 @@
             // 
             // visitWorkSheetUctr1
             // 
-            visitWorkSheetUctr1.Location = new Point(258, 208);
+            visitWorkSheetUctr1.Location = new Point(258, 222);
             visitWorkSheetUctr1.Name = "visitWorkSheetUctr1";
-            visitWorkSheetUctr1.Size = new Size(987, 368);
+            visitWorkSheetUctr1.Size = new Size(987, 393);
             visitWorkSheetUctr1.TabIndex = 0;
             // 
             // WeekToFill
             // 
-            WeekToFill.Location = new Point(866, 154);
+            WeekToFill.Location = new Point(866, 164);
             WeekToFill.Name = "WeekToFill";
             WeekToFill.Size = new Size(200, 23);
             WeekToFill.TabIndex = 1;
-           // WeekToFill.ValueChanged += WeekToFill_ValueChanged;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(636, 162);
+            label1.Location = new Point(636, 173);
             label1.Name = "label1";
-            label1.Size = new Size(204, 15);
+            label1.Size = new Size(204, 16);
             label1.TabIndex = 2;
             label1.Text = "Choisir une journée dans la date cible";
             // 
             // SaveWork
             // 
-            SaveWork.Location = new Point(275, 699);
+            SaveWork.Location = new Point(275, 746);
             SaveWork.Name = "SaveWork";
-            SaveWork.Size = new Size(140, 41);
+            SaveWork.Size = new Size(140, 44);
             SaveWork.TabIndex = 3;
-            SaveWork.Text = "Save";
             SaveWork.UseVisualStyleBackColor = true;
-            //SaveWork.Click += SaveWork_Click;
             // 
             // button2
             // 
-            button2.Location = new Point(513, 696);
+            button2.Location = new Point(513, 742);
             button2.Name = "button2";
-            button2.Size = new Size(151, 46);
+            button2.Size = new Size(151, 49);
             button2.TabIndex = 4;
             button2.Text = "button2";
             button2.UseVisualStyleBackColor = true;
             // 
             // UsersTreeView
             // 
-            UsersTreeView.Location = new Point(0, 30);
+            UsersTreeView.Location = new Point(0, 32);
             UsersTreeView.Name = "UsersTreeView";
-            UsersTreeView.Size = new Size(225, 670);
+            UsersTreeView.Size = new Size(225, 714);
             UsersTreeView.TabIndex = 10;
-            //UsersTreeView.AfterSelect += UsersTreeView_AfterSelect;
             // 
             // panel1
             // 
             panel1.BackColor = SystemColors.Window;
             panel1.Controls.Add(SearchUserTxt);
             panel1.Controls.Add(UsersTreeView);
-            panel1.Location = new Point(12, 54);
+            panel1.Location = new Point(12, 58);
             panel1.Name = "panel1";
-            panel1.Size = new Size(225, 700);
+            panel1.Size = new Size(225, 747);
             panel1.TabIndex = 11;
             // 
             // SearchUserTxt
@@ -107,7 +103,6 @@
             SearchUserTxt.Name = "SearchUserTxt";
             SearchUserTxt.Size = new Size(219, 23);
             SearchUserTxt.TabIndex = 11;
-            //SearchUserTxt.TextChanged += txtSearch_TextChanged;
             // 
             // employeeUsSchedulair
             // 
@@ -118,12 +113,12 @@
             employeeUsSchedulair.NasEmployee = "";
             employeeUsSchedulair.NoteEmployee = "";
             employeeUsSchedulair.PhoneEmployee = "";
-            employeeUsSchedulair.Size = new Size(342, 188);
+            employeeUsSchedulair.Size = new Size(342, 201);
             employeeUsSchedulair.TabIndex = 12;
             // 
             // EmployeeSchedularUsCtr
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(7F, 16F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(employeeUsSchedulair);
             Controls.Add(panel1);
@@ -132,8 +127,9 @@
             Controls.Add(label1);
             Controls.Add(WeekToFill);
             Controls.Add(visitWorkSheetUctr1);
+            Font = new Font("Segoe UI Emoji", 9F);
             Name = "EmployeeSchedularUsCtr";
-            Size = new Size(1582, 757);
+            Size = new Size(1582, 807);
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             ResumeLayout(false);
