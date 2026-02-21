@@ -65,17 +65,20 @@
             // 
             // compagniBase
             // 
+            compagniBase.BackColor = Color.FromArgb(250, 250, 250);
             compagniBase.CompagnyBaseAdress = "label6";
-            compagniBase.CompagnyBaseCode = "label5";
+            compagniBase.CompagnyBaseCode = "LABEL5";
+            compagniBase.CompagnyBaseIsActive = false;
             compagniBase.CompagnyBaseName = "label4";
             compagniBase.Location = new Point(293, 30);
             compagniBase.Name = "compagniBase";
-            compagniBase.Size = new Size(628, 181);
+            compagniBase.Padding = new Padding(15);
+            compagniBase.Size = new Size(600, 179);
             compagniBase.TabIndex = 1;
             // 
             // WeekToFill
             // 
-            WeekToFill.Location = new Point(431, 217);
+            WeekToFill.Location = new Point(1039, 216);
             WeekToFill.Name = "WeekToFill";
             WeekToFill.Size = new Size(200, 23);
             WeekToFill.TabIndex = 3;
@@ -84,7 +87,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(294, 220);
+            label1.Location = new Point(907, 224);
             label1.Name = "label1";
             label1.Size = new Size(86, 15);
             label1.TabIndex = 4;
@@ -92,9 +95,9 @@
             // 
             // visitWorkSheetUctr1
             // 
-            visitWorkSheetUctr1.Location = new Point(282, 246);
+            visitWorkSheetUctr1.Location = new Point(286, 259);
             visitWorkSheetUctr1.Name = "visitWorkSheetUctr1";
-            visitWorkSheetUctr1.Size = new Size(990, 365);
+            visitWorkSheetUctr1.Size = new Size(990, 386);
             visitWorkSheetUctr1.TabIndex = 5;
             // 
             // ComapgnySchedularUsCtr

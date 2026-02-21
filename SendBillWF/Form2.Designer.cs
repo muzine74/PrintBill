@@ -3,6 +3,7 @@ using SendBillWF.Compagny.Compagny;
 using SendBillWF.Employee;
 using SendBillWF.Employee.CreatEmployee;
 using SendBillWF.Work;
+using SendBillWF.Report;
 
 namespace SendBillWF
 {
@@ -131,7 +132,7 @@ namespace SendBillWF
             treeNode17.Text = "schedular";
             treeNode18.Name = "V";
             treeNode18.Text = "Visualizer";
-            treeNode19.Name = "Node1";
+            treeNode19.Name = "EmployeeWorkReport";
             treeNode19.Text = "Employee Work Report";
             treeNode20.Name = "Node2";
             treeNode20.Text = "Compagny work Rport";
@@ -180,6 +181,8 @@ namespace SendBillWF
         private UpdateEmployeeUct updateEmployeeUct;
         private ComapgnySchedularUsCtr compagnySchedularUsCtr;
         private AssignedEmployeePriceToCompagny assignedEmployeePriceToCompagny;
+        private EmployeeWorkReportUsCtr employeeWorkReportUsCtr;
+
 
 
         //private UpdateCmpUsctr updateCmpUsctr1;

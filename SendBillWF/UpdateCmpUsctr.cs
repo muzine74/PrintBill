@@ -292,11 +292,13 @@ namespace SendBillWF
 
                 var CompanyPricingCalendars = compagniManipulation.GetCompanyPricingCalendars(compagniePoco.CompagnieID);
 
+                compagniePoco._companyPricingCalendar.Clear();
 
                 foreach (var cpc in CompanyPricingCalendars)
                 {
                     compagniePoco._companyPricingCalendar.Add(new CompanyPricingCalendar
                     {
+                        CompanyPricingCalendarId  = cpc.CompanyPricingCalendarId,
                         Days = cpc.Days,
                         DaysStatus = cpc.DaysStatus,
                         CopagnyBenifictPrice = cpc.CopagnyBenifictPrice,

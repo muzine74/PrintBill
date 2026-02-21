@@ -44,8 +44,8 @@ namespace SendBillWF.Report.EmployeeWorkReport
             this.Padding = new Padding(0);
             this.Margin = new Padding(0);
 
-            InitialiserAvecSectionsReutilisables();
-            ChargerDonnees();
+            //InitialiserAvecSectionsReutilisables();
+            //ChargerDonnees();
 
             // Gérer le redimensionnement
             this.Resize += (s, e) => {
@@ -65,7 +65,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
         }
 
 
-        private void RemplirPanelInformations(Panel panel)
+        private void RemplirPanelInformations(Panel panel , ReportDTO reportDTO)
         {
             panel.Controls.Clear();
 
@@ -82,7 +82,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
             // Titre (pas d'emoji, garder Segoe UI normal)
             Label lblTitre = new Label
             {
-                Text = "Rapport de travail des employés",
+                Text = "Rapport de travail de l'employé : " + reportDTO.ReportName,
                 Font = new Font("Segoe UI Emoji", 14, FontStyle.Bold),
                 AutoSize = true,
                 ForeColor = Color.FromArgb(44, 62, 80),
@@ -93,7 +93,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
             // Période avec emoji 📅
             Label lblPeriode = new Label
             {
-                Text = "📅 Période: Février 2026",
+                Text = "📅 Période  du: " + reportDTO.BeginDate + "   au: "+ reportDTO.EndDate,
                 AutoSize = true,
                 Font = new Font("Segoe UI Emoji", 10), // Police avec support emoji
                 Margin = new Padding(0, 0, 0, 5)
@@ -103,7 +103,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
             // Service avec emoji 🏢
             Label lblService = new Label
             {
-                Text = "🏢 Service: Développement",
+                Text = "🧹✨ Service: Entretien ménager",
                 AutoSize = true,
                 Font = new Font("Segoe UI Emoji", 10), // Police avec support emoji
                 Margin = new Padding(0, 0, 0, 5)
@@ -113,7 +113,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
             // Responsable avec emoji 👤
             Label lblResponsable = new Label
             {
-                Text = "👤 Responsable: M. Dupont",
+                Text = "👤 Responsable: " + reportDTO.Supervisor,
                 AutoSize = true,
                 Font = new Font("Segoe UI Emoji", 10), // Police avec support emoji
                 Margin = new Padding(0, 0, 0, 5)
@@ -423,7 +423,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
             return Guid.Empty;
         }
 
-        private void InitialiserAvecSectionsReutilisables()
+        private void InitialiserAvecSectionsReutilisables(ReportDTO reportDTO)
         {
             var flowPanel = new FlowLayoutPanel
             {
@@ -444,10 +444,13 @@ namespace SendBillWF.Report.EmployeeWorkReport
                 EstDeplie = true
             };
             sectionInfos.DefinirHauteurContenu(150);
-            RemplirPanelInformations(sectionInfos.ContenuPanel);
+            RemplirPanelInformations(sectionInfos.ContenuPanel , reportDTO);
             this.Resize += (s, e) => sectionInfos.Width = this.Width;
             flowPanel.Controls.Add(sectionInfos);
 
+            statistique.Nombrecompagny = 0;
+            statistique.NombrVIsites = 0;
+            statistique.Totalpaiment = 0;
             // SECTION 2: Companies (dynamique depuis le dictionnaire)
             foreach (var item in cpmWorkPriceInf)
             {
@@ -679,25 +682,26 @@ namespace SendBillWF.Report.EmployeeWorkReport
             .ToString("dddd d MMMM yyyy", new CultureInfo("fr-FR"));
         }
 
-        private void ChargerDonnees()
+        public void ChargerDonnees(ReportDTO reportDTO)
         {
-            Guid empInf = ConvertStringToGuid("B7422A1B-3B10-4F2C-9367-59F10DD36D1F");
+            //Guid empInf = ConvertStringToGuid("B7422A1B-3B10-4F2C-9367-59F10DD36D1F");
             //reste l'intervalle de travaille
 
             WorkManipulation workManipulation = new WorkManipulation();
             CompagniManipulation compagniManipulation = new CompagniManipulation();
             List<EmployeeReport> employeeReports ;
 
-            
-            List<CompagniePoco> compagniesLst = compagniManipulation.GetCompagnyByEmployee(empInf);
 
+            cpmWorkPriceInf.Clear();  // Le dictionnaire est maintenant vide            
+
+            List<CompagniePoco> compagniesLst = compagniManipulation.GetCompagnyByEmployee(reportDTO.ReportId);
 
             //List<EmployeeCompagnyPricingPoco>
             foreach (var item in compagniesLst)
             {
                 employeeReports = new List<EmployeeReport>();
 
-                workManipulation.GetWorkListByCompagnyEmployeeId(empInf, item.CompagnieID);
+                workManipulation.GetWorkListByCompagnyEmployeeId(reportDTO.ReportId, item.CompagnieID);
                 foreach (var work in workManipulation.workPoco.workLst)
                 {
                     employeeReports.Add(new EmployeeReport
@@ -711,21 +715,8 @@ namespace SendBillWF.Report.EmployeeWorkReport
                 cpmWorkPriceInf[item.CompagnieName] = employeeReports;
             }
 
-            //var test = workManipulation.GetWorkPrice(empInf,)
-
-            //// Remplir le dictionnaire avec les données réelles
-            //foreach (var cpm in compagniesLst)
-            //{
-            //    if (!cpmWorkPriceInf.ContainsKey(cpm.CompagnieName))
-            //    {
-            //        var pricingData = compagniManipulation.GetCompanyPricingCalendars(cpm.CompagnieID);
-            //        cpmWorkPriceInf[cpm.CompagnieName] = pricingData ?? new List<CompanyPricingCalendarPoco>();
-            //    }
-            //}
-
-            // IMPORTANT: Reconstruire l'interface avec les nouvelles données
             this.Controls.Clear();
-            InitialiserAvecSectionsReutilisables();
+            InitialiserAvecSectionsReutilisables(reportDTO);
         }
     }
 }

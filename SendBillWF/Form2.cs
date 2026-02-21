@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
 using SendBillWF.Compagny.Compagny;
+using SendBillWF.Report;
 
 namespace SendBillWF
 {
@@ -39,6 +40,7 @@ namespace SendBillWF
             updateEmployeeUct = new UpdateEmployeeUct();
             compagnySchedularUsCtr = new ComapgnySchedularUsCtr();
             assignedEmployeePriceToCompagny = new AssignedEmployeePriceToCompagny();
+            employeeWorkReportUsCtr = new EmployeeWorkReportUsCtr();
 
 
             // updateCmpUsctr1.Hide();
@@ -200,12 +202,26 @@ namespace SendBillWF
                 RemoveControl();
 
                 assignedEmployeePriceToCompagny.Location = new Point(201, 33);
-                assignedEmployeePriceToCompagny.Name = "assignedEmployeePriceToCompagny";
+                assignedEmployeePriceToCompagny.Name = "EmployeeWorkReport";
                 assignedEmployeePriceToCompagny.Size = new Size(1750, 900);
                 assignedEmployeePriceToCompagny.TabIndex = 1;
 
                 Controls.Add(assignedEmployeePriceToCompagny);
                 assignedEmployeePriceToCompagny.Show();
+            }
+
+
+            if (e.Node.Name == "EmployeeWorkReport")  //CompagnyShedular
+            {
+                RemoveControl();
+
+                employeeWorkReportUsCtr.Location = new Point(201, 33);
+                employeeWorkReportUsCtr.Name = "employeeWorkReportUsCtr";
+                employeeWorkReportUsCtr.Size = new Size(1750, 900);
+                employeeWorkReportUsCtr.TabIndex = 1;
+
+                Controls.Add(employeeWorkReportUsCtr);
+                employeeWorkReportUsCtr.Show();
             }
 
             //assignedEmployeePriceToCompagny
@@ -226,6 +242,8 @@ namespace SendBillWF
             Controls.Remove(updateEmployeeUct);
             Controls.Remove(compagnySchedularUsCtr);
             Controls.Remove(assignedEmployeePriceToCompagny);
+            Controls.Remove(employeeWorkReportUsCtr);
+
         }
     }
 }
