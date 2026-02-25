@@ -881,6 +881,7 @@ namespace DataBridge
 
             ramssisCleaningContex.SaveChanges();
         }
+        
         private int GetWorkTypeId(string workType)
         {
             int workTypeId = ramssisCleaningContex.WorkTypes
