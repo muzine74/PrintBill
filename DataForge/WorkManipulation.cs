@@ -450,6 +450,14 @@ namespace DataBridge
             }
 
         }
+
+        public List<string> getCompagnyWorkinddays(Guid companyId)
+        {
+            return ramssisCleaningContex.CompanyPricingCalendars
+                .Where(cpc => cpc.CompanyId == companyId && cpc.IsActive == true && cpc.DaysStatus == true)
+                .Select(cpc => cpc.Days) // Sélectionne uniquement la colonne 'Days'
+                .ToList();               // Convertit le résultat en List<string>
+        }
     }
 }
 

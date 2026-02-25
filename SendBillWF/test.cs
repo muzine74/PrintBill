@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GDTOSQL;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,9 +13,17 @@ namespace SendBillWF
 {
     public partial class test : Form
     {
+
+        GoogleDrive googleDrive = new GoogleDrive();
+
         public test()
         {
             InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            googleDrive.DemoGoogleSheetsWithDropdownsAndCalendars();
         }
     }
 }

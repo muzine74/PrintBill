@@ -1,5 +1,6 @@
 ﻿using DataBridge;
 using DataBridge.Entity;
+using Google.Apis.Sheets.v4.Data;
 using Helpers.PocoGrid;
 using iText.Layout.Element;
 using System;
@@ -220,28 +221,47 @@ namespace SendBillWF
 
         private void ChargerCompagnies(List<DateTime> jours, Dictionary<string, HashSet<string>> horaire)
         {
+
+             
             foreach (var item in horaire)
             {
+                //chercher les jours que la compagnie devrais etre travailler
+               var compagnyPoco = compagniManipulation.GetCompagnyByName(item.Key).FirstOrDefault();
+
+                //il faut recuperé le Id item.key c'est le nom
+                var days = workManipulation.getCompagnyWorkinddays(compagnyPoco.CompagnieID).Select(s => s.Replace("Weekly_", "")).ToList();
+
+
+
                 int rowIndex = WorkVisiteDgv.Rows.Add();
                 var row = WorkVisiteDgv.Rows[rowIndex];
 
-                string compagnie = item.Key;
-                row.Cells["Compagnie"].Value = compagnie;
+                row.Cells["Compagnie"].Value = item.Key;
 
                 for (int i = 0; i < jours.Count; i++)
                 {
-                    row.Cells[jours[i].ToString("ddMMyyyy", culture)].Value = item.Value.Contains(jours[i].ToString("ddMMyyyy", culture));
 
-                    bool isChecked = Convert.ToBoolean(row.Cells[jours[i].ToString("ddMMyyyy", culture)].Value);
-
-
-                    if (isChecked)
+                    if(days.Contains(jours[i].DayOfWeek.ToString()))
                     {
-                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = Color.Silver;
+                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Value = item.Value.Contains(jours[i].ToString("ddMMyyyy", culture));
+
+                        bool isChecked = Convert.ToBoolean(row.Cells[jours[i].ToString("ddMMyyyy", culture)].Value);
+
+
+                        if (isChecked)
+                        {
+                            row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = System.Drawing.Color.LightSkyBlue;
+                        }
+                        else
+                        {
+                            row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = System.Drawing.Color.White;
+                        }
                     }
                     else
                     {
-                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = Color.White;
+                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Value = false;
+                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = System.Drawing.Color.LightSteelBlue;
+                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].ReadOnly = true;
                     }
                 }
             }
@@ -266,11 +286,11 @@ namespace SendBillWF
 
                     if (isChecked)
                     {
-                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = Color.Silver;
+                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = System.Drawing.Color.Silver;
                     }
                     else
                     {
-                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = Color.White;
+                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = System.Drawing.Color.White;
                     }
                 }
             }
@@ -329,7 +349,7 @@ namespace SendBillWF
                 //if (isChecked) {
                 //                  }
 
-                cell.Style.BackColor = isChecked ? Color.Silver : Color.White;
+                cell.Style.BackColor = isChecked ? System.Drawing.Color.Silver : System.Drawing.Color.White;
             }
         }
 

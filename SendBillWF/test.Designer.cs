@@ -28,26 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
-            employeeWorkRepUctr1 = new SendBillWF.Report.EmployeeWorkReport.EmployeeWorkRepUctr();
+            button1 = new Button();
             SuspendLayout();
             // 
-            // employeeWorkRepUctr1
+            // button1
             // 
-            employeeWorkRepUctr1.AutoScroll = true;
-            employeeWorkRepUctr1.BackColor = SystemColors.ActiveCaption;
-            employeeWorkRepUctr1.Dock = DockStyle.Fill;
-            employeeWorkRepUctr1.Location = new Point(0, 0);
-            employeeWorkRepUctr1.Margin = new Padding(0);
-            employeeWorkRepUctr1.Name = "employeeWorkRepUctr1";
-            employeeWorkRepUctr1.Size = new Size(1220, 756);
-            employeeWorkRepUctr1.TabIndex = 0;
+            button1.Location = new Point(557, 187);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 0;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // test
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1220, 756);
-            Controls.Add(employeeWorkRepUctr1);
+            Controls.Add(button1);
             Name = "test";
             Text = "test";
             ResumeLayout(false);
@@ -55,6 +54,6 @@
 
         #endregion
 
-        private Report.EmployeeWorkReport.EmployeeWorkRepUctr employeeWorkRepUctr1;
+        private Button button1;
     }
 }

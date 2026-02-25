@@ -123,99 +123,6 @@ namespace SendBillWF.Report.EmployeeWorkReport
             panel.Controls.Add(flowLayout);
         }
 
-        private void RemplirPanelEmployes(Panel panel)
-        {
-            panel.Controls.Clear();
-
-            // Panel conteneur principal
-            TableLayoutPanel tableLayout = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 2,
-                Padding = new Padding(0),
-                Margin = new Padding(0)
-            };
-            tableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 85));
-            tableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 15));
-
-            // DataGridView
-            dgvEmployes = new DataGridView
-            {
-                Dock = DockStyle.Fill,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                ReadOnly = true,
-                AllowUserToAddRows = false,
-                BackgroundColor = Color.White,
-                BorderStyle = BorderStyle.None,
-                RowHeadersVisible = false,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                MultiSelect = false,
-                Margin = new Padding(0, 0, 0, 10)
-            };
-
-            // Style du DataGridView
-            dgvEmployes.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
-            dgvEmployes.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            dgvEmployes.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI Emoji", 10, FontStyle.Bold);
-            dgvEmployes.ColumnHeadersHeight = 45;
-            dgvEmployes.DefaultCellStyle.Font = new Font("Segoe UI Emoji", 10);
-            dgvEmployes.DefaultCellStyle.ForeColor = Color.FromArgb(44, 62, 80);
-            dgvEmployes.DefaultCellStyle.Padding = new Padding(5);
-            dgvEmployes.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 250);
-            dgvEmployes.RowTemplate.Height = 35;
-
-            // Ajouter des colonnes
-            dgvEmployes.Columns.Add("Nom", "Nom");
-            dgvEmployes.Columns.Add("Prenom", "Prénom");
-            dgvEmployes.Columns.Add("Poste", "Poste");
-            dgvEmployes.Columns.Add("Heures", "Heures");
-            dgvEmployes.Columns.Add("Taux", "Taux (€)");
-            dgvEmployes.Columns.Add("Total", "Total (€)");
-
-            tableLayout.Controls.Add(dgvEmployes, 0, 0);
-
-            // Panel des boutons
-            FlowLayoutPanel panelBoutons = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = false,
-                AutoSize = true,
-                Margin = new Padding(0, 5, 0, 0)
-            };
-
-            Button btnExporter = new Button
-            {
-                Text = "📄 Exporter PDF",
-                Size = new Size(130, 35),
-                BackColor = Color.FromArgb(46, 204, 113),
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                FlatAppearance = { BorderSize = 0 },
-                Font = new Font("Segoe UI Emoji", 10, FontStyle.Bold),
-                Margin = new Padding(0, 0, 10, 0)
-            };
-            btnExporter.Click += BtnExporter_Click;
-            panelBoutons.Controls.Add(btnExporter);
-
-            Button btnImprimer = new Button
-            {
-                Text = "🖨️ Imprimer",
-                Size = new Size(130, 35),
-                BackColor = Color.FromArgb(52, 152, 219),
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                FlatAppearance = { BorderSize = 0 },
-                Font = new Font("Segoe UI Emoji", 10, FontStyle.Bold)
-            };
-            panelBoutons.Controls.Add(btnImprimer);
-
-            tableLayout.Controls.Add(panelBoutons, 0, 1);
-
-            panel.Controls.Add(tableLayout);
-        }
-
         private void RemplirPanelStatistiques(Panel panel)
         {
             panel.Controls.Clear();
@@ -337,92 +244,6 @@ namespace SendBillWF.Report.EmployeeWorkReport
             return carte;
         }
 
-        private void BtnExporter_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Export PDF en cours...", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-       
-     
-        private void MettreAJourStatistiques(Panel panelStats, decimal totalHeures, decimal totalMontant)
-        {
-            foreach (Control ctrl in panelStats.Controls)
-            {
-                if (ctrl is TableLayoutPanel tableLayout)
-                {
-                    foreach (Control subCtrl in tableLayout.Controls)
-                    {
-                        if (subCtrl is Panel panel && panel.Name == "panelTotal")
-                        {
-                            foreach (Control flowCtrl in panel.Controls)
-                            {
-                                if (flowCtrl is FlowLayoutPanel flow)
-                                {
-                                    foreach (Control lblCtrl in flow.Controls)
-                                    {
-                                        if (lblCtrl is Label lbl)
-                                        {
-                                            if (lbl.Text.StartsWith("Total heures"))
-                                                lbl.Text = $"Total heures: {totalHeures} h";
-                                            if (lbl.Text.StartsWith("Total à payer"))
-                                                lbl.Text = $"Total à payer: {totalMontant:F2} €";
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Mettre à jour aussi les cartes (optionnel)
-            int compteurEmployes = 5; // Vous pouvez calculer dynamiquement
-            foreach (Control ctrl in panelStats.Controls)
-            {
-                if (ctrl is TableLayoutPanel tableLayout)
-                {
-                    int row = 0, col = 0;
-                    foreach (Control subCtrl in tableLayout.Controls)
-                    {
-                        if (subCtrl is Panel carte && carte.Controls.Count >= 2)
-                        {
-                            var lblValeur = carte.Controls[1] as Label;
-                            if (lblValeur != null)
-                            {
-                                if (carte.BackColor == Color.FromArgb(52, 152, 219)) // Total employés
-                                    lblValeur.Text = compteurEmployes.ToString();
-                                else if (carte.BackColor == Color.FromArgb(46, 204, 113)) // Heures totales
-                                    lblValeur.Text = $"{totalHeures} h";
-                                else if (carte.BackColor == Color.FromArgb(155, 89, 182)) // Coût total
-                                    lblValeur.Text = $"{totalMontant:F0} €";
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        public Guid ConvertStringToGuid(string str)
-        {
-            if (string.IsNullOrWhiteSpace(str))
-                return Guid.Empty;
-
-            if (Guid.TryParse(str, out Guid result))
-                return result;
-
-            // Try different formats
-            if (Guid.TryParseExact(str, "N", out result))
-                return result;
-
-            if (Guid.TryParseExact(str, "B", out result))
-                return result;
-
-            if (Guid.TryParseExact(str, "P", out result))
-                return result;
-
-            return Guid.Empty;
-        }
-
         private void InitialiserAvecSectionsReutilisables(ReportDTO reportDTO)
         {
             var flowPanel = new FlowLayoutPanel
@@ -479,7 +300,7 @@ namespace SendBillWF.Report.EmployeeWorkReport
                 }
                 else
                 {
-                    hauteur = 100; // Hauteur minimum si pas de données
+                    hauteur = 200; // Hauteur minimum si pas de données
                 }
 
                 // Limiter à une hauteur maximum raisonnable (600px)
@@ -718,5 +539,185 @@ namespace SendBillWF.Report.EmployeeWorkReport
             this.Controls.Clear();
             InitialiserAvecSectionsReutilisables(reportDTO);
         }
+
+        //private void BtnExporter_Click(object sender, EventArgs e)
+        //{
+        //    MessageBox.Show("Export PDF en cours...", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //}
+
+
+
+        //private void MettreAJourStatistiques(Panel panelStats, decimal totalHeures, decimal totalMontant)
+        //{
+        //    foreach (Control ctrl in panelStats.Controls)
+        //    {
+        //        if (ctrl is TableLayoutPanel tableLayout)
+        //        {
+        //            foreach (Control subCtrl in tableLayout.Controls)
+        //            {
+        //                if (subCtrl is Panel panel && panel.Name == "panelTotal")
+        //                {
+        //                    foreach (Control flowCtrl in panel.Controls)
+        //                    {
+        //                        if (flowCtrl is FlowLayoutPanel flow)
+        //                        {
+        //                            foreach (Control lblCtrl in flow.Controls)
+        //                            {
+        //                                if (lblCtrl is Label lbl)
+        //                                {
+        //                                    if (lbl.Text.StartsWith("Total heures"))
+        //                                        lbl.Text = $"Total heures: {totalHeures} h";
+        //                                    if (lbl.Text.StartsWith("Total à payer"))
+        //                                        lbl.Text = $"Total à payer: {totalMontant:F2} €";
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    // Mettre à jour aussi les cartes (optionnel)
+        //    int compteurEmployes = 5; // Vous pouvez calculer dynamiquement
+        //    foreach (Control ctrl in panelStats.Controls)
+        //    {
+        //        if (ctrl is TableLayoutPanel tableLayout)
+        //        {
+        //            int row = 0, col = 0;
+        //            foreach (Control subCtrl in tableLayout.Controls)
+        //            {
+        //                if (subCtrl is Panel carte && carte.Controls.Count >= 2)
+        //                {
+        //                    var lblValeur = carte.Controls[1] as Label;
+        //                    if (lblValeur != null)
+        //                    {
+        //                        if (carte.BackColor == Color.FromArgb(52, 152, 219)) // Total employés
+        //                            lblValeur.Text = compteurEmployes.ToString();
+        //                        else if (carte.BackColor == Color.FromArgb(46, 204, 113)) // Heures totales
+        //                            lblValeur.Text = $"{totalHeures} h";
+        //                        else if (carte.BackColor == Color.FromArgb(155, 89, 182)) // Coût total
+        //                            lblValeur.Text = $"{totalMontant:F0} €";
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
+        //public Guid ConvertStringToGuid(string str)
+        //{
+        //    if (string.IsNullOrWhiteSpace(str))
+        //        return Guid.Empty;
+
+        //    if (Guid.TryParse(str, out Guid result))
+        //        return result;
+
+        //    // Try different formats
+        //    if (Guid.TryParseExact(str, "N", out result))
+        //        return result;
+
+        //    if (Guid.TryParseExact(str, "B", out result))
+        //        return result;
+
+        //    if (Guid.TryParseExact(str, "P", out result))
+        //        return result;
+
+        //    return Guid.Empty;
+        //}
+
+        //private void RemplirPanelEmployes(Panel panel)
+        //{
+        //    panel.Controls.Clear();
+
+        //    // Panel conteneur principal
+        //    TableLayoutPanel tableLayout = new TableLayoutPanel
+        //    {
+        //        Dock = DockStyle.Fill,
+        //        ColumnCount = 1,
+        //        RowCount = 2,
+        //        Padding = new Padding(0),
+        //        Margin = new Padding(0)
+        //    };
+        //    tableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 85));
+        //    tableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 15));
+
+        //    // DataGridView
+        //    dgvEmployes = new DataGridView
+        //    {
+        //        Dock = DockStyle.Fill,
+        //        AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+        //        ReadOnly = true,
+        //        AllowUserToAddRows = false,
+        //        BackgroundColor = Color.White,
+        //        BorderStyle = BorderStyle.None,
+        //        RowHeadersVisible = false,
+        //        SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+        //        MultiSelect = false,
+        //        Margin = new Padding(0, 0, 0, 10)
+        //    };
+
+        //    // Style du DataGridView
+        //    dgvEmployes.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
+        //    dgvEmployes.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+        //    dgvEmployes.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI Emoji", 10, FontStyle.Bold);
+        //    dgvEmployes.ColumnHeadersHeight = 45;
+        //    dgvEmployes.DefaultCellStyle.Font = new Font("Segoe UI Emoji", 10);
+        //    dgvEmployes.DefaultCellStyle.ForeColor = Color.FromArgb(44, 62, 80);
+        //    dgvEmployes.DefaultCellStyle.Padding = new Padding(5);
+        //    dgvEmployes.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 250);
+        //    dgvEmployes.RowTemplate.Height = 35;
+
+        //    // Ajouter des colonnes
+        //    dgvEmployes.Columns.Add("Nom", "Nom");
+        //    dgvEmployes.Columns.Add("Prenom", "Prénom");
+        //    dgvEmployes.Columns.Add("Poste", "Poste");
+        //    dgvEmployes.Columns.Add("Heures", "Heures");
+        //    dgvEmployes.Columns.Add("Taux", "Taux (€)");
+        //    dgvEmployes.Columns.Add("Total", "Total (€)");
+
+        //    tableLayout.Controls.Add(dgvEmployes, 0, 0);
+
+        //    //// Panel des boutons
+        //    //FlowLayoutPanel panelBoutons = new FlowLayoutPanel
+        //    //{
+        //    //    Dock = DockStyle.Fill,
+        //    //    FlowDirection = FlowDirection.LeftToRight,
+        //    //    WrapContents = false,
+        //    //    AutoSize = true,
+        //    //    Margin = new Padding(0, 5, 0, 0)
+        //    //};
+
+        //    //Button btnExporter = new Button
+        //    //{
+        //    //    Text = "📄 Exporter PDF",
+        //    //    Size = new Size(130, 35),
+        //    //    BackColor = Color.FromArgb(46, 204, 113),
+        //    //    ForeColor = Color.White,
+        //    //    FlatStyle = FlatStyle.Flat,
+        //    //    FlatAppearance = { BorderSize = 0 },
+        //    //    Font = new Font("Segoe UI Emoji", 10, FontStyle.Bold),
+        //    //    Margin = new Padding(0, 0, 10, 0)
+        //    //};
+        //    //btnExporter.Click += BtnExporter_Click;
+        //    //panelBoutons.Controls.Add(btnExporter);
+
+        //    //Button btnImprimer = new Button
+        //    //{
+        //    //    Text = "🖨️ Imprimer",
+        //    //    Size = new Size(130, 35),
+        //    //    BackColor = Color.FromArgb(52, 152, 219),
+        //    //    ForeColor = Color.White,
+        //    //    FlatStyle = FlatStyle.Flat,
+        //    //    FlatAppearance = { BorderSize = 0 },
+        //    //    Font = new Font("Segoe UI Emoji", 10, FontStyle.Bold)
+        //    //};
+        //    //panelBoutons.Controls.Add(btnImprimer);
+
+        //    //tableLayout.Controls.Add(panelBoutons, 0, 1);
+
+        //    panel.Controls.Add(tableLayout);
+        //}
+
     }
 }
