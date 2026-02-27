@@ -3,6 +3,7 @@ using DBConnection;
 using DBConnection.Entity;
 using Helpers.PocoGrid;
 using Microsoft.EntityFrameworkCore;
+using DataBridge.DTO;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,8 @@ namespace DataBridge
         public WorkPoco workPoco = new WorkPoco();
         RamssisCleaningContex ramssisCleaningContex;
         DbContextOptions<RamssisCleaningContex> options;
-        public List<DateTime> jours = new List<DateTime>();
+        public List<DateOnly> jours = new List<DateOnly>();
+        ReportBridgeDTO reportBridgeDTO = new ReportBridgeDTO();
 
         public WorkManipulation()
         {
@@ -230,7 +232,7 @@ namespace DataBridge
         {
             List<Work> Wks = new List<Work>();
 
-            List<string> djoursString = jours.Select(d => d.ToString("ddMMyyyy")).ToList();
+            List<DateOnly> djoursString = jours.Select(d => d).ToList();
 
             var workCompanyIds = workPoco.workLst
                                     .Select(w => w.CompanyId)
@@ -275,7 +277,7 @@ namespace DataBridge
 
                 var Emplyeepaiment = GetWorkPrice(workPoco.employeeLst[0].EmployeeId, companyId)
                         .Where(t => t.CompanyId == companyId && t.EmployeeId == workPoco.employeeLst[0].EmployeeId
-                        && t.Days.Contains(ConvertStringToDateandGetDays(dtv.workdate))).Select(e => e.Emplyeepaiment).ToList().FirstOrDefault();
+                        && t.Days.Contains(ConvertStringToDateandGetDays(dtv.workdate.ToString("ddMMyyyy")))).Select(e => e.Emplyeepaiment).ToList().FirstOrDefault();
 
                // var tes2 = ConvertStringToDateandGetDays(dtv.workdate);
 
@@ -298,18 +300,18 @@ namespace DataBridge
             ramssisCleaningContex.SaveChanges();
         }
 
-        public void GetWeek(DateTime selectedDate)
+        public void GetWeek(DateOnly selectedDate)
         {
             jours.Clear();
             //DateTime sunday = GetSunday(selectedDate);
             //DateTime saturday = GetSaturday(selectedDate);
 
-            DateTime sunday = selectedDate.AddDays(-(int)selectedDate.DayOfWeek);
-            DateTime saturday = selectedDate.AddDays(-(int)selectedDate.DayOfWeek).AddDays(6);
+            DateOnly sunday = selectedDate.AddDays(-(int)selectedDate.DayOfWeek);
+            DateOnly saturday = selectedDate.AddDays(-(int)selectedDate.DayOfWeek).AddDays(6);
 
-            for (DateTime date = sunday; date <= saturday; date = date.AddDays(1))
+            for (DateOnly date = sunday; date <= saturday; date = date.AddDays(1))
             {
-                jours.Add(date.Date);
+                jours.Add(date);
             }
         }
 
@@ -408,15 +410,17 @@ namespace DataBridge
 
         }
 
-        public void GetWorkListByCompagnyEmployeeId(Guid EmplId, Guid CpmId)
+        public void GetWorkListByCompagnyEmployeeId(ReportBridgeDTO reportBridgeDTO)
         {
             workPoco.workLst.Clear();
 
            
 
             var result = ramssisCleaningContex.Works
-                .Where(w => w.CompanyId.Equals(CpmId)  
-                                && w.EmployeeId.Equals(EmplId))
+                .Where(w => w.CompanyId.Equals(reportBridgeDTO.CompagnieID)  
+                                && w.EmployeeId.Equals(reportBridgeDTO.EmployeeID)
+                                && w.Workdate >= reportBridgeDTO.BeginDate && w.Workdate <= reportBridgeDTO.EndDate
+                                )
                 .Select(w => new
                 {
                     w.WorkId,

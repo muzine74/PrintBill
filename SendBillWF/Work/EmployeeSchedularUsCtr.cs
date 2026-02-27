@@ -239,7 +239,7 @@ namespace SendBillWF.Work
             //_currentEmployee plein ici mais l'appel  est vide a l'interieure de cette fonction
             if (_currentEmployee != null)
             {
-                DateTime selectedDate = WeekToFill.Value;
+                DateOnly selectedDate = DateOnly.FromDateTime(WeekToFill.Value);
                 visitWorkSheetUctr1.initEmployee(_currentEmployee);
                 visitWorkSheetUctr1.FillDaysDateWeek(selectedDate);
                 visitWorkSheetUctr1.initValueEmployeeSchedular();

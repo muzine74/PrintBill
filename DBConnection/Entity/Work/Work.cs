@@ -14,7 +14,7 @@ namespace DBConnection.Entity
         public Guid WorkId { get; set; }   
         public string Description { get; set; }
         public WorkType1 WorkType1 { get; set; }
-        public string? Workdate { get; set; }
+        public DateOnly Workdate { get; set; }
         public decimal ClientPrice { get; set; }
 
         public DateTime? BeginWorkDate { get; set; }

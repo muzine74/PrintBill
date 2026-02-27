@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using DataBridge.DTO;
 
 namespace SendBillWF.Report.EmployeeWorkReport
 {
@@ -511,24 +512,37 @@ namespace SendBillWF.Report.EmployeeWorkReport
             WorkManipulation workManipulation = new WorkManipulation();
             CompagniManipulation compagniManipulation = new CompagniManipulation();
             List<EmployeeReport> employeeReports ;
+            ReportBridgeDTO reportBridgeDTO;
 
 
             cpmWorkPriceInf.Clear();  // Le dictionnaire est maintenant vide            
 
-            List<CompagniePoco> compagniesLst = compagniManipulation.GetCompagnyByEmployee(reportDTO.ReportId);
+            List<CompagniePoco> compagniesLst = compagniManipulation.GetCompagnyByEmployee(reportDTO.EmployeeID);
 
             //List<EmployeeCompagnyPricingPoco>
             foreach (var item in compagniesLst)
             {
                 employeeReports = new List<EmployeeReport>();
 
-                workManipulation.GetWorkListByCompagnyEmployeeId(reportDTO.ReportId, item.CompagnieID);
+                reportBridgeDTO = new ReportBridgeDTO
+                {
+                    ReportId = reportDTO.ReportId,                    
+                    CompagnieID = item.CompagnieID,
+                    EmployeeID = reportDTO.EmployeeID,
+                    ReportName = reportDTO.ReportName,
+                    BeginDate = reportDTO.BeginDate,
+                    EndDate = reportDTO.EndDate,
+                    Supervisor = reportDTO.Supervisor
+                };
+
+
+                workManipulation.GetWorkListByCompagnyEmployeeId(reportBridgeDTO);
                 foreach (var work in workManipulation.workPoco.workLst)
                 {
                     employeeReports.Add(new EmployeeReport
                     {
                         CompagnyName = item.CompagnieName,
-                        Workdate = work.Workdate,
+                        Workdate = work.Workdate.ToString("ddMMyyyy"),
                         EmployePrice = work.ClientPrice
                     });
                 }              

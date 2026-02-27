@@ -85,13 +85,13 @@ namespace SendBillWF
             workManipulation.GetEmployeeAssinedToCompanyList();
         }
 
-        Dictionary<string, HashSet<string>> LoadWorkedCompagyDate()
+        Dictionary<string, HashSet<DateOnly>> LoadWorkedCompagyDate()
         {
 
             //HashSet<string> val1 = new HashSet<string>();
-            List<string> val1 = new List<string>();
+            List<DateOnly> val1 = new List<DateOnly>();
 
-            Dictionary<string, HashSet<string>> keyValuePairsfinal = new Dictionary<string, HashSet<string>>();
+            Dictionary<string, HashSet<DateOnly>> keyValuePairsfinal = new Dictionary<string, HashSet<DateOnly>>();
 
 
             foreach (var cl in workManipulation.workPoco.companyLst)
@@ -106,7 +106,7 @@ namespace SendBillWF
                         val1.Add(wc.Workdate);
                     }
 
-                    HashSet<string> hset = new HashSet<string>();
+                    HashSet<DateOnly> hset = new HashSet<DateOnly>();
                     hset.UnionWith(val1.ToList());
 
 
@@ -115,7 +115,7 @@ namespace SendBillWF
                 }
                 else
                 {
-                    keyValuePairsfinal.Add(cl.companyCode, new HashSet<string>());
+                    keyValuePairsfinal.Add(cl.companyCode, new HashSet<DateOnly>());
                 }
 
             }
@@ -123,13 +123,13 @@ namespace SendBillWF
             return keyValuePairsfinal;
         }
 
-         Dictionary<string, HashSet<string>> LoadWorkedEmployeeDate()
+         Dictionary<string, HashSet<DateOnly>> LoadWorkedEmployeeDate()
         {
 
             //HashSet<string> val1 = new HashSet<string>();
-            List<string> val1 = new List<string>();
+            List<DateOnly> val1 = new List<DateOnly>();
 
-            Dictionary<string, HashSet<string>> keyValuePairsfinal = new Dictionary<string, HashSet<string>>();
+            Dictionary<string, HashSet<DateOnly>> keyValuePairsfinal = new Dictionary<string, HashSet<DateOnly>>();
 
 
             foreach (var cl in workManipulation.workPoco.employeeLst)
@@ -144,7 +144,7 @@ namespace SendBillWF
                         val1.Add(wc.Workdate);
                     }
 
-                    HashSet<string> hset = new HashSet<string>();
+                    HashSet<DateOnly> hset = new HashSet<DateOnly>();
                     hset.UnionWith(val1.ToList());
 
 
@@ -153,7 +153,7 @@ namespace SendBillWF
                 }
                 else
                 {
-                    keyValuePairsfinal.Add(cl.name, new HashSet<string>());
+                    keyValuePairsfinal.Add(cl.name, new HashSet<DateOnly>());
                 }
 
             }
@@ -161,7 +161,7 @@ namespace SendBillWF
             return keyValuePairsfinal;
         }
 
-        private void CreerCompagnyColonnes(List<DateTime> jours)
+        private void CreerCompagnyColonnes(List<DateOnly> jours)
         {
 
             WorkVisiteDgv.Columns.Clear();
@@ -178,7 +178,7 @@ namespace SendBillWF
             {
                 WorkVisiteDgv.Columns.Add(new DataGridViewCheckBoxColumn
                 {
-                    Name = jour.ToString("ddMMyyyy", culture),
+                    Name = jour.ToString(),
                     HeaderText = jour.ToString("ddd dd MM yyyy", culture),
                     Width = 100,
                     Tag = "clearCheckBoxDatagrid"
@@ -191,7 +191,7 @@ namespace SendBillWF
 
 
 
-        private void CreerEmployeeColonnes(List<DateTime> jours)
+        private void CreerEmployeeColonnes(List<DateOnly> jours)
         {
 
             WorkVisiteDgv.Columns.Clear();
@@ -208,7 +208,7 @@ namespace SendBillWF
             {
                 WorkVisiteDgv.Columns.Add(new DataGridViewCheckBoxColumn
                 {
-                    Name = jour.ToString("ddMMyyyy", culture),
+                    Name = jour.ToString(),
                     HeaderText = jour.ToString("ddd dd MM yyyy", culture),
                     Width = 100,
                     Tag = "clearCheckBoxDatagrid"
@@ -219,7 +219,7 @@ namespace SendBillWF
             WorkVisiteDgv.AllowUserToAddRows = false;
         }
 
-        private void ChargerCompagnies(List<DateTime> jours, Dictionary<string, HashSet<string>> horaire)
+        private void ChargerCompagnies(List<DateOnly> jours, Dictionary<string, HashSet<DateOnly>> horaire)
         {
 
              
@@ -243,31 +243,31 @@ namespace SendBillWF
 
                     if(days.Contains(jours[i].DayOfWeek.ToString()))
                     {
-                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Value = item.Value.Contains(jours[i].ToString("ddMMyyyy", culture));
+                        row.Cells[jours[i].ToString()].Value = item.Value.Contains(jours[i]);//.ToString()
 
-                        bool isChecked = Convert.ToBoolean(row.Cells[jours[i].ToString("ddMMyyyy", culture)].Value);
+                        bool isChecked = Convert.ToBoolean(row.Cells[jours[i].ToString()].Value);
 
 
                         if (isChecked)
                         {
-                            row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = System.Drawing.Color.LightSkyBlue;
+                            row.Cells[jours[i].ToString()].Style.BackColor = System.Drawing.Color.LightSkyBlue;
                         }
                         else
                         {
-                            row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = System.Drawing.Color.White;
+                            row.Cells[jours[i].ToString()].Style.BackColor = System.Drawing.Color.White;
                         }
                     }
                     else
                     {
-                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Value = false;
-                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = System.Drawing.Color.LightSteelBlue;
-                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].ReadOnly = true;
+                        row.Cells[jours[i].ToString()].Value = false;
+                        row.Cells[jours[i].ToString()].Style.BackColor = System.Drawing.Color.LightSteelBlue;
+                        row.Cells[jours[i].ToString()].ReadOnly = true;
                     }
                 }
             }
         }
 
-        private void ChargerEmployee(List<DateTime> jours, Dictionary<string, HashSet<string>> horaire)
+        private void ChargerEmployee(List<DateOnly> jours, Dictionary<string, HashSet<DateOnly>> horaire)
         {
             foreach (var item in horaire)
             {
@@ -279,18 +279,18 @@ namespace SendBillWF
 
                 for (int i = 0; i < jours.Count; i++)
                 {
-                    row.Cells[jours[i].ToString("ddMMyyyy", culture)].Value = item.Value.Contains(jours[i].ToString("ddMMyyyy", culture));
+                    row.Cells[jours[i].ToString()].Value = item.Value.Contains(jours[i]);
 
-                    bool isChecked = Convert.ToBoolean(row.Cells[jours[i].ToString("ddMMyyyy", culture)].Value);
+                    bool isChecked = Convert.ToBoolean(row.Cells[jours[i].ToString()].Value);
 
 
                     if (isChecked)
                     {
-                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = System.Drawing.Color.Silver;
+                        row.Cells[jours[i].ToString()].Style.BackColor = System.Drawing.Color.Silver;
                     }
                     else
                     {
-                        row.Cells[jours[i].ToString("ddMMyyyy", culture)].Style.BackColor = System.Drawing.Color.White;
+                        row.Cells[jours[i].ToString()].Style.BackColor = System.Drawing.Color.White;
                     }
                 }
             }
@@ -300,7 +300,7 @@ namespace SendBillWF
         {
             employeePoco = _employeePoco;
         }
-        public void FillDaysDateWeek(DateTime selectedDate)
+        public void FillDaysDateWeek(DateOnly selectedDate)
         {
             ClearAllCheckBoxes();
 
@@ -392,7 +392,7 @@ namespace SendBillWF
                                 dtvToWorkManipPoco.Add(new DtvToWorkManipPoco
                                 {
                                     compagnyCode = compagnie,
-                                    workdate = cell.OwningColumn.Name
+                                    workdate = DateOnly.Parse(cell.OwningColumn.Name) 
                                 });                               
                             }
                         }

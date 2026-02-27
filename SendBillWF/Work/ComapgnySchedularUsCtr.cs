@@ -139,8 +139,8 @@ namespace SendBillWF.Work
 
         private void WeekToFillData()
         {
-            List<DateTime> jours = new List<DateTime>();
-            DateTime selectedDate = WeekToFill.Value;
+            List<DateOnly> jours = new List<DateOnly>();
+            DateOnly selectedDate = DateOnly.FromDateTime(WeekToFill.Value);
 
             visitWorkSheetUctr1.FillDaysDateWeek(selectedDate);
             visitWorkSheetUctr1.initValueCompagnySchedular();   //  il faut faire la meme chsoe pour les compagnie

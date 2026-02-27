@@ -9,7 +9,7 @@ namespace Helpers.PocoGrid
     public  class DtvToWorkManipPoco
     {
         public string compagnyCode { get; set; }
-        public string workdate { get; set; }
+        public DateOnly workdate { get; set; }
         public Guid EmployeeID { get; set; }
     }
 }

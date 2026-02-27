@@ -341,7 +341,7 @@ namespace SendBillWF.Report
                 ReportDTO reportDTO = new ReportDTO
                 {
                     ReportName = _employeeManipulation.GetEmployeeById(employeeId.ToString()).EmployeeName,
-                    ReportId = employeeId,
+                    EmployeeID = employeeId,
                     BeginDate = DateOnly.FromDateTime(BeguinDate.Value),
                     EndDate = DateOnly.FromDateTime(EndDate.Value)
                 };
