@@ -1,14 +1,15 @@
-﻿using System;
+﻿using AutoMapper;
+using DataBridge.Entity;
+using DataBridge.Helpers;
+using DBConnection;
+using DBConnection.Entity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DBConnection;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using DataBridge.Entity;
-using DBConnection.Entity;
-using AutoMapper;
 
 
 namespace DataBridge
@@ -32,21 +33,47 @@ namespace DataBridge
 
             ramssisCleaningContex = new RamssisCleaningContex(options);
 
-            config = new MapperConfiguration(cfg =>
-            {
-                cfg.
-                        CreateMap<Employee, EmployeePoco>()
-                        .ForMember(dest => dest.EmployeeId, opt => opt.MapFrom(src => src.EmployeeId))
-                        .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.name))
-                        .ForMember(dest => dest.EmployeeMail, opt => opt.MapFrom(src => src.EmployeeMail))
-                        .ForMember(dest => dest.EmployeePhone, opt => opt.MapFrom(src => src.EmployeePhone))
-                        .ForMember(dest => dest.EmployeeNote, opt => opt.MapFrom(src => src.notes))
+            EmployeeEmployeePcoMapper();
 
-                        // Adresse (première)
-                        .ForMember(dest => dest.AddressId, opt => opt.MapFrom(src => src.Addresses.FirstOrDefault().AddressId))
-                        // Compagnies
-                        .ForMember(dest => dest.EmployeeCompagnies,
-                            opt => opt.MapFrom(src => src.EmployeeCompanies.Select(ec => ec.Company)));
+        }
+
+        private void EmployeeEmployeePcoMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Employee, EmployeePoco>()
+                    // Propriétés simples
+                    .ForMember(dest => dest.EmployeeId, opt => opt.MapFrom(src => src.EmployeeId))
+                    .ForMember(dest => dest.NAS, opt => opt.MapFrom(src => src.NAS))
+                    .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.name))
+                    .ForMember(dest => dest.EmployeeMail, opt => opt.MapFrom(src => src.EmployeeMail))
+                    .ForMember(dest => dest.EmployeePhone, opt => opt.MapFrom(src => src.EmployeePhone))
+                    .ForMember(dest => dest.EmployeeNote, opt => opt.MapFrom(src => src.notes))
+
+                    // Adresse (prend la première adresse de la collection)
+                    .ForMember(dest => dest.AddressId, opt => opt.MapFrom(src =>
+                        src.Addresses.FirstOrDefault().AddressId))
+                    .ForMember(dest => dest.EmployeeCivicNumber, opt => opt.MapFrom(src =>
+                        src.Addresses.FirstOrDefault().civicNumber))
+                    .ForMember(dest => dest.EmployeeSuite, opt => opt.MapFrom(src =>
+                        src.Addresses.FirstOrDefault().suite))
+                    .ForMember(dest => dest.EmployeeZipCode, opt => opt.MapFrom(src =>
+                        src.Addresses.FirstOrDefault().zipCode))
+                    .ForMember(dest => dest.EmployeeCity, opt => opt.MapFrom(src =>
+                        src.Addresses.FirstOrDefault().city))
+                    .ForMember(dest => dest.EmployeeState, opt => opt.MapFrom(src =>
+                        src.Addresses.FirstOrDefault().state))
+                    .ForMember(dest => dest.EmployeeCountry, opt => opt.MapFrom(src =>
+                        src.Addresses.FirstOrDefault().country))
+                    .ForMember(dest => dest.EmployeeAdressNote, opt => opt.MapFrom(src =>
+                        src.Addresses.FirstOrDefault().notes))
+
+                    // Compagnies (mapping de EmployeeCompanies vers CompagniePoco)
+                    .ForMember(dest => dest.EmployeeCompagnies, opt => opt.MapFrom(src =>
+                        src.EmployeeCompanies.Select(ec => ec.Company)));
+
+                // Mapping pour Company vers CompagniePoco (si nécessaire)
+                
             });
 
             _mapper = config.CreateMapper();
@@ -336,7 +363,27 @@ namespace DataBridge
             transaction.Commit();
         }
 
-      
+        public EmployeePoco GetEmployeeByCredential(Login login)
+        {
+            //EmployeePoco employeePoco = new EmployeePoco();
+
+            Employee employee = ramssisCleaningContex.EmployeeCredentials
+                             .Where(cred => cred.Username == login.Username && cred.PasswordHash == login.Password)
+                             .Join(ramssisCleaningContex.Employees,
+                                 cred => cred.EmplyeeID,
+                                 emp => emp.EmployeeId,
+                                 (cred, emp) => emp)
+                             .FirstOrDefault();  // ou SingleOrDefault() si unique
+
+            if (employee == null)
+            {
+                return null;
+            }
+
+            return  _mapper.Map<EmployeePoco>(employee);
+        }
+
+        
 
     }
 }

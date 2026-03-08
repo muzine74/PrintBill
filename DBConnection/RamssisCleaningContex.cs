@@ -35,7 +35,9 @@ namespace DBConnection
 
         public DbSet<CompanyPricingCalendar> CompanyPricingCalendars { get; set; }
         
-            public DbSet<EmployeeCompagnyPricing> EmployeeCompagnyPricings { get; set; }
+        public DbSet<EmployeeCompagnyPricing> EmployeeCompagnyPricings { get; set; }
+
+        public DbSet<EmployeeCredential> EmployeeCredentials { get; set; }
 
 
 
