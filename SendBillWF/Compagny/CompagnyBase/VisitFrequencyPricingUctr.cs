@@ -59,10 +59,6 @@ namespace SendBillWF.Compagny.CompagnyBase
 
 
 
-
-
-
-
         private void WorkFrequency_SelectedIndexChanged(object sender, EventArgs e)
         {
             DisableAllGroupeBox();

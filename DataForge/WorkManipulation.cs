@@ -53,7 +53,7 @@ namespace DataBridge
             }
 
         }
-
+        
         public void GetWorkListByCompagnyEmployeeId()
         {
             workPoco.workLst.Clear();
@@ -98,6 +98,7 @@ namespace DataBridge
             }
 
         }
+        
         public void GetEmployeeAssinedToCompanyList()
         {
 
@@ -116,8 +117,7 @@ namespace DataBridge
                 }
             }
         }
-
-
+        
         public void GetCompagnyAssinedToEmployeeList()
         {
             workPoco.employeeCompanyLst.Clear();
@@ -134,7 +134,7 @@ namespace DataBridge
                 }
             }
         }
-
+       
         public void GetCompagnyListByObject()
         {
             workPoco.companyLst.Clear();
@@ -150,6 +150,7 @@ namespace DataBridge
                 }
             }
         }
+        
         public void GetEmployeeListByObject()
         {
             workPoco.employeeLst.Clear();
@@ -165,7 +166,7 @@ namespace DataBridge
                 }
             }
         }
-
+        
         public void ClearAllObjectList()
         {
             workPoco.ClearAllObjectList();
@@ -413,8 +414,6 @@ namespace DataBridge
         public void GetWorkListByCompagnyEmployeeId(ReportBridgeDTO reportBridgeDTO)
         {
             workPoco.workLst.Clear();
-
-           
 
             var result = ramssisCleaningContex.Works
                 .Where(w => w.CompanyId.Equals(reportBridgeDTO.CompagnieID)  
