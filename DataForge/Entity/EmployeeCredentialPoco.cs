@@ -13,6 +13,6 @@ namespace DataBridge.Entity
         public string PasswordHash { get; set; }
         public Guid EmplyeeID { get; set; }
 
-        public List<CompagniePoco> EmployeeCompagnies { get; set; }
+       // public List<CompagniePoco> EmployeeCompagnies { get; set; }
     }
 }

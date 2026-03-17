@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataBridge.Helpers; // For Login model
 
 
 namespace DataBridge
@@ -383,7 +384,27 @@ namespace DataBridge
             return  _mapper.Map<EmployeePoco>(employee);
         }
 
-        
+
+        #region login
+        public async Task<EmployeePoco> ValidateUserCredentials(Login login)
+        {
+          var employee =  ramssisCleaningContex.EmployeeCredentials.Where(cred => cred.Username == login.Username && cred.PasswordHash == login.Password)
+                .Join(ramssisCleaningContex.Employees,
+                    cred => cred.EmplyeeID,
+                    emp => emp.EmployeeId,
+                    (cred, emp) => emp)
+                .SingleOrDefault();  // ou SingleOrDefault() si unique
+
+            if (employee == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<EmployeePoco>(employee);
+        }
+
+        #endregion
+
 
     }
 }
