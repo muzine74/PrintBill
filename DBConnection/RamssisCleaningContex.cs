@@ -39,6 +39,9 @@ namespace DBConnection
 
         public DbSet<EmployeeCredential> EmployeeCredentials { get; set; }
 
+        public DbSet<EmployeeTimeLog> EmployeeTimeLogs { get; set; }
+        
+
 
 
 

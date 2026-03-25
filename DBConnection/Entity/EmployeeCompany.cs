@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 namespace DBConnection.Entity
 {
     public class EmployeeCompany
-    {
-
-
+    {        
         public Guid CompanyId { get; set; }
         public Guid EmployeeId { get; set; }
         public string? Note { get; set; }

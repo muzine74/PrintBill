@@ -1,11 +1,14 @@
-﻿using DataBridge.Entity;
+﻿using DataBridge.DTO;
+using DataBridge.Entity;
+using DataBridge.Helpers;
 using DBConnection;
 using DBConnection.Entity;
 using Helpers.PocoGrid;
 using Microsoft.EntityFrameworkCore;
-using DataBridge.DTO;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Globalization;
@@ -53,7 +56,7 @@ namespace DataBridge
             }
 
         }
-        
+
         public void GetWorkListByCompagnyEmployeeId()
         {
             workPoco.workLst.Clear();
@@ -98,7 +101,7 @@ namespace DataBridge
             }
 
         }
-        
+
         public void GetEmployeeAssinedToCompanyList()
         {
 
@@ -117,7 +120,7 @@ namespace DataBridge
                 }
             }
         }
-        
+
         public void GetCompagnyAssinedToEmployeeList()
         {
             workPoco.employeeCompanyLst.Clear();
@@ -134,7 +137,7 @@ namespace DataBridge
                 }
             }
         }
-       
+
         public void GetCompagnyListByObject()
         {
             workPoco.companyLst.Clear();
@@ -150,7 +153,7 @@ namespace DataBridge
                 }
             }
         }
-        
+
         public void GetEmployeeListByObject()
         {
             workPoco.employeeLst.Clear();
@@ -166,7 +169,7 @@ namespace DataBridge
                 }
             }
         }
-        
+
         public void ClearAllObjectList()
         {
             workPoco.ClearAllObjectList();
@@ -263,13 +266,13 @@ namespace DataBridge
 
             ramssisCleaningContex.SaveChanges();
 
-            
+
 
             //remplir les nouveau
 
             foreach (var dtv in dtvToWorkManipPoco)
             {
-                
+
 
                 Guid companyId = ramssisCleaningContex.Companies
                     .Where(c => c.companyCode == dtv.compagnyCode)
@@ -280,7 +283,7 @@ namespace DataBridge
                         .Where(t => t.CompanyId == companyId && t.EmployeeId == workPoco.employeeLst[0].EmployeeId
                         && t.Days.Contains(ConvertStringToDateandGetDays(dtv.workdate.ToString("ddMMyyyy")))).Select(e => e.Emplyeepaiment).ToList().FirstOrDefault();
 
-               // var tes2 = ConvertStringToDateandGetDays(dtv.workdate);
+                // var tes2 = ConvertStringToDateandGetDays(dtv.workdate);
 
 
                 if (companyId == Guid.Empty)
@@ -291,7 +294,7 @@ namespace DataBridge
                     WorkId = Guid.NewGuid(),
                     Description = "",
                     Workdate = dtv.workdate,
-                   ClientPrice = Emplyeepaiment,
+                    ClientPrice = Emplyeepaiment,
                     CompanyId = companyId,
                     EmployeeId = workPoco.employeeLst[0].EmployeeId
                 };
@@ -350,7 +353,7 @@ namespace DataBridge
             return ramssisCleaningContex.EmployeeCompagnyPricings.Where(ecp => ecp.EmployeeId == empID &&
                                        ecp.CompanyPricingCalendarId == cpcId &&
                                        ecp.IsActive.Equals(true)).FirstOrDefault();
-            
+
         }
 
 
@@ -364,30 +367,30 @@ namespace DataBridge
             return ramssisCleaningContex.CompanyPricingCalendars
                     .Where(cpc => cpc.IsActive.Equals(true) && cpc.Days == daysKey)
                     .Select(cpc => cpc.CompanyPricingCalendarId)
-                    .FirstOrDefault(); 
+                    .FirstOrDefault();
         }
 
         public List<EmployeeCompagnyPricingPoco> GetWorkPrice(Guid EmplId, Guid CpmId)
         {
             CompagniManipulation compagniManipulation = new CompagniManipulation();
             List<EmployeeCompagnyPricingPoco> employeeCompagnyPricingPoco = new List<EmployeeCompagnyPricingPoco>();
-            var  EmployeCompagny = compagniManipulation.GetCompagnyByEmployee(EmplId);
+            var EmployeCompagny = compagniManipulation.GetCompagnyByEmployee(EmplId);
 
 
             employeeCompagnyPricingPoco = (from c in EmployeCompagny
-                                          join p in GetCompanyPricingCalendarsList(EmployeCompagny) on c.CompagnieID equals p.CompanyId
-                                          where p.IsActive == true && p.DaysStatus == true
-                                          select new EmployeeCompagnyPricingPoco
-                                          {
-                                              CompanyPricingCalendarId = p.CompanyPricingCalendarId,
-                                              CompanyId = c.CompagnieID,
-                                              CompagnyCode = c.CompagnieCode,
-                                              CompagnyName = c.CompagnieName,
-                                              EmployeeId = EmplId,
-                                              Emplyeepaiment = p.Emplyeepaiment,
-                                              DaysStatus = p.DaysStatus,
-                                              Days = p.Days
-                                          }).ToList();
+                                           join p in GetCompanyPricingCalendarsList(EmployeCompagny) on c.CompagnieID equals p.CompanyId
+                                           where p.IsActive == true && p.DaysStatus == true
+                                           select new EmployeeCompagnyPricingPoco
+                                           {
+                                               CompanyPricingCalendarId = p.CompanyPricingCalendarId,
+                                               CompanyId = c.CompagnieID,
+                                               CompagnyCode = c.CompagnieCode,
+                                               CompagnyName = c.CompagnieName,
+                                               EmployeeId = EmplId,
+                                               Emplyeepaiment = p.Emplyeepaiment,
+                                               DaysStatus = p.DaysStatus,
+                                               Days = p.Days
+                                           }).ToList();
 
             //IL faut aller cherché les paiment specilal pour les emplyéé 
             EmployeeCompagnyPricing employeeCompagnyPricing;
@@ -406,7 +409,7 @@ namespace DataBridge
         private string ConvertStringToDateandGetDays(string fdate)
         {
             DateTime date = DateTime.ParseExact(fdate, "ddMMyyyy", CultureInfo.InvariantCulture);
-            
+
             return date.ToString("dddd", CultureInfo.InvariantCulture);
 
         }
@@ -416,7 +419,7 @@ namespace DataBridge
             workPoco.workLst.Clear();
 
             var result = ramssisCleaningContex.Works
-                .Where(w => w.CompanyId.Equals(reportBridgeDTO.CompagnieID)  
+                .Where(w => w.CompanyId.Equals(reportBridgeDTO.CompagnieID)
                                 && w.EmployeeId.Equals(reportBridgeDTO.EmployeeID)
                                 && w.Workdate >= reportBridgeDTO.BeginDate && w.Workdate <= reportBridgeDTO.EndDate
                                 )
@@ -460,6 +463,65 @@ namespace DataBridge
                 .Where(cpc => cpc.CompanyId == companyId && cpc.IsActive == true && cpc.DaysStatus == true)
                 .Select(cpc => cpc.Days) // Sélectionne uniquement la colonne 'Days'
                 .ToList();               // Convertit le résultat en List<string>
+        }
+
+        public List<TimeLogQueryResultDto> GetEmployeeTimeLog(Guid employeeId, DateOnly week)
+        {
+
+            workPoco.employeeCompanyLst.Clear();
+            
+                var(startWeek, endWeek) = HelpersExtensions.GetWeekDates(week);
+
+           var resultQuerry = GetEmployeeTimeLogsWithDetails(employeeId : employeeId, startDate: startWeek, endDate : endWeek);
+
+            return resultQuerry;
+
+        }
+
+        public List<TimeLogQueryResultDto> GetEmployeeTimeLogsWithDetails(Guid? employeeId = null, Guid? companyId = null, DateOnly? startDate = null, DateOnly? endDate = null)
+        {
+            var query = from ec in ramssisCleaningContex.EmployeeCompanies
+                        join c in ramssisCleaningContex.Companies
+                            on ec.CompanyId equals c.CompanyId
+                        from etl in ramssisCleaningContex.EmployeeTimeLogs
+                            .Where(tl => tl.EmployeeId == ec.EmployeeId
+                                      && tl.CompanyId == ec.CompanyId
+                                      && tl.Workdate >= startDate
+                                      && tl.Workdate <= endDate)
+                            .DefaultIfEmpty()
+                        //where ec.EmployeeId == employeeId
+                        select new TimeLogQueryResultDto
+                        {
+                            EmployeeId = ec.EmployeeId,
+                            CompanyId = ec.CompanyId,
+                            CompanyName = c.companyName,
+                            Note = ec.Note,
+                            TimeLogId = etl != null ? etl.EmployeeTimeLogId : Guid.Empty,
+                            WorkDate = etl != null ? etl.Workdate : DateOnly.MinValue,  // Date par défaut      
+                            BeginWork = etl != null ? etl.BeginWorkDate : null,
+                            EndWork = etl != null ? etl.EndWorkDate : null,
+                            ClientPrice = etl != null ? etl.ClientPrice : 0,
+                            WorkType = etl != null ? etl.WorkType1 : 0
+                        };
+
+            var result = query.OrderBy(x => x.CompanyId)
+                  .ThenBy(x => x.WorkDate);
+
+
+            // Appliquer les filtres dynamiquement
+            //if (employeeId.HasValue)
+            //    query = query.Where(x => x.EmployeeId == employeeId.Value);
+
+            //if (companyId.HasValue)
+            //    query = query.Where(x => x.CompanyId == companyId.Value);
+
+            //if (startDate.HasValue)
+            //    query = query.Where(x => x.WorkDate >= startDate.Value);
+
+            //if (endDate.HasValue)
+            //    query = query.Where(x => x.WorkDate <= endDate.Value);
+
+            return result.ToList();
         }
     }
 }

@@ -47,6 +47,7 @@ namespace DataBridge
                     .ForMember(dest => dest.EmployeeId, opt => opt.MapFrom(src => src.EmployeeId))
                     .ForMember(dest => dest.NAS, opt => opt.MapFrom(src => src.NAS))
                     .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.name))
+                    .ForMember(dest => dest.EmployeeId, opt => opt.MapFrom(src => src.EmployeeId))
                     .ForMember(dest => dest.EmployeeMail, opt => opt.MapFrom(src => src.EmployeeMail))
                     .ForMember(dest => dest.EmployeePhone, opt => opt.MapFrom(src => src.EmployeePhone))
                     .ForMember(dest => dest.EmployeeNote, opt => opt.MapFrom(src => src.notes))
