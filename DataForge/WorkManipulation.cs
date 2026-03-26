@@ -504,16 +504,16 @@ namespace DataBridge
                             WorkType = etl != null ? etl.WorkType1 : 0
                         };
 
-            var result = query.OrderBy(x => x.CompanyId)
+            query = query.OrderBy(x => x.CompanyId)
                   .ThenBy(x => x.WorkDate);
 
 
-            // Appliquer les filtres dynamiquement
-            //if (employeeId.HasValue)
-            //    query = query.Where(x => x.EmployeeId == employeeId.Value);
+            //Appliquer les filtres dynamiquement
+            if (employeeId.HasValue)
+                query = query.Where(x => x.EmployeeId == employeeId.Value);
 
-            //if (companyId.HasValue)
-            //    query = query.Where(x => x.CompanyId == companyId.Value);
+            if (companyId.HasValue)
+                query = query.Where(x => x.CompanyId == companyId.Value);
 
             //if (startDate.HasValue)
             //    query = query.Where(x => x.WorkDate >= startDate.Value);
@@ -521,7 +521,7 @@ namespace DataBridge
             //if (endDate.HasValue)
             //    query = query.Where(x => x.WorkDate <= endDate.Value);
 
-            return result.ToList();
+            return query.ToList();
         }
     }
 }
