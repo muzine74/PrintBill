@@ -20,23 +20,15 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DataBridge
 {
-    public class WorkManipulation
+    public class WorkManipulation : ManipulationBase
     {
         public WorkTypePoco WorkTypePoco;
         public WorkPoco workPoco = new WorkPoco();
-        RamssisCleaningContex ramssisCleaningContex;
-        DbContextOptions<RamssisCleaningContex> options;
         public List<DateOnly> jours = new List<DateOnly>();
         ReportBridgeDTO reportBridgeDTO = new ReportBridgeDTO();
 
-        public WorkManipulation()
+        public WorkManipulation() : base()
         {
-            options = new DbContextOptionsBuilder<RamssisCleaningContex>()
-                        .UseSqlServer("Server=DESKTOP-71ON71H\\SQLEXPRESS;Database=RamssisCleaningDB;Trusted_Connection=True;TrustServerCertificate=true;")
-          .Options;
-
-            ramssisCleaningContex = new RamssisCleaningContex(options);
-
             WorkTypePoco = new WorkTypePoco();
         }
 
@@ -506,7 +498,6 @@ namespace DataBridge
 
             query = query.OrderBy(x => x.CompanyId)
                   .ThenBy(x => x.WorkDate);
-
 
             //Appliquer les filtres dynamiquement
             if (employeeId.HasValue)

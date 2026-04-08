@@ -1,15 +1,17 @@
-﻿using DBConnection.Entity;
+using DBConnection.Entity;
 using GDTOSQL.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DataBridge.Entity
 {
     public class CompagniePoco
     {
+        [JsonPropertyName("compagnieId")]
         public Guid CompagnieID { get; set; }
         public Guid AddressID { get; set; }
         public Guid ContactID { get; set; }

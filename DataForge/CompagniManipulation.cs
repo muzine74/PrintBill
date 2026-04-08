@@ -6,6 +6,7 @@ using GDTOSQL.Entity;
 using Helpers.generalHelp;
 using Helpers.GoogleDrive;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Collections.Immutable;
 
 
@@ -13,10 +14,8 @@ using System.Collections.Immutable;
 
 namespace DataBridge
 {
-    public class CompagniManipulation
+    public class CompagniManipulation : ManipulationBase
     {
-        DbContextOptions<RamssisCleaningContex> options;
-        RamssisCleaningContex ramssisCleaningContex;
         CompagniePoco compagniePoco;
         public List<WorkBillInfo> _badeDataList = new List<WorkBillInfo>();
         public CompanyAddress CompagnyAdress = new CompanyAddress();
@@ -25,18 +24,11 @@ namespace DataBridge
         public List<Address> AdressList = new List<Address>();
         public List<Company> CompagnyList = new List<Company>();
         public List<Client> ClientList = new List<Client>();
+        private readonly ILogger<CompagniManipulation> _log;
 
-
-        public CompagniManipulation()
+        public CompagniManipulation() : base()
         {
-            options = new DbContextOptionsBuilder<RamssisCleaningContex>()
-                        .UseSqlServer("Server=DESKTOP-71ON71H\\SQLEXPRESS;Database=RamssisCleaningDB;Trusted_Connection=True;TrustServerCertificate=true;")
-          .Options;
-
-            ramssisCleaningContex = new RamssisCleaningContex(options);
-
             compagniePoco = new CompagniePoco();
-
         }
 
         public List<CompagniePoco> GetCompagieInfo()
@@ -160,6 +152,16 @@ namespace DataBridge
         public void SaveBillHisrory(List<BillHistoryPoco> _billHistoryPocoLst, List<BillDescriptionPoco> billDescriptionPocolist)
         {
             BillSearchStatus billSearchStatus = new BillSearchStatus();
+
+            var billIdentifier = _billHistoryPocoLst.FirstOrDefault()?.billIdentifier;
+
+            if (billIdentifier.HasValue)
+            {
+                foreach (var item in billDescriptionPocolist)
+                {
+                    item.BillHistoryIdPoco = billIdentifier.Value;
+                }
+            }
 
             billSearchStatus.keysearch = _billHistoryPocoLst[0].BillNumber;
             ;//_billHistoryPocoLst[0].BillNumber;
@@ -605,151 +607,197 @@ namespace DataBridge
             return result ?? new CompagniePoco();
         }
 
+        public CompagniePoco GetCompanyById(Guid compagnyId)
+        {
+            var result =
+                (from c in ramssisCleaningContex.Companies
+                 join ac in ramssisCleaningContex.CompanyAddresses on c.CompanyId equals ac.CompanyId
+                 join a in ramssisCleaningContex.Addresses on ac.AddressId equals a.AddressId
+                 join cl in ramssisCleaningContex.Clients on c.CompanyId equals cl.CompanyId
+                 where  c.CompanyId == compagnyId
+                 select new CompagniePoco
+                 {
+                     CompagnieID = c.CompanyId,
+                     AddressID = a.AddressId,
+                     ContactID = cl.clientID,
+                     CompagnieName = c.companyName,
+                     CompagnieStatus = c.companyStatus,
+                     CompagnieCode = c.companyCode,
+                     Compagniecountry = a.country,
+                     CompagnieState = a.state,
+                     Compagniecity = a.city,
+                     CompagnieZipCode = a.zipCode,
+                     CompagnieSuite = a.suite,
+                     CompagnieCivicNumber = a.civicNumber,
+                     CompagnieProvider = c.prividercode,
+                     PaymentFrequency = c.PaymentFrequency,
+                     WorkFrequency = c.WorkFrequency,
+                     TPSNumber = c.TPSNumber,
+                     TVQNumber = c.TVQNumber,
+                     ContactName = cl.name,
+                     ContactMail = cl.mail,
+                     ContactPhones = cl.phone,
+
+
+                     smtpServer = c.MailCredential.smtpServer,
+                     smtpPort = c.MailCredential.smtpPort,
+                     smtpUsername = c.MailCredential.smtpUsername,
+                     smtpPassword = c.MailCredential.smtpPassword,
+                 }).ToList().GroupBy(p => p.CompagnieCode)
+            .Select(g => g.First()).FirstOrDefault();
+
+            // 🔥 Si le résultat est null → retourner un objet vide (jamais null)
+            return result ?? new CompagniePoco();
+        }
 
         public void UpdateCompagnyInfo(CompagniePoco cmpPocoUp)
         {
-            var companie = ramssisCleaningContex.Companies
-                            .Include(c => c.CompanyPricingCalendars)
-                            .Where(c => c.CompanyId == cmpPocoUp.CompagnieID)
-                            .First();
-            var Adresse = ramssisCleaningContex.Addresses
-                            .Where(c => c.AddressId == cmpPocoUp.AddressID)
-                            .First();
-            var client = ramssisCleaningContex.Clients.Where(c => c.clientID == cmpPocoUp.ContactID).First();
+            using var context = CreateContext();
+            using var transaction = context.Database.BeginTransaction();
 
+            var companie = context.Companies
+                .Include(c => c.CompanyPricingCalendars)
+                .FirstOrDefault(c => c.CompanyId == cmpPocoUp.CompagnieID)
+                ?? throw new InvalidOperationException($"Compagnie introuvable : {cmpPocoUp.CompagnieID}");
 
+            var adresse = context.Addresses
+                .FirstOrDefault(a => a.AddressId == cmpPocoUp.AddressID)
+                ?? throw new InvalidOperationException($"Adresse introuvable : {cmpPocoUp.AddressID}");
 
+            var client = context.Clients
+                .FirstOrDefault(c => c.clientID == cmpPocoUp.ContactID)
+                ?? throw new InvalidOperationException($"Client introuvable : {cmpPocoUp.ContactID}");
+
+            // ── Scalaires compagnie ───────────────────────────────────────────
             companie.companyName = cmpPocoUp.CompagnieName;
             companie.companyCode = cmpPocoUp.CompagnieCode;
             companie.companyStatus = cmpPocoUp.CompagnieStatus;
             companie.prividercode = cmpPocoUp.CompagnieProvider;
             companie.PaymentFrequency = cmpPocoUp.PaymentFrequency;
             companie.WorkFrequency = cmpPocoUp.WorkFrequency;
-            //companie.CompanyPricingCalendars = cmpPocoUp._companyPricingCalendar;
+            companie.TPSNumber = cmpPocoUp.TPSNumber;
+            companie.TVQNumber = cmpPocoUp.TVQNumber;
 
-            Adresse.country = cmpPocoUp.Compagniecountry;
-            Adresse.state = cmpPocoUp.CompagnieState;
-            Adresse.city = cmpPocoUp.Compagniecity;
-            Adresse.zipCode = cmpPocoUp.CompagnieZipCode;
-            Adresse.suite = cmpPocoUp.CompagnieSuite;
-            Adresse.civicNumber = cmpPocoUp.CompagnieCivicNumber;
+            // ── Adresse ───────────────────────────────────────────────────────
+            adresse.civicNumber = cmpPocoUp.CompagnieCivicNumber;
+            adresse.suite = cmpPocoUp.CompagnieSuite;
+            adresse.zipCode = cmpPocoUp.CompagnieZipCode;
+            adresse.city = cmpPocoUp.Compagniecity;
+            adresse.state = cmpPocoUp.CompagnieState;
+            adresse.country = cmpPocoUp.Compagniecountry;
 
+            // ── Contact ───────────────────────────────────────────────────────
             client.name = cmpPocoUp.ContactName;
             client.mail = cmpPocoUp.ContactMail;
             client.phone = cmpPocoUp.ContactPhones;
-            Adresse.country = "Canada";
 
+            // ── Snapshot anciens calendriers actifs ───────────────────────────
+            var oldActive = companie.CompanyPricingCalendars
+                .Where(x => x.IsActive)
+                .Select(x => new
+                {
+                    x.CompanyPricingCalendarId,
+                    x.Days
+                })
+                .ToList();
 
-            List<CompanyPricingCalendarPoco> CpcPOldList = new List<CompanyPricingCalendarPoco>();
-            List<CompanyPricingCalendarPoco> CpcPNewList = new List<CompanyPricingCalendarPoco>();
-
-
-            CpcPOldList = companie.CompanyPricingCalendars
-                .Where(x => x.IsActive == true)
-                .Select(x => 
-                    new CompanyPricingCalendarPoco
-                    {
-                        CompanyPricingCalendarId = x.CompanyPricingCalendarId,
-                        Days = x.Days,
-                        DaysStatus = x.DaysStatus,
-                        CopagnyBenifictPrice = x.CopagnyBenifictPrice,
-                        Emplyeepaiment = x.Emplyeepaiment,
-                        IsActive = x.IsActive
-                    }
-                ).ToList();
-
-            // ÉTAPE 1: Mettre à jour une propriété sur TOUS les calendriers existants
-            if (companie.CompanyPricingCalendars != null && companie.CompanyPricingCalendars.Any())
+            // ── Désactiver anciens calendriers (TRACKÉ PAR EF) ────────────────
+            foreach (var cal in companie.CompanyPricingCalendars)
             {
-                //foreach (var existingCalendar in companie.CompanyPricingCalendars)
-                //{
-                //    // Mettre à jour la propriété spécifique
-                //    // Exemple: mettre à jour le statut ou une autre propriété
-                //    //existingCalendar.Status = "Updated"; // Remplacez par la propriété réelle
-                //      existingCalendar.IsActive = false;
-                //                                         // Ou: existingCalendar.LastModified = DateTime.Now;
-
-                //    // Vous pouvez mettre à jour plusieurs propriétés si nécessaire
-                //    // existingCalendar.SomeProperty = newValue;
-                //}
+                cal.IsActive = false;
             }
 
-            // ÉTAPE 2: Réinsérer la nouvelle liste (ajouter de nouveaux)
-            // Supposons que cmpPocoUp._companyPricingCalendar est la nouvelle liste
-            if (cmpPocoUp._companyPricingCalendar != null && cmpPocoUp._companyPricingCalendar.Any())
+            // ── Ajouter nouveaux calendriers (SAFE mapping) ───────────────────
+            var newCalendars = new List<CompanyPricingCalendar>();
+
+            if (cmpPocoUp._companyPricingCalendar != null)
             {
-                companie.CompanyPricingCalendars.ToList().ForEach(item => item.IsActive = false);
-
-                foreach (var newCalendar in cmpPocoUp._companyPricingCalendar)
+                foreach (var newCal in cmpPocoUp._companyPricingCalendar)
                 {
-                    // Vérifier si ce calendrier existe déjà (basé sur une clé unique)
-                    // Si vous avez un identifiant unique comme CalendarId ou une combinaison de propriétés
-                    //var exists = companie.CompanyPricingCalendars
-                    //    .Any(cpc => cpc.CompanyPricingCalendarId == newCalendar.CompanyPricingCalendarId); // Adaptez avec votre clé
+                    var entity = new CompanyPricingCalendar
+                    {
+                        CompanyId = companie.CompanyId,
+                        Days = newCal.Days,
+                        DaysStatus = newCal.DaysStatus,
+                        CopagnyBenifictPrice = newCal.CopagnyBenifictPrice,
+                        Emplyeepaiment = newCal.Emplyeepaiment,
+                        IsActive = true
+                    };
 
-                    //if (!exists)
-                    //{
-                    // Ajouter comme nouveau
-                    newCalendar.CompanyId = companie.CompanyId; // S'assurer de la relation
-                    companie.CompanyPricingCalendars.Add(newCalendar);
-                    //}
-                    //else
-                    //{
-
-                    //    // Optionnel: Mettre à jour complètement l'existant si trouvé
-                    //    var existing = companie.CompanyPricingCalendars
-                    //        .First(cpc => cpc.CompanyPricingCalendarId == newCalendar.CompanyPricingCalendarId);
-
-                    //    existing.IsActive = false;
-                    //    // ramssisCleaningContex.Entry(existing).CurrentValues.SetValues(newCalendar);
-                    //}
+                    newCalendars.Add(entity);
+                    companie.CompanyPricingCalendars.Add(entity);
                 }
             }
 
-            ramssisCleaningContex.SaveChanges();
+            // ── SaveChanges UNIQUE (important) ────────────────────────────────
+            try
+            {
+                context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                var details = string.Join("; ", ex.Entries.Select(e =>
+                {
+                    var keyValues = e.Metadata.FindPrimaryKey()
+                        ?.Properties
+                        .Select(p => $"{p.Name}={e.CurrentValues[p]}")
+                        ?? Enumerable.Empty<string>();
+                    return $"{e.Entity.GetType().Name}[{string.Join(",", keyValues)}] état={e.State}";
+                }));
 
+                throw new InvalidOperationException(
+                    $"SaveChanges a échoué (conflit de concurrence). Entités : {details}", ex);
+            }
 
-            CpcPNewList = companie.CompanyPricingCalendars
-                .Where(x => x.IsActive == true)
-                .Select(x =>
-                    new CompanyPricingCalendarPoco
-                    {
-                        CompanyPricingCalendarId = x.CompanyPricingCalendarId,
-                        Days = x.Days,
-                        DaysStatus = x.DaysStatus,
-                        CopagnyBenifictPrice = x.CopagnyBenifictPrice,
-                        Emplyeepaiment = x.Emplyeepaiment,
-                        IsActive = x.IsActive
-                    }
-                ).ToList();
+            // ── Re-mapping anciens → nouveaux calendriers ─────────────────────
+            var newActive = newCalendars
+                .Select(x => new
+                {
+                    x.CompanyPricingCalendarId,
+                    x.Days
+                })
+                .ToList();
 
-
-
-
-            List<(Guid OldId, Guid NewId)> idsPairs = CpcPOldList.Join(
-                CpcPNewList,
+            var idsPairs = oldActive.Join(
+                newActive,
                 o => o.Days,
                 n => n.Days,
-                (oldItem, newItem) => (OldId: oldItem.CompanyPricingCalendarId, NewId: newItem.CompanyPricingCalendarId)
+                (o, n) => (OldId: o.CompanyPricingCalendarId, NewId: n.CompanyPricingCalendarId)
             ).ToList();
 
-
-            UpdateEmployeeCompagnyPricings(idsPairs);
-        }
-
-        private void UpdateEmployeeCompagnyPricings(List<(Guid OldId, Guid NewId)> idsPairs)
-        {
             foreach (var (OldId, NewId) in idsPairs)
             {
-                var empCompagnyPricings = ramssisCleaningContex.EmployeeCompagnyPricings
+                var pricings = context.EmployeeCompagnyPricings
                     .Where(ecp => ecp.CompanyPricingCalendarId == OldId)
                     .ToList();
-                foreach (var ecp in empCompagnyPricings)
+
+                foreach (var ecp in pricings)
                 {
                     ecp.CompanyPricingCalendarId = NewId;
                 }
             }
-            ramssisCleaningContex.SaveChanges();
+
+            // ── Save final ────────────────────────────────────────────────────
+            try
+            {
+                context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                var details = string.Join("; ", ex.Entries.Select(e =>
+                {
+                    var keyValues = e.Metadata.FindPrimaryKey()
+                        ?.Properties
+                        .Select(p => $"{p.Name}={e.CurrentValues[p]}")
+                        ?? Enumerable.Empty<string>();
+                    return $"{e.Entity.GetType().Name}[{string.Join(",", keyValues)}] état={e.State}";
+                }));
+
+                throw new InvalidOperationException(
+                    $"Mise à jour des pointages échouée. Entités : {details}", ex);
+            }
+
+            transaction.Commit();
         }
 
         public List<SheetInfo> GetListgoogleSheet(SheetInfo sheetInfo)

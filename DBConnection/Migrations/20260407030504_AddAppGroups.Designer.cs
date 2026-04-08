@@ -4,6 +4,7 @@ using DBConnection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DBConnection.Migrations
 {
     [DbContext(typeof(RamssisCleaningContex))]
-    partial class RamssisCleaningContexModelSnapshot : ModelSnapshot
+    [Migration("20260407030504_AddAppGroups")]
+    partial class AddAppGroups
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,116 +103,6 @@ namespace DBConnection.Migrations
                     b.HasKey("GroupId", "EmployeeId");
 
                     b.ToTable("AppGroupEmployees", (string)null);
-                });
-
-            modelBuilder.Entity("DBConnection.Entity.AppPermission", b =>
-                {
-                    b.Property<int>("PermissionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PermissionId"));
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Module")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("PermissionId");
-
-                    b.HasIndex("Key")
-                        .IsUnique();
-
-                    b.ToTable("AppPermissions", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            PermissionId = 1,
-                            Key = "employees.view",
-                            Label = "Voir",
-                            Module = "Employés"
-                        },
-                        new
-                        {
-                            PermissionId = 2,
-                            Key = "employees.edit",
-                            Label = "Modifier",
-                            Module = "Employés"
-                        },
-                        new
-                        {
-                            PermissionId = 3,
-                            Key = "employees.create",
-                            Label = "Créer",
-                            Module = "Employés"
-                        },
-                        new
-                        {
-                            PermissionId = 4,
-                            Key = "employees.delete",
-                            Label = "Supprimer",
-                            Module = "Employés"
-                        },
-                        new
-                        {
-                            PermissionId = 5,
-                            Key = "companies.view",
-                            Label = "Voir",
-                            Module = "Compagnies"
-                        },
-                        new
-                        {
-                            PermissionId = 6,
-                            Key = "companies.edit",
-                            Label = "Modifier",
-                            Module = "Compagnies"
-                        },
-                        new
-                        {
-                            PermissionId = 7,
-                            Key = "invoices.view",
-                            Label = "Voir",
-                            Module = "Factures"
-                        },
-                        new
-                        {
-                            PermissionId = 8,
-                            Key = "invoices.edit",
-                            Label = "Modifier",
-                            Module = "Factures"
-                        },
-                        new
-                        {
-                            PermissionId = 9,
-                            Key = "invoices.send",
-                            Label = "Envoyer",
-                            Module = "Factures"
-                        },
-                        new
-                        {
-                            PermissionId = 10,
-                            Key = "pointage.view",
-                            Label = "Voir",
-                            Module = "Pointage"
-                        },
-                        new
-                        {
-                            PermissionId = 11,
-                            Key = "pointage.validate",
-                            Label = "Valider",
-                            Module = "Pointage"
-                        });
                 });
 
             modelBuilder.Entity("DBConnection.Entity.AppUserRole", b =>

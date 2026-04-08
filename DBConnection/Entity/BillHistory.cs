@@ -21,12 +21,12 @@ namespace DBConnection.Entity
         public string MouthBill { get; set; }
         public DateTime BilledDate { get; set; }
         public string? BillDescriptionText { get; set; } // Renamed to avoid conflict
-        public float compagnyPrice { get; set; }
+        public decimal compagnyPrice { get; set; }
         public int NumberOfVisite { get; set; }
-        public float TotalWithOutTax { get; set; }
-        public float TPS { get; set; }
-        public float TVQ { get; set; }
-        public float TotalWithTax { get; set; }
+        public decimal TotalWithOutTax { get; set; }
+        public decimal TPS { get; set; }
+        public decimal TVQ { get; set; }
+        public decimal TotalWithTax { get; set; }
         public string BillPath { get; set; }
         public string? AfterSendedBillPath { get; set; }
         public bool? Issended { get; set; }

@@ -40,7 +40,15 @@ namespace DBConnection
         public DbSet<EmployeeCredential> EmployeeCredentials { get; set; }
 
         public DbSet<EmployeeTimeLog> EmployeeTimeLogs { get; set; }
-        
+
+        public DbSet<PointageValidation> PointageValidations { get; set; }
+
+        public DbSet<EmployeeFile> EmployeeFiles { get; set; }
+
+        public DbSet<AppGroup>         AppGroups         { get; set; }
+        public DbSet<AppGroupEmployee> AppGroupEmployees { get; set; }
+        public DbSet<AppUserRole>      AppUserRoles      { get; set; }
+        public DbSet<AppPermission>    AppPermissions    { get; set; }
 
 
 
@@ -55,6 +63,8 @@ namespace DBConnection
             ConfigureWork(modelBuilder);
             ConfigureBilling(modelBuilder);
             ConfigureCredentials(modelBuilder);
+            ConfigureAppGroups(modelBuilder);
+            ConfigureAppPermissions(modelBuilder);
             SeedWorkTypes(modelBuilder);
             
         }
@@ -80,6 +90,18 @@ namespace DBConnection
                       .WithOne(ec => ec.Employee)
                       .HasForeignKey(ec => ec.EmployeeId)
                       .IsRequired();
+
+                entity.HasMany(e => e.EmployeeFiles)
+                      .WithOne(f => f.Employee)
+                      .HasForeignKey(f => f.EmployeeId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<EmployeeFile>(entity =>
+            {
+                entity.HasKey(f => f.EmployeeFileId);
+                entity.Property(f => f.FileName).IsRequired().HasMaxLength(500);
+                entity.Property(f => f.OriginalName).IsRequired().HasMaxLength(500);
             });
         }
 
@@ -171,6 +193,62 @@ namespace DBConnection
                 entity.HasKey(e => e.CompanyId);
                 entity.HasIndex(e => e.CompanyId).IsUnique();
             });
+        }
+
+        private static void ConfigureAppGroups(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AppGroup>(e =>
+            {
+                e.ToTable("AppGroups");
+                e.HasKey(g => g.GroupId);
+                e.Property(g => g.Name).IsRequired().HasMaxLength(100);
+                e.Property(g => g.Description).HasDefaultValue(string.Empty);
+                e.Property(g => g.PermissionsJson).HasDefaultValue("[]");
+            });
+
+            modelBuilder.Entity<AppGroupEmployee>(e =>
+            {
+                e.ToTable("AppGroupEmployees");
+                e.HasKey(ge => new { ge.GroupId, ge.EmployeeId });
+                e.HasOne(ge => ge.Group)
+                 .WithMany(g => g.GroupEmployees)
+                 .HasForeignKey(ge => ge.GroupId);
+            });
+
+            modelBuilder.Entity<AppUserRole>(e =>
+            {
+                e.ToTable("AppUserRoles");
+                e.HasKey(r => r.CredentialId);
+                e.Property(r => r.Role).HasDefaultValue("USER").HasMaxLength(20);
+            });
+        }
+
+        private static void ConfigureAppPermissions(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AppPermission>(e =>
+            {
+                e.ToTable("AppPermissions");
+                e.HasKey(p => p.PermissionId);
+                e.Property(p => p.Key).IsRequired().HasMaxLength(100);
+                e.Property(p => p.Label).IsRequired().HasMaxLength(100);
+                e.Property(p => p.Module).IsRequired().HasMaxLength(100);
+                e.HasIndex(p => p.Key).IsUnique();
+            });
+
+            modelBuilder.Entity<AppPermission>().HasData(
+                new AppPermission { PermissionId =  1, Module = "Employés",   Key = "employees.view",   Label = "Voir"       },
+                new AppPermission { PermissionId =  2, Module = "Employés",   Key = "employees.edit",   Label = "Modifier"   },
+                new AppPermission { PermissionId =  3, Module = "Employés",   Key = "employees.create", Label = "Créer"      },
+                new AppPermission { PermissionId =  4, Module = "Employés",   Key = "employees.delete", Label = "Supprimer"  },
+                new AppPermission { PermissionId =  5, Module = "Compagnies", Key = "companies.view",   Label = "Voir"       },
+                new AppPermission { PermissionId =  6, Module = "Compagnies", Key = "companies.edit",   Label = "Modifier"   },
+                new AppPermission { PermissionId =  7, Module = "Factures",   Key = "invoices.view",    Label = "Voir"       },
+                new AppPermission { PermissionId =  8, Module = "Factures",   Key = "invoices.edit",    Label = "Modifier"   },
+                new AppPermission { PermissionId =  9, Module = "Factures",   Key = "invoices.send",    Label = "Envoyer"    },
+                new AppPermission { PermissionId = 10, Module = "Pointage",   Key = "pointage.view",    Label = "Voir"       },
+                new AppPermission { PermissionId = 11, Module = "Pointage",   Key = "pointage.validate",Label = "Valider"    },
+                new AppPermission { PermissionId = 1001, Module = "Groupes",  Key = "groups.manage",    Label = "Gérer"      }
+            );
         }
 
         private static void SeedWorkTypes(ModelBuilder modelBuilder)

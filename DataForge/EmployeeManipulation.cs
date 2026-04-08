@@ -15,27 +15,18 @@ using DataBridge.Helpers; // For Login model
 
 namespace DataBridge
 {
-    public class EmployeeManipulation
+    public class EmployeeManipulation : ManipulationBase
     {
-        DbContextOptions<RamssisCleaningContex> options;
-        RamssisCleaningContex ramssisCleaningContex;
         MapperConfiguration config;
         IMapper _mapper;
 
         Employee employee;
         EmployeePoco employeePoco;
 
-        public EmployeeManipulation()
+        public EmployeeManipulation() : base()
         {
             employee = new Employee();
-            options = new DbContextOptionsBuilder<RamssisCleaningContex>()
-            .UseSqlServer("Server=DESKTOP-71ON71H\\SQLEXPRESS;Database=RamssisCleaningDB;Trusted_Connection=True;TrustServerCertificate=true;")
-            .Options;
-
-            ramssisCleaningContex = new RamssisCleaningContex(options);
-
             EmployeeEmployeePcoMapper();
-
         }
 
         private void EmployeeEmployeePcoMapper()
@@ -199,8 +190,12 @@ namespace DataBridge
                 employeeId = "00000000-0000-0000-0000-000000000000";
 
 
-            return ramssisCleaningContex.EmployeeAddresses
+            var employeeAdresse = ramssisCleaningContex.EmployeeAddresses
                 .AsNoTracking()
+                .Include(ea => ea.Employee)
+                    .ThenInclude(e => e.EmployeeCompanies)
+                        .ThenInclude(ec => ec.Company)
+                .Include(ea => ea.Address)
                 .Where(ea => ea.Employee.EmployeeId == new Guid(employeeId))
                 .Select(ea => new EmployeePoco
                 {
@@ -210,6 +205,7 @@ namespace DataBridge
                     EmployeeMail = ea.Employee.EmployeeMail,
                     EmployeePhone = ea.Employee.EmployeePhone,
                     EmployeeNote = ea.Employee.notes,
+                    IsActive = ea.Employee.IsActive,
 
                     AddressId = ea.Address.AddressId,
                     EmployeeCivicNumber = ea.Address.civicNumber,
@@ -229,6 +225,8 @@ namespace DataBridge
                         .ToList()
                 })
                 .FirstOrDefault();
+
+            return employeeAdresse;
         }
 
 
@@ -245,6 +243,7 @@ namespace DataBridge
                   EmployeeMail = ea.Employee.EmployeeMail,
                   EmployeePhone = ea.Employee.EmployeePhone,
                   EmployeeNote = ea.Employee.notes,
+                  IsActive = ea.Employee.IsActive,
 
                   AddressId = ea.Address.AddressId,
                   EmployeeCivicNumber = ea.Address.civicNumber,
@@ -306,7 +305,10 @@ namespace DataBridge
 
         private RamssisCleaningContex CreateContext()
         {
-            return new RamssisCleaningContex(options);
+            var opts = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<RamssisCleaningContex>()
+                .UseSqlServer(ConnectionConfig.ConnectionString)
+                .Options;
+            return new RamssisCleaningContex(opts);
         }
         public void UpdateEmployee(EmployeePoco emplPoco)
         {
@@ -365,6 +367,32 @@ namespace DataBridge
             transaction.Commit();
         }
 
+        public void AssignCompany(Guid employeeId, Guid companyId)
+        {
+            bool already = ramssisCleaningContex.EmployeeCompanies
+                .Any(ec => ec.EmployeeId == employeeId && ec.CompanyId == companyId);
+
+            if (already) return;
+
+            ramssisCleaningContex.EmployeeCompanies.Add(new EmployeeCompany
+            {
+                EmployeeId = employeeId,
+                CompanyId  = companyId
+            });
+            ramssisCleaningContex.SaveChanges();
+        }
+
+        public void UnassignCompany(Guid employeeId, Guid companyId)
+        {
+            var link = ramssisCleaningContex.EmployeeCompanies
+                .FirstOrDefault(ec => ec.EmployeeId == employeeId && ec.CompanyId == companyId);
+
+            if (link is null) return;
+
+            ramssisCleaningContex.EmployeeCompanies.Remove(link);
+            ramssisCleaningContex.SaveChanges();
+        }
+
         public EmployeePoco GetEmployeeByCredential(Login login)
         {
             //EmployeePoco employeePoco = new EmployeePoco();
@@ -389,11 +417,11 @@ namespace DataBridge
         #region login
         public async Task<EmployeePoco> ValidateUserCredentials(Login login)
         {
-          var employee =  ramssisCleaningContex.EmployeeCredentials.Where(cred => cred.Username == login.Username && cred.PasswordHash == login.Password)
-                .Join(ramssisCleaningContex.Employees,
-                    cred => cred.EmplyeeID,
-                    emp => emp.EmployeeId,
-                    (cred, emp) => emp)
+            var employee = ramssisCleaningContex.EmployeeCredentials.Where(cred => cred.Username == login.Username && cred.PasswordHash == login.Password)
+                  .Join(ramssisCleaningContex.Employees,
+                      cred => cred.EmplyeeID,
+                      emp => emp.EmployeeId,
+                      (cred, emp) => emp)
                 .SingleOrDefault();  // ou SingleOrDefault() si unique
 
             if (employee == null)

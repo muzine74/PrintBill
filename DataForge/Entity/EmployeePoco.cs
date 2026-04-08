@@ -23,6 +23,7 @@ namespace DataBridge.Entity
         public string EmployeeMail { get; set; } = string.Empty;
         public string EmployeePhone { get; set; } = string.Empty;
         public string EmployeeNote { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
 
 
         #region Adress

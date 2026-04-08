@@ -15,23 +15,14 @@ using DBConnection;
 
 namespace DataBridge
 {
-    public class BillDescriptionMAnipulation
+    public class BillDescriptionMAnipulation : ManipulationBase
     {
-        DbContextOptions<RamssisCleaningContex> options;
-        RamssisCleaningContex ramssisCleaningContex;
         BillDescriptionPoco billDescriptionPoco;
         MapperConfiguration config;
-        //IMapper mapper;
-
         IMapper _mapper;
 
-        public BillDescriptionMAnipulation()
+        public BillDescriptionMAnipulation() : base()
         {
-            options = new DbContextOptionsBuilder<RamssisCleaningContex>()
-            .UseSqlServer("Server=DESKTOP-71ON71H\\SQLEXPRESS;Database=RamssisCleaningDB;Trusted_Connection=True;TrustServerCertificate=true;")
-.Options;
-
-            ramssisCleaningContex = new RamssisCleaningContex(options);
             billDescriptionPoco = new BillDescriptionPoco();
 
 
@@ -53,14 +44,14 @@ namespace DataBridge
 
         }
 
-        public List<BillDescriptionPoco> GetBillDescriptionByBillHistoryId(int bilIdentifier)
-        {
-            var billDescriptionList = ramssisCleaningContex.BillDescriptions
-        .Where(b => b.BillHistoryId == bilIdentifier)
-        .ToList();
+        //public List<BillDescriptionPoco> GetBillDescriptionByBillHistoryId(int bilIdentifier)
+        //{
+        //    var billDescriptionList = ramssisCleaningContex.BillDescriptions
+        //.Where(b => b.BillHistoryId == bilIdentifier)
+        //.ToList();
 
-            return _mapper.Map<List<BillDescriptionPoco>>(billDescriptionList);
-        }   
+        //    return _mapper.Map<List<BillDescriptionPoco>>(billDescriptionList);
+        //}   
 
     }
 }

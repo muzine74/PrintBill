@@ -13,6 +13,7 @@ namespace DBConnection.Entity
         public string? EmployeeMail { get; set; }
         public string? EmployeePhone { get; set; }
         public string? notes { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
 
@@ -23,5 +24,7 @@ namespace DBConnection.Entity
        
 
         public virtual ICollection<Work> Works { get; set; } = new List<Work>();
+
+        public virtual ICollection<EmployeeFile> EmployeeFiles { get; set; } = new List<EmployeeFile>();
     }
 }
