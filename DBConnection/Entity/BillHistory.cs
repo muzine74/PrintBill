@@ -40,6 +40,8 @@ namespace DBConnection.Entity
         public string? ClientEmail   { get; set; }
         public string? ClientPhone   { get; set; }
 
+        // Lien parent (null = facture racine, non nul = avoir d'une autre facture)
+        public int? ParentBillIdentifier { get; set; }
 
         public ICollection<BillDescription> BillDescriptions { get; set; }
          = new List<BillDescription>();
