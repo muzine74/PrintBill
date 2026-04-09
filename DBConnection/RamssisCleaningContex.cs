@@ -49,6 +49,7 @@ namespace DBConnection
         public DbSet<AppGroupEmployee> AppGroupEmployees { get; set; }
         public DbSet<AppUserRole>      AppUserRoles      { get; set; }
         public DbSet<AppPermission>    AppPermissions    { get; set; }
+        public DbSet<AppConfig>        AppConfigs        { get; set; }
 
 
 
@@ -65,6 +66,7 @@ namespace DBConnection
             ConfigureCredentials(modelBuilder);
             ConfigureAppGroups(modelBuilder);
             ConfigureAppPermissions(modelBuilder);
+            ConfigureAppConfig(modelBuilder);
             SeedWorkTypes(modelBuilder);
             
         }
@@ -247,8 +249,34 @@ namespace DBConnection
                 new AppPermission { PermissionId =  9, Module = "Factures",   Key = "invoices.send",    Label = "Envoyer"    },
                 new AppPermission { PermissionId = 10, Module = "Pointage",   Key = "pointage.view",    Label = "Voir"       },
                 new AppPermission { PermissionId = 11, Module = "Pointage",   Key = "pointage.validate",Label = "Valider"    },
-                new AppPermission { PermissionId = 1001, Module = "Groupes",  Key = "groups.manage",    Label = "Gérer"      }
+                new AppPermission { PermissionId = 1001, Module = "Groupes",      Key = "groups.manage",  Label = "Gérer"      },
+                new AppPermission { PermissionId = 1002, Module = "Application", Key = "config.manage",  Label = "Configurer" }
             );
+        }
+
+        private static void ConfigureAppConfig(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AppConfig>(e =>
+            {
+                e.ToTable("AppConfigs");
+                e.HasKey(c => c.ConfigId);
+                e.Property(c => c.TpsRate).HasColumnType("decimal(6,4)").HasDefaultValue(5m);
+                e.Property(c => c.TvqRate).HasColumnType("decimal(6,4)").HasDefaultValue(9.975m);
+                e.Property(c => c.LogoPath).HasMaxLength(500);
+                e.Property(c => c.CompanyName).HasMaxLength(200);
+                e.Property(c => c.CompanyAddress).HasMaxLength(500);
+                e.Property(c => c.CompanyPhone).HasMaxLength(50);
+                e.Property(c => c.CompanyEmail).HasMaxLength(200);
+                e.Property(c => c.SmtpServer).HasMaxLength(200);
+                e.Property(c => c.SmtpUser).HasMaxLength(200);
+                e.Property(c => c.SmtpPassword).HasMaxLength(200);
+                e.Property(c => c.TpsNumber).HasMaxLength(50);
+                e.Property(c => c.TvqNumber).HasMaxLength(50);
+                e.Property(c => c.ContactName).HasMaxLength(200);
+                e.Property(c => c.ContactPhone).HasMaxLength(50);
+                e.Property(c => c.ContactEmail).HasMaxLength(200);
+                e.Property(c => c.AppVersion).HasMaxLength(50);
+            });
         }
 
         private static void SeedWorkTypes(ModelBuilder modelBuilder)
