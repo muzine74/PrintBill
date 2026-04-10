@@ -890,6 +890,74 @@ namespace DataBridge
 
         }
 
+        public List<CompagniePoco> getAllCompagnies()
+        {
+            var cpmList = (
+                        from C in ramssisCleaningContex.Companies
+                        join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
+                        join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
+                        join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
+                        select new
+                        {
+                            C.CompanyId,
+                            A.AddressId,
+                            CL.clientID,
+                            C.companyName,
+                            C.companyStatus,
+                            C.companyCode,
+                            C.prividercode,
+                            C.PaymentFrequency,
+                            C.WorkFrequency,
+                            A.country,
+                            A.state,
+                            A.city,
+                            A.zipCode,
+                            A.suite,
+                            A.civicNumber,
+                            CL.name,
+                            CL.mail,
+                            CL.phone,
+                            C.TPSNumber,
+                            C.TVQNumber,
+                            C.MailCredential.smtpUsername,
+                            C.MailCredential.smtpPassword,
+                            C.MailCredential.smtpServer,
+                            C.MailCredential.smtpPort
+                        }
+                        ).ToList();
+
+            var copiedList = cpmList.Select(cp => new CompagniePoco
+            {
+                CompagnieID      = cp.CompanyId,
+                AddressID        = cp.AddressId,
+                ContactID        = cp.clientID,
+                CompagnieName    = cp.companyName,
+                CompagnieStatus  = cp.companyStatus,
+                CompagnieCode    = cp.companyCode,
+                CompagnieProvider = cp.prividercode,
+                Compagniecountry = cp.country,
+                CompagnieState   = cp.state,
+                Compagniecity    = cp.city,
+                CompagnieZipCode = cp.zipCode,
+                CompagnieSuite   = cp.suite,
+                CompagnieCivicNumber = cp.civicNumber,
+                PaymentFrequency = cp.PaymentFrequency,
+                WorkFrequency    = cp.WorkFrequency,
+                TPSNumber        = cp.TPSNumber,
+                TVQNumber        = cp.TVQNumber,
+                ContactName      = cp.name,
+                ContactMail      = cp.mail,
+                ContactPhones    = cp.phone,
+                smtpUsername     = cp.smtpUsername,
+                smtpPassword     = cp.smtpPassword,
+                smtpServer       = cp.smtpServer,
+                smtpPort         = cp.smtpPort
+            }).ToList();
+
+            return copiedList.GroupBy(p => p.CompagnieCode)
+                .Select(g => g.First()).OrderBy(c => c.CompagnieName).ToList();
+        }
+
         public List<BillHistory> GetBillByBillNumber(BillSearchStatus BillSearchStatus)
         {
 
