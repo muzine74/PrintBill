@@ -7,6 +7,5 @@ namespace DBConnection;
 /// </summary>
 public static class ConnectionConfig
 {
-    public static string ConnectionString { get; set; } =
-        "Server=DESKTOP-71ON71H\\SQLEXPRESS;Database=RamssisCleaningDB;Trusted_Connection=True;TrustServerCertificate=true;";
+    public static string ConnectionString { get; set; } = string.Empty;
 }
