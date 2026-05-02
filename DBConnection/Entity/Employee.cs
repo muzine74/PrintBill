@@ -14,6 +14,7 @@ namespace DBConnection.Entity
         public string? EmployeePhone { get; set; }
         public string? notes { get; set; }
         public bool IsActive { get; set; } = true;
+        public string EmployeeType { get; set; } = "Permanent";
 
         public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
 
