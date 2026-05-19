@@ -13,8 +13,9 @@ namespace DBConnection.Entity
         public string? EmployeeMail { get; set; }
         public string? EmployeePhone { get; set; }
         public string? notes { get; set; }
-        public bool IsActive { get; set; } = true;
+        public bool   IsActive     { get; set; } = true;
         public string EmployeeType { get; set; } = "Permanent";
+        public Guid   TenantId     { get; set; }
 
         public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
 

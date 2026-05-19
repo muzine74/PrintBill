@@ -8,6 +8,7 @@ namespace DBConnection.Entity
         public string Name            { get; set; } = string.Empty;
         public string Description     { get; set; } = string.Empty;
         public string PermissionsJson { get; set; } = "[]";
+        public Guid   TenantId        { get; set; }
 
         public ICollection<AppGroupEmployee> GroupEmployees { get; set; } = [];
 

@@ -11,7 +11,8 @@ namespace DBConnection.Entity
             Clients = new List<Client>();   
         }
 
-        public Guid CompanyId { get; set; }
+        public Guid   CompanyId   { get; set; }
+        public Guid   TenantId    { get; set; }
         public string companyName { get; set; }
         public string companyCode { get; set; }
         public bool companyStatus { get; set; }

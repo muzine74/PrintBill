@@ -43,6 +43,8 @@ namespace DBConnection.Entity
         // Lien parent (null = facture racine, non nul = avoir d'une autre facture)
         public int? ParentBillIdentifier { get; set; }
 
+        public Guid TenantId { get; set; }
+
         public ICollection<BillDescription> BillDescriptions { get; set; }
          = new List<BillDescription>();
     }

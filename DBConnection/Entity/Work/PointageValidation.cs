@@ -14,6 +14,7 @@ namespace DBConnection.Entity
 
         public DateTime ValidatedAt        { get; set; }
         public Guid     ValidatedByAdminId { get; set; }
+        public Guid     TenantId           { get; set; }
 
         // Navigation
         public virtual Employee Employee { get; set; } = null!;

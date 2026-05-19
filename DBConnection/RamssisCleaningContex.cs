@@ -50,8 +50,7 @@ namespace DBConnection
         public DbSet<AppUserRole>      AppUserRoles      { get; set; }
         public DbSet<AppPermission>    AppPermissions    { get; set; }
         public DbSet<AppConfig>        AppConfigs        { get; set; }
-
-
+        public DbSet<Tenant>           Tenants           { get; set; }
 
 
 
@@ -67,8 +66,8 @@ namespace DBConnection
             ConfigureAppGroups(modelBuilder);
             ConfigureAppPermissions(modelBuilder);
             ConfigureAppConfig(modelBuilder);
+            ConfigureTenants(modelBuilder);
             SeedWorkTypes(modelBuilder);
-            
         }
 
         #region Configurations
@@ -260,6 +259,7 @@ namespace DBConnection
             {
                 e.ToTable("AppConfigs");
                 e.HasKey(c => c.ConfigId);
+                e.Property(c => c.ConfigId).ValueGeneratedNever();
                 e.Property(c => c.TpsRate).HasColumnType("decimal(6,4)").HasDefaultValue(5m);
                 e.Property(c => c.TvqRate).HasColumnType("decimal(6,4)").HasDefaultValue(9.975m);
                 e.Property(c => c.LogoPath).HasMaxLength(500);
@@ -289,6 +289,20 @@ namespace DBConnection
                 new WorkType { WorkTypeId = 5, Name = "Mensuel" },
                 new WorkType { WorkTypeId = 6, Name = "Horaire" }
             );
+        }
+
+        private static void ConfigureTenants(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Tenant>(e =>
+            {
+                e.ToTable("Tenants");
+                e.HasKey(t => t.TenantId);
+                e.Property(t => t.Name).IsRequired().HasMaxLength(200);
+                e.Property(t => t.Slug).IsRequired().HasMaxLength(100);
+                e.HasIndex(t => t.Slug).IsUnique();
+                e.Property(t => t.OwnerEmail).HasMaxLength(200);
+                e.Property(t => t.Plan).HasDefaultValue("starter").HasMaxLength(50);
+            });
         }
 
         #endregion

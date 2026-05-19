@@ -22,8 +22,10 @@ namespace DBConnection.Entity
         public Guid CompanyId { get; set; }
 
         public Guid EmployeeId { get; set; }
+        public Guid TenantId   { get; set; }
+
         // Navigation properties
-        public virtual Company Company { get; set; }
+        public virtual Company  Company  { get; set; }
         public virtual Employee Employee { get; set; }
     }
 }

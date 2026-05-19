@@ -2,11 +2,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DBConnection.Entity
 {
-    /// <summary>Configuration singleton de l'application (une seule ligne, ConfigId = 1).</summary>
+    /// <summary>Configuration par tenant (une ligne par tenant).</summary>
     public class AppConfig
     {
         [Key]
-        public int ConfigId { get; set; } = 1;
+        public int  ConfigId { get; set; }
+        public Guid TenantId { get; set; }
 
         // ── Compagnie ────────────────────────────────────────────────────────
         public string? LogoPath       { get; set; }
