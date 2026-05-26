@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace DBConnection.Entity
 {
+    public enum WorkType1
+    {
+        Visit,      // Paid per visit
+        Hourly,     // Paid per hour
+        FlatRate    // Fixed amount
+    }
+
     [Table("EmployeeTimeLogs")]
     public class EmployeeTimeLog
     {

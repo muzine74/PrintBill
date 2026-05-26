@@ -11,7 +11,7 @@ namespace DBConnection.Entity
         public Guid EmployeeCompagnyPricingId { get; set; }
         public Guid CompanyPricingCalendarId { get; set; }
         public Guid EmployeeId { get; set; }
-        public decimal EmplyeePaiment { get; set; }
+        public decimal EmployeePayment { get; set; }
         public bool IsActive { get; set; }  = false;
         public DateTime ApplicatedDate { get; set; } = DateTime.Now;
     }

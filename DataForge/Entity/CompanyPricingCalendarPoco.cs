@@ -11,8 +11,8 @@ namespace DataBridge.Entity
         public Guid CompanyPricingCalendarId { get; set; }
         public string Days { get; set; }
         public bool DaysStatus { get; set; }
-        public decimal CopagnyBenifictPrice { get; set; }
-        public decimal Emplyeepaiment { get; set; }
+        public decimal CompanyBenefitPrice { get; set; }
+        public decimal EmployeePayment { get; set; }
         public bool IsActive { get; set; }
 
     }

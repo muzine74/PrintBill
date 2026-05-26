@@ -214,8 +214,8 @@ namespace SendBillWF
                         CompanyPricingCalendarId = Guid.NewGuid(),
                         CompanyId = CompagnyGuid,
                         Days = item.Days,
-                        CopagnyBenifictPrice = item.CopagnyBenifictPrice,
-                        Emplyeepaiment = item.Emplyeepaiment,
+                        CompanyBenefitPrice = item.CompanyBenefitPrice,
+                        EmployeePayment = item.EmployeePayment,
                         ApplicatedDate = DateTime.Now,
                         IsActive = true
                     });

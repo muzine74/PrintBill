@@ -25,8 +25,6 @@ namespace DBConnection.Entity
         // Navigation property for assignments
        
 
-        public virtual ICollection<Work> Works { get; set; } = new List<Work>();
-
         public virtual ICollection<EmployeeFile> EmployeeFiles { get; set; } = new List<EmployeeFile>();
     }
 }

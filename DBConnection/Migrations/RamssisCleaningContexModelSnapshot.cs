@@ -459,7 +459,7 @@ namespace DBConnection.Migrations
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("CopagnyBenifictPrice")
+                    b.Property<decimal>("CompanyBenefitPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Days")
@@ -469,7 +469,7 @@ namespace DBConnection.Migrations
                     b.Property<bool>("DaysStatus")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("Emplyeepaiment")
+                    b.Property<decimal>("EmployeePayment")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsActive")
@@ -543,7 +543,7 @@ namespace DBConnection.Migrations
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("EmplyeePaiment")
+                    b.Property<decimal>("EmployeePayment")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsActive")

@@ -14,7 +14,6 @@ namespace DataBridge
         public string CompanyName { get; set; }
         public bool CompanyStatus { get; set; }
         public string CompanyCode { get; set; }
-        public string ProviderCode { get; set; }
         public string TPSNumber { get; set; }
         public string TVQNumber { get; set; }
         public string PaymentFrequency { get; set; }

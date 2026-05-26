@@ -301,8 +301,8 @@ namespace SendBillWF
                         CompanyPricingCalendarId  = cpc.CompanyPricingCalendarId,
                         Days = cpc.Days,
                         DaysStatus = cpc.DaysStatus,
-                        CopagnyBenifictPrice = cpc.CopagnyBenifictPrice,
-                        Emplyeepaiment = cpc.Emplyeepaiment,
+                        CompanyBenefitPrice = cpc.CompanyBenefitPrice,
+                        EmployeePayment = cpc.EmployeePayment,
                         IsActive = cpc.IsActive
                     });
 

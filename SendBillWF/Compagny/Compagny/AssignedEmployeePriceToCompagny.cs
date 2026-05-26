@@ -103,7 +103,7 @@ namespace SendBillWF.Compagny.Compagny
                                                           CompagnyCode = c.CompagnieCode,
                                                           CompagnyName = c.CompagnieName,
                                                           EmployeeId = employeePoco.EmployeeId,
-                                                          Emplyeepaiment = p.Emplyeepaiment,
+                                                          EmployeePayment = p.EmployeePayment,
                                                           DaysStatus = p.DaysStatus,
                                                           Days = p.Days
                                                       }).ToList();
@@ -118,7 +118,7 @@ namespace SendBillWF.Compagny.Compagny
                 employeeCompagnyPricing = workManipulation.GetEmployeeCompagnyPricing(item.CompanyPricingCalendarId, item.EmployeeId);
                 if (employeeCompagnyPricing != null)
                 {
-                    item.Emplyeepaiment = employeeCompagnyPricing.EmplyeePaiment;
+                    item.EmployeePayment = employeeCompagnyPricing.EmployeePayment;
                 }
             }
 
@@ -172,7 +172,7 @@ namespace SendBillWF.Compagny.Compagny
                     item.CompanyPricingCalendarId = record.CompanyPricingCalendarId;
 
                     string dayName = record.Days.Replace("Weekly_", "");
-                    string value = record.DaysStatus ? record.Emplyeepaiment.ToString() : "";
+                    string value = record.DaysStatus ? record.EmployeePayment.ToString() : "";
 
                     switch (dayName.ToLower())
                     {
@@ -217,7 +217,7 @@ namespace SendBillWF.Compagny.Compagny
                 foreach (var record in group)
                 {
                     string dayKey = record.Days;
-                    string value = record.DaysStatus ? record.Emplyeepaiment.ToString() : "";
+                    string value = record.DaysStatus ? record.EmployeePayment.ToString() : "";
 
                     // Map des noms de colonnes
                     switch (dayKey)
@@ -1091,7 +1091,7 @@ namespace SendBillWF.Compagny.Compagny
         //            if (record != null)
         //            {
         //                // Mettre à jour la valeur
-        //                record.Emplyeepaiment = newValue;
+        //                record.EmployeePayment = newValue;
         //                record.ModifiedDate = DateTime.Now;
         //                // Ajoutez d'autres champs de suivi si nécessaire
         //            }
@@ -1125,7 +1125,7 @@ namespace SendBillWF.Compagny.Compagny
 
         //            if (record != null)
         //            {
-        //                record.Emplyeepaiment = newValue;
+        //                record.EmployeePayment = newValue;
         //                record.ModifiedDate = DateTime.Now;
         //            }
         //        }

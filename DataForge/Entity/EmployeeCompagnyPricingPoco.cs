@@ -13,7 +13,7 @@ namespace DataBridge.Entity
         public Guid EmployeeId { get; set; } = Guid.Empty;
         public bool DaysStatus { get; set; }
 
-        public decimal Emplyeepaiment { get; set; }
+        public decimal EmployeePayment { get; set; }
         public string CompagnyName { get; set; }
         public Guid CompanyId { get; set; }
         public string CompagnyCode { get; set; }

@@ -22,14 +22,12 @@ namespace DataBridge
 {
     public class WorkManipulation : ManipulationBase
     {
-        public WorkTypePoco WorkTypePoco;
         public WorkPoco workPoco = new WorkPoco();
         public List<DateOnly> jours = new List<DateOnly>();
         ReportBridgeDTO reportBridgeDTO = new ReportBridgeDTO();
 
         public WorkManipulation() : base()
         {
-            WorkTypePoco = new WorkTypePoco();
         }
 
         public void GetEmployeeList(EmployeePoco employeePoco)
@@ -49,50 +47,6 @@ namespace DataBridge
 
         }
 
-        public void GetWorkListByCompagnyEmployeeId()
-        {
-            workPoco.workLst.Clear();
-
-            var companyIds = workPoco.companyLst.Select(c => c.CompanyId).ToList();
-            var employeeIds = workPoco.employeeLst.Select(c => c.EmployeeId).ToList();
-            //var companyIds = t.Select(c => c.CompanyId).ToList();
-
-            var result = ramssisCleaningContex.Works
-                .Where(w => companyIds.Contains(w.CompanyId)
-                                && employeeIds.Contains(w.EmployeeId))
-                .Select(w => new
-                {
-                    w.WorkId,
-                    w.Description,
-                    w.WorkType1,
-                    w.Workdate,
-                    w.ClientPrice,
-                    w.BeginWorkDate,
-                    w.EndWorkDate,
-                    w.CompanyId,
-                    w.EmployeeId
-
-                })
-                .ToList();
-
-            foreach (var item in result)
-            {
-                Work work = new Work
-                {
-                    WorkId = item.WorkId,
-                    Description = item.Description,
-                    WorkType1 = item.WorkType1,
-                    Workdate = item.Workdate,
-                    ClientPrice = item.ClientPrice,
-                    BeginWorkDate = item.BeginWorkDate,
-                    EndWorkDate = item.EndWorkDate,
-                    CompanyId = item.CompanyId,
-                    EmployeeId = item.EmployeeId
-                };
-                workPoco.workLst.Add(work);
-            }
-
-        }
 
         public void GetEmployeeAssinedToCompanyList()
         {
@@ -173,7 +127,6 @@ namespace DataBridge
             GetEmployeeList(employeePoco);
             GetCompagnyAssinedToEmployeeList();
             GetCompagnyListByObject();
-            GetWorkListByCompagnyEmployeeId();
         }
 
         public void initValuefromCompagnyId(CompagniePoco compagniePoco)
@@ -183,7 +136,6 @@ namespace DataBridge
             GetCompagnyList(compagniePoco);
             GetEmployeeAssinedToCompanyList();
             GetEmployeeListByObject();
-            GetWorkListByCompagnyEmployeeId();
         }
 
         //private void GetCompagnyAssinedEmployeeList()
@@ -224,77 +176,6 @@ namespace DataBridge
             }
         }
 
-        public void SaveWorkLstChanege(List<DtvToWorkManipPoco> dtvToWorkManipPoco)
-        {
-            List<Work> Wks = new List<Work>();
-
-            List<DateOnly> djoursString = jours.Select(d => d).ToList();
-
-            var workCompanyIds = workPoco.workLst
-                                    .Select(w => w.CompanyId)
-                                    .Distinct()
-                                    .ToList();
-
-            var workEmployeeIds = workPoco.workLst
-                                    .Select(w => w.EmployeeId)
-                                    .Distinct()
-                                    .ToList();
-
-
-            var companyIds = ramssisCleaningContex.Companies
-                                .Where(c => workCompanyIds.Contains(c.CompanyId))
-                                .Select(c => c.CompanyId)
-                                .ToList();
-
-            var worksToDelete = ramssisCleaningContex.Works
-                                    .Where(w =>
-                                        companyIds.Contains(w.CompanyId) &&
-                                        djoursString.Contains(w.Workdate) &&
-                                        workEmployeeIds.Contains(w.EmployeeId)
-                                    )
-                                    .ToList();
-
-            ramssisCleaningContex.Works.RemoveRange(worksToDelete);
-
-            ramssisCleaningContex.SaveChanges();
-
-
-
-            //remplir les nouveau
-
-            foreach (var dtv in dtvToWorkManipPoco)
-            {
-
-
-                Guid companyId = ramssisCleaningContex.Companies
-                    .Where(c => c.companyCode == dtv.compagnyCode)
-                    .Select(c => c.CompanyId)
-                    .FirstOrDefault();
-
-                var Emplyeepaiment = GetWorkPrice(workPoco.employeeLst[0].EmployeeId, companyId)
-                        .Where(t => t.CompanyId == companyId && t.EmployeeId == workPoco.employeeLst[0].EmployeeId
-                        && t.Days.Contains(ConvertStringToDateandGetDays(dtv.workdate.ToString("ddMMyyyy")))).Select(e => e.Emplyeepaiment).ToList().FirstOrDefault();
-
-                // var tes2 = ConvertStringToDateandGetDays(dtv.workdate);
-
-
-                if (companyId == Guid.Empty)
-                    continue;
-
-                Work wk = new Work
-                {
-                    WorkId = Guid.NewGuid(),
-                    Description = "",
-                    Workdate = dtv.workdate,
-                    ClientPrice = Emplyeepaiment,
-                    CompanyId = companyId,
-                    EmployeeId = workPoco.employeeLst[0].EmployeeId
-                };
-
-                ramssisCleaningContex.Works.Add(wk);
-            }
-            ramssisCleaningContex.SaveChanges();
-        }
 
         public void GetWeek(DateOnly selectedDate)
         {
@@ -311,11 +192,6 @@ namespace DataBridge
             }
         }
 
-        public void GetAllWorkTypes()
-        {
-            WorkTypePoco.WorkTypesLst = ramssisCleaningContex.WorkTypes.ToList();
-
-        }
 
         public List<CompanyPricingCalendar> GetCompanyPricingCalendarsList(List<CompagniePoco> CompagniesLst)
         {
@@ -379,7 +255,7 @@ namespace DataBridge
                                                CompagnyCode = c.CompagnieCode,
                                                CompagnyName = c.CompagnieName,
                                                EmployeeId = EmplId,
-                                               Emplyeepaiment = p.Emplyeepaiment,
+                                               EmployeePayment = p.EmployeePayment,
                                                DaysStatus = p.DaysStatus,
                                                Days = p.Days
                                            }).ToList();
@@ -391,63 +267,14 @@ namespace DataBridge
                 employeeCompagnyPricing = GetEmployeeCompagnyPricing(item.CompanyPricingCalendarId, item.EmployeeId);
                 if (employeeCompagnyPricing != null)
                 {
-                    item.Emplyeepaiment = employeeCompagnyPricing.EmplyeePaiment;
+                    item.EmployeePayment = employeeCompagnyPricing.EmployeePayment;
                 }
             }
 
             return employeeCompagnyPricingPoco;
         }
 
-        private string ConvertStringToDateandGetDays(string fdate)
-        {
-            DateTime date = DateTime.ParseExact(fdate, "ddMMyyyy", CultureInfo.InvariantCulture);
 
-            return date.ToString("dddd", CultureInfo.InvariantCulture);
-
-        }
-
-        public void GetWorkListByCompagnyEmployeeId(ReportBridgeDTO reportBridgeDTO)
-        {
-            workPoco.workLst.Clear();
-
-            var result = ramssisCleaningContex.Works
-                .Where(w => w.CompanyId.Equals(reportBridgeDTO.CompagnieID)
-                                && w.EmployeeId.Equals(reportBridgeDTO.EmployeeID)
-                                && w.Workdate >= reportBridgeDTO.BeginDate && w.Workdate <= reportBridgeDTO.EndDate
-                                )
-                .Select(w => new
-                {
-                    w.WorkId,
-                    w.Description,
-                    w.WorkType1,
-                    w.Workdate,
-                    w.ClientPrice,
-                    w.BeginWorkDate,
-                    w.EndWorkDate,
-                    w.CompanyId,
-                    w.EmployeeId
-
-                })
-                .ToList();
-
-            foreach (var item in result)
-            {
-                Work work = new Work
-                {
-                    WorkId = item.WorkId,
-                    Description = item.Description,
-                    WorkType1 = item.WorkType1,
-                    Workdate = item.Workdate,
-                    ClientPrice = item.ClientPrice,
-                    BeginWorkDate = item.BeginWorkDate,
-                    EndWorkDate = item.EndWorkDate,
-                    CompanyId = item.CompanyId,
-                    EmployeeId = item.EmployeeId
-                };
-                workPoco.workLst.Add(work);
-            }
-
-        }
 
         public List<string> getCompagnyWorkinddays(Guid companyId)
         {

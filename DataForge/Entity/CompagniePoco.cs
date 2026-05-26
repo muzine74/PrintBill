@@ -25,16 +25,10 @@ namespace DataBridge.Entity
         public string CompagnieZipCode { get; set; }
         public string CompagnieSuite { get; set; }
         public string CompagnieCivicNumber { get; set; }
-        public string CompagnieProvider { get; set; }
         public string ContactName { get; set; }
         public string ContactMail { get; set; }
         public string ContactPhones { get; set; }
         //public string? Compagnieprividercode { get; set; }
-
-        public string? smtpServer { get; set; }
-        public int? smtpPort { get; set; }
-        public string? smtpUsername { get; set; }
-        public string? smtpPassword { get; set; }
 
         public string? TPSNumber { get; set; }
         public string? TVQNumber { get; set; }

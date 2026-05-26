@@ -23,7 +23,6 @@ namespace DataBridge
 
         public List<Address> AdressList = new List<Address>();
         public List<Company> CompagnyList = new List<Company>();
-        public List<Client> ClientList = new List<Client>();
         private readonly ILogger<CompagniManipulation> _log;
 
         public CompagniManipulation() : base()
@@ -39,10 +38,8 @@ namespace DataBridge
                 from C in ramssisCleaningContex.Companies
                 join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
                 join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
-                join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
                 where C.companyStatus == true
                 orderby C.companyName
-
                 select new
                 {
                     C.CompanyId,
@@ -55,10 +52,7 @@ namespace DataBridge
                     A.zipCode,
                     A.suite,
                     A.civicNumber,
-                    CL.name,
-                    CL.mail,
-                    CL.phone,
-                    C.prividercode,
+
                     C.PaymentFrequency,
                     C.WorkFrequency
                 }
@@ -76,10 +70,7 @@ namespace DataBridge
                 CompagnieZipCode = cp.zipCode,
                 CompagnieSuite = cp.suite,
                 CompagnieCivicNumber = cp.civicNumber,
-                ContactName = cp.name,
-                ContactMail = cp.mail,
-                ContactPhones = cp.phone,
-                CompagnieProvider = cp.prividercode,
+
                 PaymentFrequency = cp.PaymentFrequency,
                 WorkFrequency = cp.WorkFrequency
             }
@@ -438,42 +429,27 @@ namespace DataBridge
         {
             Company CompagnyTemp = new Company();
             Address AdressTemp = new Address();
-            Client ClientTemp = new Client();
             CompanyAddress CompagnyAdress = new CompanyAddress();
 
-            CompagnyTemp.WorkTypeId = GetWorkTypeId(cmpPoco.WorkFrequency); //default work type id
             DesactivateOldWorkType(cmpPoco.CompagnieID);
 
-
             // Fill Compagny Info
-            CompagnyTemp.CompanyId = cmpPoco.CompagnieID;
-            CompagnyTemp.companyName = cmpPoco.CompagnieName;
-            CompagnyTemp.companyCode = cmpPoco.CompagnieCode;
-            CompagnyTemp.companyStatus = cmpPoco.CompagnieStatus;
-            CompagnyTemp.prividercode = cmpPoco.CompagnieProvider;
-            CompagnyTemp.TPSNumber = cmpPoco.TPSNumber;
-            CompagnyTemp.TVQNumber = cmpPoco.TVQNumber;
+            CompagnyTemp.CompanyId       = cmpPoco.CompagnieID;
+            CompagnyTemp.companyName     = cmpPoco.CompagnieName;
+            CompagnyTemp.companyCode     = cmpPoco.CompagnieCode;
+            CompagnyTemp.companyStatus   = cmpPoco.CompagnieStatus;
+            CompagnyTemp.TPSNumber       = cmpPoco.TPSNumber;
+            CompagnyTemp.TVQNumber       = cmpPoco.TVQNumber;
             CompagnyTemp.PaymentFrequency = cmpPoco.PaymentFrequency;
-            CompagnyTemp.WorkFrequency = cmpPoco.WorkFrequency;
+            CompagnyTemp.WorkFrequency   = cmpPoco.WorkFrequency;
 
-
-            //Fill Address to last Company
-            AdressTemp.AddressId = cmpPoco.AddressID;
+            // Fill Address
+            AdressTemp.AddressId   = cmpPoco.AddressID;
             AdressTemp.civicNumber = cmpPoco.CompagnieCivicNumber;
-            AdressTemp.suite = cmpPoco.CompagnieSuite;
-            AdressTemp.zipCode = cmpPoco.CompagnieZipCode;
-            AdressTemp.city = cmpPoco.Compagniecity;
-            AdressTemp.state = cmpPoco.CompagnieState;
-
-
-            //Fill Contact Client to Last Compagny
-            ClientTemp.clientID = cmpPoco.CompagnieID;
-            ClientTemp.name = cmpPoco.ContactName;
-            ClientTemp.mail = cmpPoco.ContactMail;
-            ClientTemp.phone = cmpPoco.ContactPhones;
-
-
-            ClientTemp.CompanyId = cmpPoco.CompagnieID;
+            AdressTemp.suite       = cmpPoco.CompagnieSuite;
+            AdressTemp.zipCode     = cmpPoco.CompagnieZipCode;
+            AdressTemp.city        = cmpPoco.Compagniecity;
+            AdressTemp.state       = cmpPoco.CompagnieState;
 
             CompagnyAdress.AddressId = cmpPoco.AddressID;
             CompagnyAdress.CompanyId = cmpPoco.CompagnieID;
@@ -481,13 +457,8 @@ namespace DataBridge
 
             CompagnyTemp.CompanyPricingCalendars = cmpPoco._companyPricingCalendar;
 
-
-
             ramssisCleaningContex.Companies.Add(CompagnyTemp);
             ramssisCleaningContex.Addresses.Add(AdressTemp);
-            ramssisCleaningContex.Clients.Add(ClientTemp);
-
-
             ramssisCleaningContex.SaveChanges();
         }
 
@@ -500,18 +471,15 @@ namespace DataBridge
                 from C in ramssisCleaningContex.Companies
                 join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
                 join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
-                join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
                 where (C.companyName.Contains(searchKey) || C.companyCode.Contains(searchKey))
-
                 select new
                 {
                     C.CompanyId,
                     A.AddressId,
-                    CL.clientID,
                     C.companyName,
                     C.companyStatus,
                     C.companyCode,
-                    C.prividercode,
+
                     C.TPSNumber,
                     C.TVQNumber,
                     C.PaymentFrequency,
@@ -522,10 +490,6 @@ namespace DataBridge
                     A.zipCode,
                     A.suite,
                     A.civicNumber,
-                    CL.name,
-                    CL.mail,
-                    CL.phone
-
                 }
                 ).ToList();
 
@@ -533,7 +497,6 @@ namespace DataBridge
             {
                 CompagnieID = cp.CompanyId,
                 AddressID = cp.AddressId,
-                ContactID = cp.clientID,
                 CompagnieName = cp.companyName,
                 CompagnieStatus = cp.companyStatus,
                 CompagnieCode = cp.companyCode,
@@ -543,16 +506,11 @@ namespace DataBridge
                 CompagnieZipCode = cp.zipCode,
                 CompagnieSuite = cp.suite,
                 CompagnieCivicNumber = cp.civicNumber,
-                CompagnieProvider = cp.prividercode,
+
                 TPSNumber = cp.TPSNumber,
                 TVQNumber = cp.TVQNumber,
-                ContactName = cp.name,
-                ContactMail = cp.mail,
-                ContactPhones = cp.phone,
                 PaymentFrequency = cp.PaymentFrequency,
                 WorkFrequency = cp.WorkFrequency,
-
-
             }
             ).ToList();
 
@@ -569,14 +527,11 @@ namespace DataBridge
                 (from c in ramssisCleaningContex.Companies
                  join ac in ramssisCleaningContex.CompanyAddresses on c.CompanyId equals ac.CompanyId
                  join a in ramssisCleaningContex.Addresses on ac.AddressId equals a.AddressId
-                 join cl in ramssisCleaningContex.Clients on c.CompanyId equals cl.CompanyId
-                 where c.companyStatus == true
-                       && c.companyCode == cpCode
+                 where c.companyStatus == true && c.companyCode == cpCode
                  select new CompagniePoco
                  {
                      CompagnieID = c.CompanyId,
                      AddressID = a.AddressId,
-                     ContactID = cl.clientID,
                      CompagnieName = c.companyName,
                      CompagnieStatus = c.companyStatus,
                      CompagnieCode = c.companyCode,
@@ -586,20 +541,11 @@ namespace DataBridge
                      CompagnieZipCode = a.zipCode,
                      CompagnieSuite = a.suite,
                      CompagnieCivicNumber = a.civicNumber,
-                     CompagnieProvider = c.prividercode,
+
                      PaymentFrequency = c.PaymentFrequency,
                      WorkFrequency = c.WorkFrequency,
                      TPSNumber = c.TPSNumber,
                      TVQNumber = c.TVQNumber,
-                     ContactName = cl.name,
-                     ContactMail = cl.mail,
-                     ContactPhones = cl.phone,
-
-
-                     smtpServer = c.MailCredential.smtpServer,
-                     smtpPort = c.MailCredential.smtpPort,
-                     smtpUsername = c.MailCredential.smtpUsername,
-                     smtpPassword = c.MailCredential.smtpPassword,
                  }).ToList().GroupBy(p => p.CompagnieCode)
             .Select(g => g.First()).FirstOrDefault();
 
@@ -613,13 +559,11 @@ namespace DataBridge
                 (from c in ramssisCleaningContex.Companies
                  join ac in ramssisCleaningContex.CompanyAddresses on c.CompanyId equals ac.CompanyId
                  join a in ramssisCleaningContex.Addresses on ac.AddressId equals a.AddressId
-                 join cl in ramssisCleaningContex.Clients on c.CompanyId equals cl.CompanyId
-                 where  c.CompanyId == compagnyId
+                 where c.CompanyId == compagnyId
                  select new CompagniePoco
                  {
                      CompagnieID = c.CompanyId,
                      AddressID = a.AddressId,
-                     ContactID = cl.clientID,
                      CompagnieName = c.companyName,
                      CompagnieStatus = c.companyStatus,
                      CompagnieCode = c.companyCode,
@@ -629,20 +573,11 @@ namespace DataBridge
                      CompagnieZipCode = a.zipCode,
                      CompagnieSuite = a.suite,
                      CompagnieCivicNumber = a.civicNumber,
-                     CompagnieProvider = c.prividercode,
+
                      PaymentFrequency = c.PaymentFrequency,
                      WorkFrequency = c.WorkFrequency,
                      TPSNumber = c.TPSNumber,
                      TVQNumber = c.TVQNumber,
-                     ContactName = cl.name,
-                     ContactMail = cl.mail,
-                     ContactPhones = cl.phone,
-
-
-                     smtpServer = c.MailCredential.smtpServer,
-                     smtpPort = c.MailCredential.smtpPort,
-                     smtpUsername = c.MailCredential.smtpUsername,
-                     smtpPassword = c.MailCredential.smtpPassword,
                  }).ToList().GroupBy(p => p.CompagnieCode)
             .Select(g => g.First()).FirstOrDefault();
 
@@ -664,15 +599,11 @@ namespace DataBridge
                 .FirstOrDefault(a => a.AddressId == cmpPocoUp.AddressID)
                 ?? throw new InvalidOperationException($"Adresse introuvable : {cmpPocoUp.AddressID}");
 
-            var client = context.Clients
-                .FirstOrDefault(c => c.clientID == cmpPocoUp.ContactID)
-                ?? throw new InvalidOperationException($"Client introuvable : {cmpPocoUp.ContactID}");
 
             // ── Scalaires compagnie ───────────────────────────────────────────
             companie.companyName = cmpPocoUp.CompagnieName;
             companie.companyCode = cmpPocoUp.CompagnieCode;
             companie.companyStatus = cmpPocoUp.CompagnieStatus;
-            companie.prividercode = cmpPocoUp.CompagnieProvider;
             companie.PaymentFrequency = cmpPocoUp.PaymentFrequency;
             companie.WorkFrequency = cmpPocoUp.WorkFrequency;
             companie.TPSNumber = cmpPocoUp.TPSNumber;
@@ -685,11 +616,6 @@ namespace DataBridge
             adresse.city = cmpPocoUp.Compagniecity;
             adresse.state = cmpPocoUp.CompagnieState;
             adresse.country = cmpPocoUp.Compagniecountry;
-
-            // ── Contact ───────────────────────────────────────────────────────
-            client.name = cmpPocoUp.ContactName;
-            client.mail = cmpPocoUp.ContactMail;
-            client.phone = cmpPocoUp.ContactPhones;
 
             // ── Snapshot anciens calendriers actifs ───────────────────────────
             var oldActive = companie.CompanyPricingCalendars
@@ -719,8 +645,8 @@ namespace DataBridge
                         CompanyId = companie.CompanyId,
                         Days = newCal.Days,
                         DaysStatus = newCal.DaysStatus,
-                        CopagnyBenifictPrice = newCal.CopagnyBenifictPrice,
-                        Emplyeepaiment = newCal.Emplyeepaiment,
+                        CompanyBenefitPrice = newCal.CompanyBenefitPrice,
+                        EmployeePayment = newCal.EmployeePayment,
                         IsActive = true
                     };
 
@@ -816,18 +742,15 @@ namespace DataBridge
                         from C in ramssisCleaningContex.Companies
                         join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
                         join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
-                        join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
                         where C.companyStatus == true
-
                         select new
                         {
                             C.CompanyId,
                             A.AddressId,
-                            CL.clientID,
                             C.companyName,
                             C.companyStatus,
                             C.companyCode,
-                            C.prividercode,
+        
                             C.PaymentFrequency,
                             C.WorkFrequency,
                             A.country,
@@ -836,50 +759,29 @@ namespace DataBridge
                             A.zipCode,
                             A.suite,
                             A.civicNumber,
-                            CL.name,
-                            CL.mail,
-                            CL.phone,
-                            //C.TaxCredential.TVQNumber,
-                            //C.TaxCredential.TPSNumber,
                             C.TPSNumber,
                             C.TVQNumber,
-                            C.MailCredential.smtpUsername,
-                            C.MailCredential.smtpPassword,
-                            C.MailCredential.smtpServer,
-                            C.MailCredential.smtpPort
                         }
                         ).ToList();
 
             copiedList = cpmList.Select(cp => new CompagniePoco
             {
-                CompagnieID = cp.CompanyId,
-                AddressID = cp.AddressId,
-                ContactID = cp.clientID,
-
-                CompagnieName = cp.companyName,
-                CompagnieStatus = cp.companyStatus,
-                CompagnieCode = cp.companyCode,
-                CompagnieProvider = cp.prividercode,
+                CompagnieID      = cp.CompanyId,
+                AddressID        = cp.AddressId,
+                CompagnieName    = cp.companyName,
+                CompagnieStatus  = cp.companyStatus,
+                CompagnieCode    = cp.companyCode,
 
                 Compagniecountry = cp.country,
-                CompagnieState = cp.state,
-                Compagniecity = cp.city,
+                CompagnieState   = cp.state,
+                Compagniecity    = cp.city,
                 CompagnieZipCode = cp.zipCode,
-                CompagnieSuite = cp.suite,
+                CompagnieSuite   = cp.suite,
                 CompagnieCivicNumber = cp.civicNumber,
                 PaymentFrequency = cp.PaymentFrequency,
-                WorkFrequency = cp.WorkFrequency,
-                TPSNumber = cp.TPSNumber,
-                TVQNumber = cp.TVQNumber,
-
-                ContactName = cp.name,
-                ContactMail = cp.mail,
-                ContactPhones = cp.phone,
-
-                smtpUsername = cp.smtpUsername,
-                smtpPassword = cp.smtpPassword,
-                smtpServer = cp.smtpServer,
-                smtpPort = cp.smtpPort
+                WorkFrequency    = cp.WorkFrequency,
+                TPSNumber        = cp.TPSNumber,
+                TVQNumber        = cp.TVQNumber,
             }
             ).ToList();
 
@@ -896,16 +798,14 @@ namespace DataBridge
                         from C in ramssisCleaningContex.Companies
                         join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
                         join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
-                        join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
                         select new
                         {
                             C.CompanyId,
                             A.AddressId,
-                            CL.clientID,
                             C.companyName,
                             C.companyStatus,
                             C.companyCode,
-                            C.prividercode,
+        
                             C.PaymentFrequency,
                             C.WorkFrequency,
                             A.country,
@@ -914,15 +814,8 @@ namespace DataBridge
                             A.zipCode,
                             A.suite,
                             A.civicNumber,
-                            CL.name,
-                            CL.mail,
-                            CL.phone,
                             C.TPSNumber,
                             C.TVQNumber,
-                            C.MailCredential.smtpUsername,
-                            C.MailCredential.smtpPassword,
-                            C.MailCredential.smtpServer,
-                            C.MailCredential.smtpPort
                         }
                         ).ToList();
 
@@ -930,11 +823,10 @@ namespace DataBridge
             {
                 CompagnieID      = cp.CompanyId,
                 AddressID        = cp.AddressId,
-                ContactID        = cp.clientID,
                 CompagnieName    = cp.companyName,
                 CompagnieStatus  = cp.companyStatus,
                 CompagnieCode    = cp.companyCode,
-                CompagnieProvider = cp.prividercode,
+
                 Compagniecountry = cp.country,
                 CompagnieState   = cp.state,
                 Compagniecity    = cp.city,
@@ -945,13 +837,6 @@ namespace DataBridge
                 WorkFrequency    = cp.WorkFrequency,
                 TPSNumber        = cp.TPSNumber,
                 TVQNumber        = cp.TVQNumber,
-                ContactName      = cp.name,
-                ContactMail      = cp.mail,
-                ContactPhones    = cp.phone,
-                smtpUsername     = cp.smtpUsername,
-                smtpPassword     = cp.smtpPassword,
-                smtpServer       = cp.smtpServer,
-                smtpPort         = cp.smtpPort
             }).ToList();
 
             return copiedList.GroupBy(p => p.CompagnieCode)
@@ -998,14 +883,6 @@ namespace DataBridge
             ramssisCleaningContex.SaveChanges();
         }
         
-        private int GetWorkTypeId(string workType)
-        {
-            int workTypeId = ramssisCleaningContex.WorkTypes
-                .Where(wt => wt.Name == workType)
-                .Select(wt => wt.WorkTypeId)
-                .FirstOrDefault();
-            return workTypeId;
-        }
 
         public List<CompanyPricingCalendarPoco> GetCompanyPricingCalendars(Guid CompanyId)
         {
@@ -1022,8 +899,8 @@ namespace DataBridge
                     CompanyPricingCalendarId = wt.CompanyPricingCalendarId,
                     Days = wt.Days,
                     DaysStatus = wt.DaysStatus,
-                    CopagnyBenifictPrice = wt.CopagnyBenifictPrice,
-                    Emplyeepaiment = wt.Emplyeepaiment,
+                    CompanyBenefitPrice = wt.CompanyBenefitPrice,
+                    EmployeePayment = wt.EmployeePayment,
                     IsActive = wt.IsActive
 
                 });
@@ -1042,22 +919,16 @@ namespace DataBridge
                     on company.CompanyId equals companyAddress.CompanyId
                 join address in ramssisCleaningContex.Addresses
                     on companyAddress.AddressId equals address.AddressId
-                join client in ramssisCleaningContex.Clients
-                    on company.CompanyId equals client.CompanyId
                 join employeeCompany in ramssisCleaningContex.EmployeeCompanies
                 on company.CompanyId equals employeeCompany.CompanyId
-                where employeeCompany.EmployeeId == EmployeeId  //&& company.companyStatus == true
-                //   || company.CompanyCode.Contains(searchKey)
+                where employeeCompany.EmployeeId == EmployeeId
                 select new CompanyInfoDto
                 {
                     CompanyId = company.CompanyId,
                     AddressId = address.AddressId,
-                    ClientId = client.clientID,
-
                     CompanyName = company.companyName,
                     CompanyStatus = company.companyStatus,
                     CompanyCode = company.companyCode,
-                    ProviderCode = company.prividercode,
                     TPSNumber = company.TPSNumber,
                     TVQNumber = company.TVQNumber,
                     PaymentFrequency = company.PaymentFrequency,
@@ -1068,9 +939,6 @@ namespace DataBridge
                     ZipCode = address.zipCode,
                     Suite = address.suite,
                     CivicNumber = address.civicNumber,
-                    ContactName = client.name,
-                    ContactEmail = client.mail,
-                    ContactPhone = client.phone
                 };
 
             var companies = companiesQuery.ToList();
@@ -1096,7 +964,6 @@ namespace DataBridge
                 CompagnieZipCode = dto.ZipCode,
                 CompagnieSuite = dto.Suite,
                 CompagnieCivicNumber = dto.CivicNumber,
-                CompagnieProvider = dto.ProviderCode,
                 TPSNumber = dto.TPSNumber,
                 TVQNumber = dto.TVQNumber,
                 ContactName = dto.ContactName,
@@ -1135,7 +1002,7 @@ namespace DataBridge
                         {
                             CompanyPricingCalendarId = change.Key.CompanyPricingCalendarId,
                             EmployeeId = change.Key.EmployeeId,
-                            EmplyeePaiment = change.Value,
+                            EmployeePayment = change.Value,
                             IsActive = true,
                             ApplicatedDate = DateTime.Now
                         };

@@ -132,8 +132,8 @@ namespace SendBillWF.Compagny.CompagnyBase
                 PaimentFrequencySelected = PaimentFrequencySelectedItem,
                 Days = d.Day,
                 DaysStatus = d.DaysStatus,
-                CopagnyBenifictPrice = SafeParseDecimal(d.Company),
-                Emplyeepaiment = SafeParseDecimal(d.Employee)
+                CompanyBenefitPrice = SafeParseDecimal(d.Company),
+                EmployeePayment = SafeParseDecimal(d.Employee)
             }).ToList();
             //return visittFreqPriLst;
         }
@@ -170,8 +170,8 @@ namespace SendBillWF.Compagny.CompagnyBase
                 PaimentFrequencySelected = PaimentFrequencySelectedItem,
                 Days = d.Day,
                 DaysStatus = d.DaysStatus,
-                CopagnyBenifictPrice = SafeParseDecimal(d.Company),
-                Emplyeepaiment = SafeParseDecimal(d.Employee)
+                CompanyBenefitPrice = SafeParseDecimal(d.Company),
+                EmployeePayment = SafeParseDecimal(d.Employee)
             }).ToList();
 
         }
@@ -244,22 +244,22 @@ namespace SendBillWF.Compagny.CompagnyBase
 
 
 
-            WeeklyCpmMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Monday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            WeeklyCpmTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Tuesday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            WeeklyCpmWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Wednesday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            WeeklyCpmThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Thursday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            WeeklyCpmFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Friday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            WeeklyCpmSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Saturday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            WeeklyCpmSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Sunday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
+            WeeklyCpmMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Monday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            WeeklyCpmTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Tuesday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            WeeklyCpmWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Wednesday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            WeeklyCpmThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Thursday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            WeeklyCpmFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Friday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            WeeklyCpmSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Saturday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            WeeklyCpmSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Sunday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
 
 
-            WeeklyEmplMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Monday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            WeeklyEmplTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Tuesday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            WeeklyEmplWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Wednesday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            WeeklyEmplThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Thursday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            WeeklyEmplFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Friday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            WeeklyEmplSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Saturday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            WeeklyEmplSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Sunday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
+            WeeklyEmplMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Monday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            WeeklyEmplTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Tuesday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            WeeklyEmplWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Wednesday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            WeeklyEmplThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Thursday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            WeeklyEmplFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Friday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            WeeklyEmplSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Saturday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            WeeklyEmplSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "Weekly_Sunday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
 
 
             Weekly.Visible = true;
@@ -309,22 +309,22 @@ namespace SendBillWF.Compagny.CompagnyBase
 
 
 
-            BiWeek1PriceCpmMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Monday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek1PriceCpmTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Tuesday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek1PriceCpmWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Wednesday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek1PriceCpmThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Thursday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek1PriceCpmFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Friday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek1PriceCpmSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Saturday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek1PriceCpmSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Sunday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
+            BiWeek1PriceCpmMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Monday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek1PriceCpmTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Tuesday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek1PriceCpmWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Wednesday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek1PriceCpmThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Thursday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek1PriceCpmFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Friday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek1PriceCpmSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Saturday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek1PriceCpmSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Sunday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
 
 
-            BiWeek1PriceEmpMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Monday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek1PriceEmpTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Tuesday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek1PriceEmpWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Wednesday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek1PriceEmpThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Thursday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek1PriceEmpFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Friday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek1PriceEmpSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Saturday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek1PriceEmpSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Sunday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
+            BiWeek1PriceEmpMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Monday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek1PriceEmpTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Tuesday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek1PriceEmpWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Wednesday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek1PriceEmpThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Thursday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek1PriceEmpFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Friday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek1PriceEmpSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Saturday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek1PriceEmpSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek1_Sunday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
 
 
 
@@ -339,22 +339,22 @@ namespace SendBillWF.Compagny.CompagnyBase
 
 
 
-            BiWeek2PriceCpmMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek2PriceCpmTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Tuesday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek2PriceCpmWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Wednesday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek2PriceCpmThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Thursday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek2PriceCpmFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Friday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek2PriceCpmSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Saturday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
-            BiWeek2PriceCpmSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Sunday" && C.IsActive == true)).Select(CP => CP.CopagnyBenifictPrice).FirstOrDefault().ToString();
+            BiWeek2PriceCpmMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek2PriceCpmTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Tuesday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek2PriceCpmWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Wednesday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek2PriceCpmThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Thursday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek2PriceCpmFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Friday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek2PriceCpmSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Saturday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
+            BiWeek2PriceCpmSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Sunday" && C.IsActive == true)).Select(CP => CP.CompanyBenefitPrice).FirstOrDefault().ToString();
 
 
-            BiWeek2PriceEmpMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek2PriceEmpTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek2PriceEmpWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek2PriceEmpThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek2PriceEmpFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek2PriceEmpSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
-            BiWeek2PriceEmpSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Sunday" && C.IsActive == true)).Select(CP => CP.Emplyeepaiment).FirstOrDefault().ToString();
+            BiWeek2PriceEmpMonday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek2PriceEmpTuesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek2PriceEmpWednesday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek2PriceEmpThursday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek2PriceEmpFriday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek2PriceEmpSaturday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Monday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
+            BiWeek2PriceEmpSunday.Text = (compagniePoco._companyPricingCalendar.Where(C => C.Days == "BiWeek2_Sunday" && C.IsActive == true)).Select(CP => CP.EmployeePayment).FirstOrDefault().ToString();
 
 
             BiWeekly.Visible = true;
@@ -396,8 +396,8 @@ namespace SendBillWF.Compagny.CompagnyBase
                 {
                     Days = item.Days,
                     DaysStatus = item.DaysStatus,
-                    CopagnyBenifictPrice = item.CopagnyBenifictPrice,
-                    Emplyeepaiment = item.Emplyeepaiment,
+                    CompanyBenefitPrice = item.CompanyBenefitPrice,
+                    EmployeePayment = item.EmployeePayment,
                     ApplicatedDate = DateTime.Now,
                     IsActive = true 
                 });
@@ -416,8 +416,8 @@ namespace SendBillWF.Compagny.CompagnyBase
                 {
                     Days = item.Days,
                     DaysStatus = item.DaysStatus,
-                    CopagnyBenifictPrice = item.CopagnyBenifictPrice,
-                    Emplyeepaiment = item.Emplyeepaiment,
+                    CompanyBenefitPrice = item.CompanyBenefitPrice,
+                    EmployeePayment = item.EmployeePayment,
                     ApplicatedDate = DateTime.Now,
                     IsActive = true
                 });
