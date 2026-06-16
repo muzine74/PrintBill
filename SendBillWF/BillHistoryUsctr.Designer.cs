@@ -35,7 +35,6 @@
             EndDate = new DateTimePicker();
             BillHistoryDGrid = new DataGridView();
             PrintMenuStrip = new ContextMenuStrip(components);
-            //toolPrintMenuStrip = new ToolStripMenuItem();
             SendedCheckBox = new CheckedListBox();
             payedListBox = new CheckedListBox();
             label1 = new Label();
@@ -43,7 +42,6 @@
             intervalDatecheckBox = new CheckBox();
             printFile = new PrintDialog();
             ((System.ComponentModel.ISupportInitialize)BillHistoryDGrid).BeginInit();
-            PrintMenuStrip.SuspendLayout();
             SuspendLayout();
             // 
             // SearchbtnHsBtn
@@ -83,7 +81,6 @@
             // 
             BillHistoryDGrid.AllowUserToAddRows = false;
             BillHistoryDGrid.AllowUserToDeleteRows = false;
-            BillHistoryDGrid.AllowUserToOrderColumns = true;
             BillHistoryDGrid.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             BillHistoryDGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             BillHistoryDGrid.ContextMenuStrip = PrintMenuStrip;
@@ -95,16 +92,8 @@
             // 
             // PrintMenuStrip
             // 
-            //PrintMenuStrip.Items.AddRange(new ToolStripItem[] { toolPrintMenuStrip });
-            //PrintMenuStrip.Name = "Print";
-            //PrintMenuStrip.Size = new Size(144, 26);
-            //PrintMenuStrip.MouseDown += PrintPdfMenuItem_Click;
-            // 
-            // toolPrintMenuStrip
-            // 
-            //toolPrintMenuStrip.Name = "toolPrintMenuStrip";
-            //toolPrintMenuStrip.Size = new Size(143, 22);
-            //toolPrintMenuStrip.Text = "Send To Print";
+            PrintMenuStrip.Name = "PrintMenuStrip";
+            PrintMenuStrip.Size = new Size(61, 4);
             // 
             // SendedCheckBox
             // 
@@ -174,7 +163,6 @@
             Name = "BillHistoryUsctr";
             Size = new Size(1100, 862);
             ((System.ComponentModel.ISupportInitialize)BillHistoryDGrid).EndInit();
-            PrintMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }

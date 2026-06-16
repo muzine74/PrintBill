@@ -1,0 +1,132 @@
+USE [RamssisCleaningDB]
+GO
+/****** Object:  UserDefinedFunction [dbo].[fn_GetEmployeesWithCompanies]    Script Date: 2026-01-18 10:12:37 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+--  SELECT * FROM dbo.fn_GetEmployeesWithCompanies() ORDER BY EmployeeId;
+
+CREATE FUNCTION [dbo].[fn_GetEmployeesWithCompanies]()
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT
+        e.Name,
+        e.EmployeeId,
+        c.*
+    FROM dbo.Employees e
+    INNER JOIN dbo.EmployeeCompanies ec
+        ON e.EmployeeId = ec.EmployeeId
+    INNER JOIN dbo.Companies c
+        ON ec.CompanyId = c.CompanyId
+);
+GO
+
+USE [RamssisCleaningDB_OLDBak]
+GO
+/****** Object:  UserDefinedFunction [dbo].[fn_GetCompaniesByEmployee]    Script Date: 2026-01-18 10:12:33 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- SELECT * FROM dbo.fn_GetCompaniesByEmployee('GUID-EMPLOYEE') ORDER BY EmployeeId;
+
+
+
+CREATE FUNCTION [dbo].[fn_GetCompaniesByEmployee]
+(
+    @EmployeeId UNIQUEIDENTIFIER
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT
+        e.Name,
+        e.EmployeeId,
+        c.*
+    FROM dbo.Employees e
+    INNER JOIN dbo.EmployeeCompanies ec
+        ON e.EmployeeId = ec.EmployeeId
+    INNER JOIN dbo.Companies c
+        ON ec.CompanyId = c.CompanyId
+    WHERE e.EmployeeId = @EmployeeId
+);
+GO
+
+USE [RamssisCleaningDB_OLDBak]
+GO
+/****** Object:  UserDefinedFunction [dbo].[fn_GetAddressesWithEmployees]    Script Date: 2026-01-18 10:12:29 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- SELECT * FROM dbo.fn_GetAddressesWithEmployees();
+
+
+CREATE FUNCTION [dbo].[fn_GetAddressesWithEmployees]()
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT 
+
+        E.*,
+		A.AddressId,
+		A.civicNumber,
+		A.suite,
+		A.zipCode,
+		A.city,
+		A.state,
+		A.country
+    FROM dbo.Addresses A
+    INNER JOIN dbo.EmployeeAddresses EA 
+        ON A.AddressId = EA.AddressId
+    INNER JOIN dbo.Employees E 
+        ON E.EmployeeId = EA.EmployeeId
+);
+GO
+
+USE [RamssisCleaningDB_OLDBak]
+GO
+/****** Object:  UserDefinedFunction [dbo].[fn_GetAddressesByEmployee]    Script Date: 2026-01-18 10:12:24 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+--SELECT * FROM dbo.fn_GetAddressesByEmployee('GUID-ICI');
+
+CREATE FUNCTION [dbo].[fn_GetAddressesByEmployee]
+(
+    @EmployeeId UNIQUEIDENTIFIER
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT 
+
+        E.*,
+		A.AddressId,
+		A.civicNumber,
+		A.suite,
+		A.zipCode,
+		A.city,
+		A.state,
+		A.country
+    FROM dbo.Addresses A
+    INNER JOIN dbo.EmployeeAddresses EA 
+        ON A.AddressId = EA.AddressId
+    INNER JOIN dbo.Employees E 
+        ON E.EmployeeId = EA.EmployeeId
+		WHERE E.EmployeeId = @EmployeeId
+);
+
+
+
+

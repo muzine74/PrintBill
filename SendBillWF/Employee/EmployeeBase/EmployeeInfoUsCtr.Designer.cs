@@ -61,7 +61,7 @@
             groupBox1.Controls.Add(employeeUsCtr1);
             groupBox1.Location = new Point(17, 14);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(370, 219);
+            groupBox1.Size = new Size(742, 219);
             groupBox1.TabIndex = 4;
             groupBox1.TabStop = false;
             groupBox1.Text = "groupBox1";
@@ -72,9 +72,10 @@
             employeeUsCtr1.MailEmployee = "";
             employeeUsCtr1.Name = "employeeUsCtr1";
             employeeUsCtr1.NameEmployee = "";
+            employeeUsCtr1.NasEmployee = "";
             employeeUsCtr1.NoteEmployee = "";
             employeeUsCtr1.PhoneEmployee = "";
-            employeeUsCtr1.Size = new Size(368, 191);
+            employeeUsCtr1.Size = new Size(715, 191);
             employeeUsCtr1.TabIndex = 0;
             // 
             // EmployeeInfoUsCtr

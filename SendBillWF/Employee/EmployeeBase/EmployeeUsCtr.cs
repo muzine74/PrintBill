@@ -40,5 +40,25 @@ namespace SendBillWF.Employee
             get { return EmployeeNoteTxt.Text; }
             set { EmployeeNoteTxt.Text = value; }
         }
+
+        public string NasEmployee
+        {
+            get { return EmployeeNasTxt.Text; }
+            set { EmployeeNasTxt.Text = value; }
+        }
+
+        public void NasTxtDisable()
+        {
+            EmployeeNasTxt.Enabled = false;
+        }
+
+
+        public void DisableUserControl()
+        {
+            EmployeeNameTxt.Enabled = false;
+            EmployeeMailTxt.Enabled = false;
+            EmployeePhoneTxt.Enabled = false;
+            EmployeeNoteTxt.Enabled = false;
+        }
     }
 }

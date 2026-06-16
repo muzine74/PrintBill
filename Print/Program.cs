@@ -1,12 +1,13 @@
 ﻿
-using System;
-using System.IO;
 using DataBridge;
 using DataBridge.Entity;
 using DBConnection;
+using DBConnection.Entity;
 using GDTOSQL;
 using Microsoft.EntityFrameworkCore;
 using PrintPDF;
+using System;
+using System.IO;
 using static iTextSharp.text.pdf.AcroFields;
 
 
@@ -21,6 +22,7 @@ CompagniManipulation compagniManipulation = new CompagniManipulation();
 List<CompagniePoco> compagnieInfoList = new List<CompagniePoco>();
 //compagnieInfoList = compagniManipulation.LinkCompagniePayment();
 List<BillHistoryPoco> _billHistoryPocoLst = new List<BillHistoryPoco>();
+List<BillDescriptionPoco> billDescriptionlist = new List<BillDescriptionPoco>();
 float sumPrice = 0;
 int nbrCompagny = 0;
 int Billidentifier = 0;
@@ -66,6 +68,13 @@ foreach (var compagnieInfo in compagnieInfoList)
 
     foreach (var item in compagnieInfo._workBillInfoList)
     {
+        billDescriptionlist.Add(new BillDescriptionPoco
+        {
+            BillDescriptionPocoId = Guid.NewGuid(),
+            DescriptionPoco = "[  ||CompagnyName : " + item.CompagnyName + "  ||NumberOfVisite : " + item.NumberOfVisite + "  ||compagnyPrice : " + item.compagnyPrice ,
+            BillHistoryIdPoco = billHistoryPoco.billIdentifier
+        });
+
         descriptionToSaveHistory += "`[  ||CompagnyName : " + item.CompagnyName + "  ||NumberOfVisite : " + item.NumberOfVisite + "  ||compagnyPrice : " + item.compagnyPrice +
                     Environment.NewLine;
         sumPrice = sumPrice + item.Totalprice;
@@ -75,7 +84,7 @@ foreach (var compagnieInfo in compagnieInfoList)
 
 
 
-    billHistoryPoco.BillDescription = descriptionToSaveHistory;
+   // billHistoryPoco.BillDescription = descriptionToSaveHistory;
     billHistoryPoco.TotalWithOutTax = sumPrice;
     billHistoryPoco.TPS = (sumPrice * 0.05f);
     billHistoryPoco.TVQ = (sumPrice * 0.0975f);
@@ -98,7 +107,7 @@ foreach (var compagnieInfo in compagnieInfoList)
 }
 
 
-compagniManipulation.SaveBillHisrory(_billHistoryPocoLst);
+compagniManipulation.SaveBillHisrory(_billHistoryPocoLst, billDescriptionlist);
 
 
 

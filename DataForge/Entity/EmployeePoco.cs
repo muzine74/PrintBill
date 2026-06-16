@@ -1,8 +1,11 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DBConnection.Entity;
+
 
 namespace DataBridge.Entity
 {
@@ -11,13 +14,16 @@ namespace DataBridge.Entity
         public EmployeePoco()
         {
             EmployeeCompagnies = new List<CompagniePoco>();
+
         }
 
-        public Guid EmployeeId { get; set; }
-        public string EmployeeName { get; set; }
-        public string EmployeeMail { get; set; }
-        public string EmployeePhone { get; set; }
-        public string EmployeeNote { get; set; }
+        public Guid EmployeeId { get; set; } = Guid.NewGuid();
+        public string NAS { get; set; } = string.Empty;
+        public string EmployeeName { get; set; } = string.Empty;
+        public string EmployeeMail { get; set; } = string.Empty;
+        public string EmployeePhone { get; set; } = string.Empty;
+        public string EmployeeNote { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
 
 
         #region Adress
@@ -32,10 +38,9 @@ namespace DataBridge.Entity
         public string EmployeeAdressNote { get; set; }
 
         #endregion
-        public List<CompagniePoco> EmployeeCompagnies ;
+
         #region EmployeeListcompagnies
-
-
+        public List<CompagniePoco> EmployeeCompagnies { get; set; }
         #endregion
 
     }

@@ -5,3 +5,8 @@ Add-Migration NomDeLaMigration
 
 # Appliquer les changements à la base de données
 Update-Database -verbose
+
+
+changer startup project a testProject
+
+et choisir default project DBconnection

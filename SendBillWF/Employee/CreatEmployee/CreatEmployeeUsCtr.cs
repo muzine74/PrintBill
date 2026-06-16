@@ -1,4 +1,8 @@
-﻿using System;
+﻿using DataBridge;
+using DataBridge.Entity;
+using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Crypto.Operators;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,8 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataBridge.Entity;
-using DataBridge;
 
 namespace SendBillWF.Employee
 {
@@ -37,22 +39,48 @@ namespace SendBillWF.Employee
             FillSourceCompagnyByUser();
         }
 
-
-        public List<CompagniePoco> GetCompagniesByUser()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public List<CompagniePoco> GetAllCompagnies()
         {
             return compagniManipulation.GetCompagieInfo();
         }
 
         public void FillSourceCompagnyByUser()
         {
-            employeeInfoUsCtr1.FillSourceCompagnyByUser(GetCompagniesByUser(), destinationCompagnirByUserList);
+            employeeInfoUsCtr1.FillSourceCompagnyByUser(GetAllCompagnies(), destinationCompagnirByUserList);
+
+            if (VerifyEmployeeInfoSaisi() == false)
+            {
+                MessageBox.Show("Veuillez saisir tous les informations de l'employé avant d'assigner des compagnies.", "Informations manquantes", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+
         }
 
         private void SaveEmplyee_Click(object sender, EventArgs e)
         {
+            employeeManipulation.SaveCreateEmployee(employeeInfoUsCtr1.SaveEmployee());
+        }
 
+        // verifier si tous les info emplyé sont bien saisi
 
-            employeeManipulation.SaveCreateEmployee(employeeInfoUsCtr1.SaveNewEmployee());
+        private bool VerifyEmployeeInfoSaisi()
+        {
+            //ajouter un message pour indiquer que l'employée existe deja   a tenir en compte le numero d'assurance sociale
+
+            if (string.IsNullOrEmpty(employeeInfoUsCtr1.NameEmployeeSaisi)  || string.IsNullOrEmpty(employeeInfoUsCtr1.MailEmployeeSaisi) || string.IsNullOrEmpty(employeeInfoUsCtr1.PhoneEmployeeSaisi))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+
         }
     }
+
 }

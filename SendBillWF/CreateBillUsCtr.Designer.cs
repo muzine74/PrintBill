@@ -31,7 +31,6 @@
             ProviderCBX = new ComboBox();
             ProviderTxt = new Label();
             BillNbrLbl = new Label();
-            BillDatLbl = new Label();
             ClientCBX = new ComboBox();
             ClientLbl = new Label();
             WorkInfoDgrd = new DataGridView();
@@ -51,6 +50,7 @@
             Cancel = new Button();
             Print = new Button();
             sendBillbtn = new Button();
+            billDate = new DateTimePicker();
             ((System.ComponentModel.ISupportInitialize)WorkInfoDgrd).BeginInit();
             SuspendLayout();
             // 
@@ -80,15 +80,6 @@
             BillNbrLbl.Size = new Size(38, 15);
             BillNbrLbl.TabIndex = 2;
             BillNbrLbl.Text = "label1";
-            // 
-            // BillDatLbl
-            // 
-            BillDatLbl.AutoSize = true;
-            BillDatLbl.Location = new Point(884, 30);
-            BillDatLbl.Name = "BillDatLbl";
-            BillDatLbl.Size = new Size(38, 15);
-            BillDatLbl.TabIndex = 3;
-            BillDatLbl.Text = "label1";
             // 
             // ClientCBX
             // 
@@ -123,22 +114,26 @@
             // 
             // QuantityDtg
             // 
+            QuantityDtg.DataPropertyName = "QuantityDtg";
             QuantityDtg.HeaderText = "Quantity";
             QuantityDtg.Name = "QuantityDtg";
             // 
             // DescriptionDtg
             // 
             DescriptionDtg.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            DescriptionDtg.DataPropertyName = "DescriptionDtg";
             DescriptionDtg.HeaderText = "Description";
             DescriptionDtg.Name = "DescriptionDtg";
             // 
             // UnitPrceDgr
             // 
+            UnitPrceDgr.DataPropertyName = "UnitPrceDgr";
             UnitPrceDgr.HeaderText = "Unite Price";
             UnitPrceDgr.Name = "UnitPrceDgr";
             // 
             // SumDtg
             // 
+            SumDtg.DataPropertyName = "SumDtg";
             SumDtg.HeaderText = "Sum";
             SumDtg.Name = "SumDtg";
             // 
@@ -156,9 +151,8 @@
             TotalwithoutTaxLbl.AutoSize = true;
             TotalwithoutTaxLbl.Location = new Point(954, 636);
             TotalwithoutTaxLbl.Name = "TotalwithoutTaxLbl";
-            TotalwithoutTaxLbl.Size = new Size(106, 15);
+            TotalwithoutTaxLbl.Size = new Size(0, 15);
             TotalwithoutTaxLbl.TabIndex = 8;
-            TotalwithoutTaxLbl.Text = "TotalwithoutTaxLbl";
             // 
             // TPSLbl
             // 
@@ -254,10 +248,19 @@
             sendBillbtn.UseVisualStyleBackColor = true;
             sendBillbtn.Click += sendBillbtn_Click;
             // 
+            // billDate
+            // 
+            billDate.Location = new Point(866, 45);
+            billDate.Name = "billDate";
+            billDate.Size = new Size(166, 23);
+            billDate.TabIndex = 19;
+            billDate.ValueChanged += billDate_ValueChanged;
+            // 
             // CreateBillUsCtr
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(billDate);
             Controls.Add(sendBillbtn);
             Controls.Add(Print);
             Controls.Add(Cancel);
@@ -273,7 +276,6 @@
             Controls.Add(WorkInfoDgrd);
             Controls.Add(ClientLbl);
             Controls.Add(ClientCBX);
-            Controls.Add(BillDatLbl);
             Controls.Add(BillNbrLbl);
             Controls.Add(ProviderTxt);
             Controls.Add(ProviderCBX);
@@ -289,7 +291,6 @@
         private ComboBox ProviderCBX;
         private Label ProviderTxt;
         private Label BillNbrLbl;
-        private Label BillDatLbl;
         private ComboBox ClientCBX;
         private Label ClientLbl;
         private DataGridView WorkInfoDgrd;
@@ -301,13 +302,14 @@
         private Label label5;
         private Label TotalwithTaxLbl;
         private Label label7;
-        private DataGridViewTextBoxColumn QuantityDtg;
-        private DataGridViewTextBoxColumn DescriptionDtg;
-        private DataGridViewTextBoxColumn UnitPrceDgr;
-        private DataGridViewTextBoxColumn SumDtg;
         private Button Save;
         private Button Cancel;
         private Button Print;
         private Button sendBillbtn;
+        private DateTimePicker billDate;
+        private DataGridViewTextBoxColumn QuantityDtg;
+        private DataGridViewTextBoxColumn DescriptionDtg;
+        private DataGridViewTextBoxColumn UnitPrceDgr;
+        private DataGridViewTextBoxColumn SumDtg;
     }
 }

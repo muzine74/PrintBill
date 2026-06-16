@@ -59,6 +59,215 @@ namespace DBConnection.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("DBConnection.Entity.AppGroup", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GroupId"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PermissionsJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("[]");
+
+                    b.HasKey("GroupId");
+
+                    b.ToTable("AppGroups", (string)null);
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.AppGroupEmployee", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("GroupId", "EmployeeId");
+
+                    b.ToTable("AppGroupEmployees", (string)null);
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.AppPermission", b =>
+                {
+                    b.Property<int>("PermissionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PermissionId"));
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("PermissionId");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("AppPermissions", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            PermissionId = 1,
+                            Key = "employees.view",
+                            Label = "Voir",
+                            Module = "Employés"
+                        },
+                        new
+                        {
+                            PermissionId = 2,
+                            Key = "employees.edit",
+                            Label = "Modifier",
+                            Module = "Employés"
+                        },
+                        new
+                        {
+                            PermissionId = 3,
+                            Key = "employees.create",
+                            Label = "Créer",
+                            Module = "Employés"
+                        },
+                        new
+                        {
+                            PermissionId = 4,
+                            Key = "employees.delete",
+                            Label = "Supprimer",
+                            Module = "Employés"
+                        },
+                        new
+                        {
+                            PermissionId = 5,
+                            Key = "companies.view",
+                            Label = "Voir",
+                            Module = "Compagnies"
+                        },
+                        new
+                        {
+                            PermissionId = 6,
+                            Key = "companies.edit",
+                            Label = "Modifier",
+                            Module = "Compagnies"
+                        },
+                        new
+                        {
+                            PermissionId = 7,
+                            Key = "invoices.view",
+                            Label = "Voir",
+                            Module = "Factures"
+                        },
+                        new
+                        {
+                            PermissionId = 8,
+                            Key = "invoices.edit",
+                            Label = "Modifier",
+                            Module = "Factures"
+                        },
+                        new
+                        {
+                            PermissionId = 9,
+                            Key = "invoices.send",
+                            Label = "Envoyer",
+                            Module = "Factures"
+                        },
+                        new
+                        {
+                            PermissionId = 10,
+                            Key = "pointage.view",
+                            Label = "Voir",
+                            Module = "Pointage"
+                        },
+                        new
+                        {
+                            PermissionId = 11,
+                            Key = "pointage.validate",
+                            Label = "Valider",
+                            Module = "Pointage"
+                        },
+                        new
+                        {
+                            PermissionId = 1001,
+                            Key = "groups.manage",
+                            Label = "Gérer",
+                            Module = "Groupes"
+                        });
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.AppUserRole", b =>
+                {
+                    b.Property<int>("CredentialId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CredentialId"));
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("USER");
+
+                    b.HasKey("CredentialId");
+
+                    b.ToTable("AppUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.BillDescription", b =>
+                {
+                    b.Property<Guid>("BillDescriptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("BillHistoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<float>("SubTotalPrice")
+                        .HasColumnType("real");
+
+                    b.Property<float>("UnitPrice")
+                        .HasColumnType("real");
+
+                    b.HasKey("BillDescriptionId");
+
+                    b.HasIndex("BillHistoryId");
+
+                    b.ToTable("BillDescriptions");
+                });
+
             modelBuilder.Entity("DBConnection.Entity.BillHistory", b =>
                 {
                     b.Property<int>("billIdentifier")
@@ -70,8 +279,7 @@ namespace DBConnection.Migrations
                     b.Property<string>("AfterSendedBillPath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BillDescription")
-                        .IsRequired()
+                    b.Property<string>("BillDescriptionText")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BillHistoryNote")
@@ -104,17 +312,23 @@ namespace DBConnection.Migrations
                     b.Property<int>("NumberOfVisite")
                         .HasColumnType("int");
 
-                    b.Property<float>("TPS")
-                        .HasColumnType("real");
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<float>("TVQ")
-                        .HasColumnType("real");
+                    b.Property<DateTime?>("SentDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<float>("TotalWithOutTax")
-                        .HasColumnType("real");
+                    b.Property<decimal>("TPS")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<float>("TotalWithTax")
-                        .HasColumnType("real");
+                    b.Property<decimal>("TVQ")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalWithOutTax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalWithTax")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("compagnyCode")
                         .IsRequired()
@@ -124,8 +338,8 @@ namespace DBConnection.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float>("compagnyPrice")
-                        .HasColumnType("real");
+                    b.Property<decimal>("compagnyPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("billIdentifier");
 
@@ -170,11 +384,29 @@ namespace DBConnection.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("IdMailCredentiel")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes2")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentFrequency")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TPSNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TVQNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkFrequency")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WorkTypeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("companyCode")
                         .IsRequired()
@@ -184,14 +416,15 @@ namespace DBConnection.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("companyStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("companyStatus")
+                        .HasColumnType("bit");
 
                     b.Property<string>("prividercode")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CompanyId");
+
+                    b.HasIndex("WorkTypeId");
 
                     b.ToTable("Companies");
                 });
@@ -214,28 +447,39 @@ namespace DBConnection.Migrations
                     b.ToTable("CompanyAddresses", (string)null);
                 });
 
-            modelBuilder.Entity("DBConnection.Entity.CompanyEmployee", b =>
+            modelBuilder.Entity("DBConnection.Entity.CompanyPricingCalendar", b =>
                 {
+                    b.Property<Guid>("CompanyPricingCalendarId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ApplicatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<decimal>("CompanyBenefitPrice")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Note")
+                    b.Property<string>("Days")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Note2")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("DaysStatus")
+                        .HasColumnType("bit");
 
-                    b.Property<float?>("Rate")
-                        .HasColumnType("real");
+                    b.Property<decimal>("EmployeePayment")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("CompanyId", "EmployeeId");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasKey("CompanyPricingCalendarId");
 
-                    b.ToTable("CompanyEmployee", (string)null);
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("CompanyPricingCalendars");
                 });
 
             modelBuilder.Entity("DBConnection.Entity.Employee", b =>
@@ -244,7 +488,17 @@ namespace DBConnection.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("mail")
+                    b.Property<string>("EmployeeMail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmployeePhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NAS")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("name")
@@ -252,9 +506,6 @@ namespace DBConnection.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("phone")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("EmployeeId");
@@ -275,6 +526,189 @@ namespace DBConnection.Migrations
                     b.HasIndex("AddressId");
 
                     b.ToTable("EmployeeAddresses", (string)null);
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.EmployeeCompagnyPricing", b =>
+                {
+                    b.Property<Guid>("EmployeeCompagnyPricingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ApplicatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CompanyPricingCalendarId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("EmployeePayment")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.HasKey("EmployeeCompagnyPricingId");
+
+                    b.ToTable("EmployeeCompagnyPricings");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.EmployeeCompany", b =>
+                {
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EmployeeId", "CompanyId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("EmployeeCompanies");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.EmployeeCredential", b =>
+                {
+                    b.Property<int>("EmployeeCredentialId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeCredentialId"));
+
+                    b.Property<Guid>("EmplyeeID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EmployeeCredentialId");
+
+                    b.ToTable("EmployeeCredentials");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.EmployeeFile", b =>
+                {
+                    b.Property<Guid>("EmployeeFileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("OriginalName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("EmployeeFileId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeeFiles");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.EmployeeTimeLog", b =>
+                {
+                    b.Property<Guid>("EmployeeTimeLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("BeginWorkDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("ClientPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EndWorkDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WorkType1")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("Workdate")
+                        .HasColumnType("date");
+
+                    b.HasKey("EmployeeTimeLogId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeeTimeLogs");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.Mail.MailCredential", b =>
+                {
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("smtpPassword")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("smtpPort")
+                        .HasColumnType("int");
+
+                    b.Property<string>("smtpServer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("smtpUsername")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CompanyId");
+
+                    b.HasIndex("CompanyId")
+                        .IsUnique();
+
+                    b.ToTable("MailCredentials");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.PointageValidation", b =>
+                {
+                    b.Property<Guid>("PointageValidationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ValidatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ValidatedByAdminId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly>("WeekStart")
+                        .HasColumnType("date");
+
+                    b.HasKey("PointageValidationId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("PointageValidations");
                 });
 
             modelBuilder.Entity("DBConnection.Entity.Provider", b =>
@@ -304,28 +738,115 @@ namespace DBConnection.Migrations
                     b.ToTable("Providers");
                 });
 
-            modelBuilder.Entity("DBConnection.Entity.WorkDay", b =>
+            modelBuilder.Entity("DBConnection.Entity.Work", b =>
                 {
-                    b.Property<Guid>("WorkDayId")
+                    b.Property<Guid>("WorkId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("BeginWorkDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("ClientPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("WorkDayId");
+                    b.Property<DateTime?>("EndWorkDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WorkType1")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("Workdate")
+                        .HasColumnType("date");
+
+                    b.HasKey("WorkId");
 
                     b.HasIndex("CompanyId");
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("WorkDays");
+                    b.ToTable("Works");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.WorkType", b =>
+                {
+                    b.Property<int>("WorkTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkTypeId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WorkTypeId");
+
+                    b.ToTable("WorkTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            WorkTypeId = 1,
+                            Name = "Par visite"
+                        },
+                        new
+                        {
+                            WorkTypeId = 2,
+                            Name = "Hebdomadaire"
+                        },
+                        new
+                        {
+                            WorkTypeId = 3,
+                            Name = "Bi-hebdomadaire"
+                        },
+                        new
+                        {
+                            WorkTypeId = 4,
+                            Name = "Bi-mensuel"
+                        },
+                        new
+                        {
+                            WorkTypeId = 5,
+                            Name = "Mensuel"
+                        },
+                        new
+                        {
+                            WorkTypeId = 6,
+                            Name = "Horaire"
+                        });
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.AppGroupEmployee", b =>
+                {
+                    b.HasOne("DBConnection.Entity.AppGroup", "Group")
+                        .WithMany("GroupEmployees")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.BillDescription", b =>
+                {
+                    b.HasOne("DBConnection.Entity.BillHistory", "BillHistoris")
+                        .WithMany("BillDescriptions")
+                        .HasForeignKey("BillHistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BillHistoris");
                 });
 
             modelBuilder.Entity("DBConnection.Entity.Client", b =>
@@ -337,6 +858,15 @@ namespace DBConnection.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.Company", b =>
+                {
+                    b.HasOne("DBConnection.Entity.WorkType", "WorkType")
+                        .WithMany("Companies")
+                        .HasForeignKey("WorkTypeId");
+
+                    b.Navigation("WorkType");
                 });
 
             modelBuilder.Entity("DBConnection.Entity.CompanyAddress", b =>
@@ -358,23 +888,15 @@ namespace DBConnection.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("DBConnection.Entity.CompanyEmployee", b =>
+            modelBuilder.Entity("DBConnection.Entity.CompanyPricingCalendar", b =>
                 {
                     b.HasOne("DBConnection.Entity.Company", "Company")
-                        .WithMany()
+                        .WithMany("CompanyPricingCalendars")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DBConnection.Entity.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Company");
-
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("DBConnection.Entity.EmployeeAddress", b =>
@@ -396,16 +918,16 @@ namespace DBConnection.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("DBConnection.Entity.WorkDay", b =>
+            modelBuilder.Entity("DBConnection.Entity.EmployeeCompany", b =>
                 {
                     b.HasOne("DBConnection.Entity.Company", "Company")
-                        .WithMany()
+                        .WithMany("EmployeeCompanies")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DBConnection.Entity.Employee", "Employee")
-                        .WithMany("WorkDays")
+                        .WithMany("EmployeeCompanies")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -415,14 +937,111 @@ namespace DBConnection.Migrations
                     b.Navigation("Employee");
                 });
 
+            modelBuilder.Entity("DBConnection.Entity.EmployeeFile", b =>
+                {
+                    b.HasOne("DBConnection.Entity.Employee", "Employee")
+                        .WithMany("EmployeeFiles")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.EmployeeTimeLog", b =>
+                {
+                    b.HasOne("DBConnection.Entity.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DBConnection.Entity.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.Mail.MailCredential", b =>
+                {
+                    b.HasOne("DBConnection.Entity.Company", "Company")
+                        .WithOne("MailCredential")
+                        .HasForeignKey("DBConnection.Entity.Mail.MailCredential", "CompanyId");
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.PointageValidation", b =>
+                {
+                    b.HasOne("DBConnection.Entity.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.Work", b =>
+                {
+                    b.HasOne("DBConnection.Entity.Company", "Company")
+                        .WithMany("Works")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DBConnection.Entity.Employee", "Employee")
+                        .WithMany("Works")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.AppGroup", b =>
+                {
+                    b.Navigation("GroupEmployees");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.BillHistory", b =>
+                {
+                    b.Navigation("BillDescriptions");
+                });
+
             modelBuilder.Entity("DBConnection.Entity.Company", b =>
                 {
                     b.Navigation("Clients");
+
+                    b.Navigation("CompanyPricingCalendars");
+
+                    b.Navigation("EmployeeCompanies");
+
+                    b.Navigation("MailCredential")
+                        .IsRequired();
+
+                    b.Navigation("Works");
                 });
 
             modelBuilder.Entity("DBConnection.Entity.Employee", b =>
                 {
-                    b.Navigation("WorkDays");
+                    b.Navigation("EmployeeCompanies");
+
+                    b.Navigation("EmployeeFiles");
+
+                    b.Navigation("Works");
+                });
+
+            modelBuilder.Entity("DBConnection.Entity.WorkType", b =>
+                {
+                    b.Navigation("Companies");
                 });
 #pragma warning restore 612, 618
         }

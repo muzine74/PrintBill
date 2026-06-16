@@ -6,16 +6,16 @@ using GDTOSQL.Entity;
 using Helpers.generalHelp;
 using Helpers.GoogleDrive;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Collections.Immutable;
 
 
 
 
 namespace DataBridge
 {
-    public class CompagniManipulation
+    public class CompagniManipulation : ManipulationBase
     {
-        DbContextOptions<RamssisCleaningContex> options;
-        RamssisCleaningContex ramssisCleaningContex;
         CompagniePoco compagniePoco;
         public List<WorkBillInfo> _badeDataList = new List<WorkBillInfo>();
         public CompanyAddress CompagnyAdress = new CompanyAddress();
@@ -23,19 +23,11 @@ namespace DataBridge
 
         public List<Address> AdressList = new List<Address>();
         public List<Company> CompagnyList = new List<Company>();
-        public List<Client> ClientList = new List<Client>();
+        private readonly ILogger<CompagniManipulation> _log;
 
-
-        public CompagniManipulation()
+        public CompagniManipulation() : base()
         {
-            options = new DbContextOptionsBuilder<RamssisCleaningContex>()
-                        .UseSqlServer("Server=DESKTOP-71ON71H\\SQLEXPRESS;Database=RamssisCleaningDB;Trusted_Connection=True;TrustServerCertificate=true;")
-          .Options;
-
-            ramssisCleaningContex = new RamssisCleaningContex(options);
-
             compagniePoco = new CompagniePoco();
-
         }
 
         public List<CompagniePoco> GetCompagieInfo()
@@ -46,10 +38,8 @@ namespace DataBridge
                 from C in ramssisCleaningContex.Companies
                 join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
                 join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
-                join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
-                where C.companyStatus == "Active"
+                where C.companyStatus == true
                 orderby C.companyName
-
                 select new
                 {
                     C.CompanyId,
@@ -62,11 +52,9 @@ namespace DataBridge
                     A.zipCode,
                     A.suite,
                     A.civicNumber,
-                    CL.name,
-                    CL.mail,
-                    CL.phone,
-                    C.prividercode
 
+                    C.PaymentFrequency,
+                    C.WorkFrequency
                 }
                 ).ToList();
 
@@ -82,17 +70,16 @@ namespace DataBridge
                 CompagnieZipCode = cp.zipCode,
                 CompagnieSuite = cp.suite,
                 CompagnieCivicNumber = cp.civicNumber,
-                ContactName = cp.name,
-                ContactMail = cp.mail,
-                ContactPhones = cp.phone,
-                Compagnieprividercode = cp.prividercode
+
+                PaymentFrequency = cp.PaymentFrequency,
+                WorkFrequency = cp.WorkFrequency
             }
             ).ToList();
 
 
             //enlever les code doublons qui devrais aller dans la meme factuer
             return (copiedList.GroupBy(p => p.CompagnieCode)
-            .Select(g => g.First()).ToList());
+            .Select(g => g.First()).OrderBy(c => c.CompagnieName).ToList());
         }
 
         public List<CompagniePoco> LinkCompagniePayment(SheetInfo sfo)
@@ -153,21 +140,124 @@ namespace DataBridge
             return googleDrive.LoadGGDrBillData(sfo);
         }
 
-        public void SaveBillHisrory(List<BillHistoryPoco> _billHistoryPocoLst)
+        public void SaveBillHisrory(List<BillHistoryPoco> _billHistoryPocoLst, List<BillDescriptionPoco> billDescriptionPocolist)
         {
+            BillSearchStatus billSearchStatus = new BillSearchStatus();
+
+            var billIdentifier = _billHistoryPocoLst.FirstOrDefault()?.billIdentifier;
+
+            if (billIdentifier.HasValue)
+            {
+                foreach (var item in billDescriptionPocolist)
+                {
+                    item.BillHistoryIdPoco = billIdentifier.Value;
+                }
+            }
+
+            billSearchStatus.keysearch = _billHistoryPocoLst[0].BillNumber;
+            ;//_billHistoryPocoLst[0].BillNumber;
+             //var bhs = GetBillByBillNumber(billSearchStatus).FirstOrDefault();
+
+
+
+            // var bhst = (from rcc in ramssisCleaningContex.BillHistories
+            //             select rcc).AsQueryable();
+
+
+            var bhs = ramssisCleaningContex.BillHistories
+                     .Include(b => b.BillDescriptions)
+                     .FirstOrDefault(bhs => bhs.BillNumber == billSearchStatus.keysearch);
+            //select rcc).Where(s => s.BillNumber.ToString().Contains("")).FirstOrDefault();
+
+
+
+            if (bhs == null)
+            {
+                InsertNewHistoryBill(_billHistoryPocoLst, billDescriptionPocolist);
+            }
+            else
+            {
+                UpdatExistingHistoryBill(_billHistoryPocoLst, billDescriptionPocolist, bhs);
+            }
+        }
+
+        void UpdatExistingHistoryBill(List<BillHistoryPoco> _billHistoryPocoLst, List<BillDescriptionPoco> billDescriptionPocolist, BillHistory bhs)
+        {
+            //les seul information qui devrais pas etre mis a jours
+            //  bhs.Id;bhs.BillNumber
+            //  bhs.billIdentifier;
+            // bhs.BillPath;
+            bhs.compagnyName = _billHistoryPocoLst[0].compagnyName;
+            bhs.compagnyCode = _billHistoryPocoLst[0].compagnyCode;
+            bhs.MouthBill = _billHistoryPocoLst[0].MouthBill;
+            bhs.BilledDate = _billHistoryPocoLst[0].BilledDate;
+            bhs.BillDescriptionText = _billHistoryPocoLst[0].BillDescriptionText;
+            bhs.compagnyPrice = _billHistoryPocoLst[0].compagnyPrice;
+            bhs.NumberOfVisite = _billHistoryPocoLst[0].NumberOfVisite;
+            bhs.TotalWithOutTax = _billHistoryPocoLst[0].TotalWithOutTax;
+            bhs.TPS = _billHistoryPocoLst[0].TPS;
+            bhs.TVQ = _billHistoryPocoLst[0].TVQ;
+            bhs.TotalWithTax = _billHistoryPocoLst[0].TotalWithTax;
+            bhs.BillHistoryNote = _billHistoryPocoLst[0].BillHistoryNote;
+            bhs.Issended = _billHistoryPocoLst[0].Issended;
+            bhs.IsPayed = _billHistoryPocoLst[0].IsPayed;
+
+
+            var toRemove = bhs.BillDescriptions
+                            .Where(d => !billDescriptionPocolist
+                            .Any(p => p.BillDescriptionPocoId == d.BillDescriptionId))
+                            .ToList();
+
+            ramssisCleaningContex.BillDescriptions.RemoveRange(toRemove);
+
+            foreach (var itr in billDescriptionPocolist)
+            {
+                var existingDesc = bhs.BillDescriptions
+                    .FirstOrDefault(d => d.BillDescriptionId == itr.BillDescriptionPocoId);
+
+                if (existingDesc != null)
+                {
+                    // UPDATE
+                    existingDesc.Quantity = itr.QuantityPoco;
+                    existingDesc.Description = itr.DescriptionPoco;
+                    existingDesc.UnitPrice = itr.UnitPricePoco;
+                    existingDesc.SubTotalPrice = itr.SubTotalPricePoco;
+                }
+                else
+                {
+                    // INSERT
+                    bhs.BillDescriptions.Add(new BillDescription
+                    {
+                        Quantity = itr.QuantityPoco,
+                        Description = itr.DescriptionPoco,
+                        UnitPrice = itr.UnitPricePoco,
+                        SubTotalPrice = itr.SubTotalPricePoco,
+                        BillHistoris = bhs
+                    });
+                }
+            }
+
+            ramssisCleaningContex.SaveChanges();
+        }
+
+
+        private void InsertNewHistoryBill(List<BillHistoryPoco> _billHistoryPocoLst, List<BillDescriptionPoco> billDescriptionPocolist)
+        {
+            List<BillDescription> billDescriptionlist = new List<BillDescription>();
+            //List<BillDescriptionPoco> billDescriptionPocolist = new List<BillDescriptionPoco>();
+
             foreach (var item in _billHistoryPocoLst)
             {
                 BillHistory billHistory = new BillHistory();
 
                 billHistory.Id = item.Id;
-                //billHistory.billIdentifier = item.billIdentifier;
+                // billHistory.billIdentifier = item.billIdentifier;
                 billHistory.BillNumber = item.BillNumber;
                 billHistory.compagnyName = item.compagnyName;
                 billHistory.compagnyCode = item.compagnyCode;
                 billHistory.compagnyPrice = item.compagnyPrice;
                 billHistory.MouthBill = item.MouthBill;
                 billHistory.BilledDate = item.BilledDate;
-                billHistory.BillDescription = item.BillDescription;
                 billHistory.compagnyPrice = item.compagnyPrice;
                 billHistory.NumberOfVisite = item.NumberOfVisite;
                 billHistory.TotalWithOutTax = item.TotalWithOutTax;
@@ -177,13 +267,53 @@ namespace DataBridge
                 billHistory.BillPath = item.BillPath;
                 billHistory.BillHistoryNote = item.BillHistoryNote;
 
+                billHistory.BillDescriptions = new List<BillDescription>();
+
+                foreach (var itr in billDescriptionPocolist)
+                {
+
+                    billHistory.BillDescriptions.Add(new BillDescription
+                    {
+                        BillDescriptionId = itr.BillDescriptionPocoId, // Corrected property assignment
+                        Quantity = itr.QuantityPoco,
+                        Description = itr.DescriptionPoco,
+                        UnitPrice = itr.UnitPricePoco,
+                        SubTotalPrice = itr.SubTotalPricePoco,
+                        BillHistoryId = itr.BillHistoryIdPoco,
+                        BillHistoris = billHistory
+
+                    });
+                }
 
                 ramssisCleaningContex.BillHistories.Add(billHistory);
-                ramssisCleaningContex.SaveChanges();
+                ramssisCleaningContex.BillDescriptions.AddRange(billHistory.BillDescriptions);
 
             }
 
+            //string logChanges = "";
+
+            //foreach (var entry in ramssisCleaningContex.ChangeTracker.Entries())
+            //{
+            //    logChanges +=  $"{entry.Entity.GetType().Name} - {entry.State}"; 
+            //    logChanges += Environment.NewLine;
+            //}
+
             ramssisCleaningContex.SaveChanges();
+            billDescriptionPocolist.Clear();
+            _billHistoryPocoLst.Clear();
+
+        }
+
+
+
+        public List<BillDescription> GetBilDescription(string searchKey)
+        {
+
+            var billDescriptions = (from bdsc in ramssisCleaningContex.BillDescriptions
+                                    where bdsc.BillHistoryId.Equals(searchKey)
+                                    select bdsc).AsQueryable();
+
+            return billDescriptions.ToList();
         }
 
         public List<BillHistory> GetBill(BillSearchStatus BillSearchStatus)
@@ -194,7 +324,7 @@ namespace DataBridge
             if (!string.IsNullOrEmpty(BillSearchStatus.keysearch))
             {
                 billhs = billhs.Where(s => s.compagnyName.Contains(BillSearchStatus.keysearch) || s.compagnyCode.Contains(BillSearchStatus.keysearch)
-                                        || s.BillDescription.Contains(BillSearchStatus.keysearch) || s.BillNumber.ToString().Contains(BillSearchStatus.keysearch)
+                                        || s.BillNumber.ToString().Contains(BillSearchStatus.keysearch) //s.BillDescription.Contains(BillSearchStatus.keysearch) ||
                                         || s.TotalWithTax.ToString().Contains(BillSearchStatus.keysearch) || s.TotalWithOutTax.ToString().Contains(BillSearchStatus.keysearch)
                                         || s.BillNumber.ToString().Contains(BillSearchStatus.keysearch));
             }
@@ -299,49 +429,39 @@ namespace DataBridge
         {
             Company CompagnyTemp = new Company();
             Address AdressTemp = new Address();
-            Client ClientTemp = new Client();
             CompanyAddress CompagnyAdress = new CompanyAddress();
 
-            Guid CompagnyGuid = Guid.NewGuid();
-            Guid AdressGuid = Guid.NewGuid();
-            Guid ClientGuid = Guid.NewGuid();
+            DesactivateOldWorkType(cmpPoco.CompagnieID);
 
             // Fill Compagny Info
-            CompagnyTemp.CompanyId = CompagnyGuid;
-            CompagnyTemp.companyName = cmpPoco.CompagnieName;
-            CompagnyTemp.companyCode = cmpPoco.CompagnieCode;
-            CompagnyTemp.companyStatus = cmpPoco.CompagnieStatus;
+            CompagnyTemp.CompanyId       = cmpPoco.CompagnieID;
+            CompagnyTemp.companyName     = cmpPoco.CompagnieName;
+            CompagnyTemp.companyCode     = cmpPoco.CompagnieCode;
+            CompagnyTemp.companyStatus   = cmpPoco.CompagnieStatus;
+            CompagnyTemp.TPSNumber       = cmpPoco.TPSNumber;
+            CompagnyTemp.TVQNumber       = cmpPoco.TVQNumber;
+            CompagnyTemp.PaymentFrequency = cmpPoco.PaymentFrequency;
+            CompagnyTemp.WorkFrequency   = cmpPoco.WorkFrequency;
 
-
-            //Fill Address to last Company
-            AdressTemp.AddressId = AdressGuid;
+            // Fill Address
+            AdressTemp.AddressId   = cmpPoco.AddressID;
             AdressTemp.civicNumber = cmpPoco.CompagnieCivicNumber;
-            AdressTemp.suite = cmpPoco.CompagnieSuite;
-            AdressTemp.zipCode = cmpPoco.CompagnieZipCode;
-            AdressTemp.city = cmpPoco.Compagniecity;
-            AdressTemp.state = cmpPoco.CompagnieState;
+            AdressTemp.suite       = cmpPoco.CompagnieSuite;
+            AdressTemp.zipCode     = cmpPoco.CompagnieZipCode;
+            AdressTemp.city        = cmpPoco.Compagniecity;
+            AdressTemp.state       = cmpPoco.CompagnieState;
 
-
-            //Fill Contact Client to Last Compagny
-            ClientTemp.clientID = ClientGuid;
-            ClientTemp.name = cmpPoco.ContactName;
-            ClientTemp.mail = cmpPoco.ContactMail;
-            ClientTemp.phone = cmpPoco.ContactPhones;
-
-            ClientTemp.CompanyId = CompagnyGuid;
-
-            CompagnyAdress.AddressId = AdressGuid;
-            CompagnyAdress.CompanyId = CompagnyGuid;
+            CompagnyAdress.AddressId = cmpPoco.AddressID;
+            CompagnyAdress.CompanyId = cmpPoco.CompagnieID;
             ramssisCleaningContex.CompanyAddresses.Add(CompagnyAdress);
+
+            CompagnyTemp.CompanyPricingCalendars = cmpPoco._companyPricingCalendar;
 
             ramssisCleaningContex.Companies.Add(CompagnyTemp);
             ramssisCleaningContex.Addresses.Add(AdressTemp);
-            ramssisCleaningContex.Clients.Add(ClientTemp);
-
-
             ramssisCleaningContex.SaveChanges();
-
         }
+
 
         public List<CompagniePoco> GetCompagnyByName(string searchKey)
         {
@@ -351,27 +471,25 @@ namespace DataBridge
                 from C in ramssisCleaningContex.Companies
                 join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
                 join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
-                join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
-                where C.companyStatus == "Active" && (C.companyName.Contains(searchKey) || C.companyCode.Contains(searchKey))
-
+                where (C.companyName.Contains(searchKey) || C.companyCode.Contains(searchKey))
                 select new
                 {
                     C.CompanyId,
                     A.AddressId,
-                    CL.clientID,
                     C.companyName,
                     C.companyStatus,
                     C.companyCode,
-                    C.prividercode,
+
+                    C.TPSNumber,
+                    C.TVQNumber,
+                    C.PaymentFrequency,
+                    C.WorkFrequency,
                     A.country,
                     A.state,
                     A.city,
                     A.zipCode,
                     A.suite,
                     A.civicNumber,
-                    CL.name,
-                    CL.mail,
-                    CL.phone
                 }
                 ).ToList();
 
@@ -379,7 +497,6 @@ namespace DataBridge
             {
                 CompagnieID = cp.CompanyId,
                 AddressID = cp.AddressId,
-                ContactID = cp.clientID,
                 CompagnieName = cp.companyName,
                 CompagnieStatus = cp.companyStatus,
                 CompagnieCode = cp.companyCode,
@@ -389,11 +506,11 @@ namespace DataBridge
                 CompagnieZipCode = cp.zipCode,
                 CompagnieSuite = cp.suite,
                 CompagnieCivicNumber = cp.civicNumber,
-                CompagnieProvider =cp.prividercode,
-                ContactName = cp.name,
-                ContactMail = cp.mail,
-                ContactPhones = cp.phone
 
+                TPSNumber = cp.TPSNumber,
+                TVQNumber = cp.TVQNumber,
+                PaymentFrequency = cp.PaymentFrequency,
+                WorkFrequency = cp.WorkFrequency,
             }
             ).ToList();
 
@@ -403,32 +520,210 @@ namespace DataBridge
             .Select(g => g.First()).ToList());
 
         }
+
+        public CompagniePoco GetCompagnyByCode(string cpCode)
+        {
+            var result =
+                (from c in ramssisCleaningContex.Companies
+                 join ac in ramssisCleaningContex.CompanyAddresses on c.CompanyId equals ac.CompanyId
+                 join a in ramssisCleaningContex.Addresses on ac.AddressId equals a.AddressId
+                 where c.companyStatus == true && c.companyCode == cpCode
+                 select new CompagniePoco
+                 {
+                     CompagnieID = c.CompanyId,
+                     AddressID = a.AddressId,
+                     CompagnieName = c.companyName,
+                     CompagnieStatus = c.companyStatus,
+                     CompagnieCode = c.companyCode,
+                     Compagniecountry = a.country,
+                     CompagnieState = a.state,
+                     Compagniecity = a.city,
+                     CompagnieZipCode = a.zipCode,
+                     CompagnieSuite = a.suite,
+                     CompagnieCivicNumber = a.civicNumber,
+
+                     PaymentFrequency = c.PaymentFrequency,
+                     WorkFrequency = c.WorkFrequency,
+                     TPSNumber = c.TPSNumber,
+                     TVQNumber = c.TVQNumber,
+                 }).ToList().GroupBy(p => p.CompagnieCode)
+            .Select(g => g.First()).FirstOrDefault();
+
+            // 🔥 Si le résultat est null → retourner un objet vide (jamais null)
+            return result ?? new CompagniePoco();
+        }
+
+        public CompagniePoco GetCompanyById(Guid compagnyId)
+        {
+            var result =
+                (from c in ramssisCleaningContex.Companies
+                 join ac in ramssisCleaningContex.CompanyAddresses on c.CompanyId equals ac.CompanyId
+                 join a in ramssisCleaningContex.Addresses on ac.AddressId equals a.AddressId
+                 where c.CompanyId == compagnyId
+                 select new CompagniePoco
+                 {
+                     CompagnieID = c.CompanyId,
+                     AddressID = a.AddressId,
+                     CompagnieName = c.companyName,
+                     CompagnieStatus = c.companyStatus,
+                     CompagnieCode = c.companyCode,
+                     Compagniecountry = a.country,
+                     CompagnieState = a.state,
+                     Compagniecity = a.city,
+                     CompagnieZipCode = a.zipCode,
+                     CompagnieSuite = a.suite,
+                     CompagnieCivicNumber = a.civicNumber,
+
+                     PaymentFrequency = c.PaymentFrequency,
+                     WorkFrequency = c.WorkFrequency,
+                     TPSNumber = c.TPSNumber,
+                     TVQNumber = c.TVQNumber,
+                 }).ToList().GroupBy(p => p.CompagnieCode)
+            .Select(g => g.First()).FirstOrDefault();
+
+            // 🔥 Si le résultat est null → retourner un objet vide (jamais null)
+            return result ?? new CompagniePoco();
+        }
+
         public void UpdateCompagnyInfo(CompagniePoco cmpPocoUp)
         {
-            var companie = ramssisCleaningContex.Companies.Where(c => c.CompanyId == cmpPocoUp.CompagnieID).First();
-            var Adresse = ramssisCleaningContex.Addresses.Where(c => c.AddressId == cmpPocoUp.AddressID).First();
-            var client = ramssisCleaningContex.Clients.Where(c => c.clientID == cmpPocoUp.ContactID).First();
+            using var context = CreateContext();
+            using var transaction = context.Database.BeginTransaction();
+
+            var companie = context.Companies
+                .Include(c => c.CompanyPricingCalendars)
+                .FirstOrDefault(c => c.CompanyId == cmpPocoUp.CompagnieID)
+                ?? throw new InvalidOperationException($"Compagnie introuvable : {cmpPocoUp.CompagnieID}");
+
+            var adresse = context.Addresses
+                .FirstOrDefault(a => a.AddressId == cmpPocoUp.AddressID)
+                ?? throw new InvalidOperationException($"Adresse introuvable : {cmpPocoUp.AddressID}");
 
 
-
+            // ── Scalaires compagnie ───────────────────────────────────────────
             companie.companyName = cmpPocoUp.CompagnieName;
             companie.companyCode = cmpPocoUp.CompagnieCode;
             companie.companyStatus = cmpPocoUp.CompagnieStatus;
-            companie.prividercode = cmpPocoUp.Compagnieprividercode;
+            companie.PaymentFrequency = cmpPocoUp.PaymentFrequency;
+            companie.WorkFrequency = cmpPocoUp.WorkFrequency;
+            companie.TPSNumber = cmpPocoUp.TPSNumber;
+            companie.TVQNumber = cmpPocoUp.TVQNumber;
 
-            Adresse.country = cmpPocoUp.Compagniecountry;
-            Adresse.state = cmpPocoUp.CompagnieState;
-            Adresse.city = cmpPocoUp.Compagniecity;
-            Adresse.zipCode = cmpPocoUp.CompagnieZipCode;
-            Adresse.suite = cmpPocoUp.CompagnieSuite;
-            Adresse.civicNumber = cmpPocoUp.CompagnieCivicNumber;
+            // ── Adresse ───────────────────────────────────────────────────────
+            adresse.civicNumber = cmpPocoUp.CompagnieCivicNumber;
+            adresse.suite = cmpPocoUp.CompagnieSuite;
+            adresse.zipCode = cmpPocoUp.CompagnieZipCode;
+            adresse.city = cmpPocoUp.Compagniecity;
+            adresse.state = cmpPocoUp.CompagnieState;
+            adresse.country = cmpPocoUp.Compagniecountry;
 
-            client.name = cmpPocoUp.ContactName;
-            client.mail = cmpPocoUp.ContactMail;
-            client.phone = cmpPocoUp.ContactPhones;
-            Adresse.country = "Canada";
+            // ── Snapshot anciens calendriers actifs ───────────────────────────
+            var oldActive = companie.CompanyPricingCalendars
+                .Where(x => x.IsActive)
+                .Select(x => new
+                {
+                    x.CompanyPricingCalendarId,
+                    x.Days
+                })
+                .ToList();
 
-            ramssisCleaningContex.SaveChanges();
+            // ── Désactiver anciens calendriers (TRACKÉ PAR EF) ────────────────
+            foreach (var cal in companie.CompanyPricingCalendars)
+            {
+                cal.IsActive = false;
+            }
+
+            // ── Ajouter nouveaux calendriers (SAFE mapping) ───────────────────
+            var newCalendars = new List<CompanyPricingCalendar>();
+
+            if (cmpPocoUp._companyPricingCalendar != null)
+            {
+                foreach (var newCal in cmpPocoUp._companyPricingCalendar)
+                {
+                    var entity = new CompanyPricingCalendar
+                    {
+                        CompanyId = companie.CompanyId,
+                        Days = newCal.Days,
+                        DaysStatus = newCal.DaysStatus,
+                        CompanyBenefitPrice = newCal.CompanyBenefitPrice,
+                        EmployeePayment = newCal.EmployeePayment,
+                        IsActive = true
+                    };
+
+                    newCalendars.Add(entity);
+                    companie.CompanyPricingCalendars.Add(entity);
+                }
+            }
+
+            // ── SaveChanges UNIQUE (important) ────────────────────────────────
+            try
+            {
+                context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                var details = string.Join("; ", ex.Entries.Select(e =>
+                {
+                    var keyValues = e.Metadata.FindPrimaryKey()
+                        ?.Properties
+                        .Select(p => $"{p.Name}={e.CurrentValues[p]}")
+                        ?? Enumerable.Empty<string>();
+                    return $"{e.Entity.GetType().Name}[{string.Join(",", keyValues)}] état={e.State}";
+                }));
+
+                throw new InvalidOperationException(
+                    $"SaveChanges a échoué (conflit de concurrence). Entités : {details}", ex);
+            }
+
+            // ── Re-mapping anciens → nouveaux calendriers ─────────────────────
+            var newActive = newCalendars
+                .Select(x => new
+                {
+                    x.CompanyPricingCalendarId,
+                    x.Days
+                })
+                .ToList();
+
+            var idsPairs = oldActive.Join(
+                newActive,
+                o => o.Days,
+                n => n.Days,
+                (o, n) => (OldId: o.CompanyPricingCalendarId, NewId: n.CompanyPricingCalendarId)
+            ).ToList();
+
+            foreach (var (OldId, NewId) in idsPairs)
+            {
+                var pricings = context.EmployeeCompagnyPricings
+                    .Where(ecp => ecp.CompanyPricingCalendarId == OldId)
+                    .ToList();
+
+                foreach (var ecp in pricings)
+                {
+                    ecp.CompanyPricingCalendarId = NewId;
+                }
+            }
+
+            // ── Save final ────────────────────────────────────────────────────
+            try
+            {
+                context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                var details = string.Join("; ", ex.Entries.Select(e =>
+                {
+                    var keyValues = e.Metadata.FindPrimaryKey()
+                        ?.Properties
+                        .Select(p => $"{p.Name}={e.CurrentValues[p]}")
+                        ?? Enumerable.Empty<string>();
+                    return $"{e.Entity.GetType().Name}[{string.Join(",", keyValues)}] état={e.State}";
+                }));
+
+                throw new InvalidOperationException(
+                    $"Mise à jour des pointages échouée. Entités : {details}", ex);
+            }
+
+            transaction.Commit();
         }
 
         public List<SheetInfo> GetListgoogleSheet(SheetInfo sheetInfo)
@@ -447,60 +742,275 @@ namespace DataBridge
                         from C in ramssisCleaningContex.Companies
                         join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
                         join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
-                        join CL in ramssisCleaningContex.Clients on C.CompanyId equals CL.CompanyId
-                        where C.companyStatus == "Active"
-
+                        where C.companyStatus == true
                         select new
                         {
                             C.CompanyId,
                             A.AddressId,
-                            CL.clientID,
                             C.companyName,
                             C.companyStatus,
                             C.companyCode,
+        
+                            C.PaymentFrequency,
+                            C.WorkFrequency,
                             A.country,
                             A.state,
                             A.city,
                             A.zipCode,
                             A.suite,
                             A.civicNumber,
-                            CL.name,
-                            CL.mail,
-                            CL.phone,
-                            C.prividercode
-
+                            C.TPSNumber,
+                            C.TVQNumber,
                         }
                         ).ToList();
 
             copiedList = cpmList.Select(cp => new CompagniePoco
             {
-                CompagnieID = cp.CompanyId,
-                AddressID = cp.AddressId,
-                ContactID = cp.clientID,
+                CompagnieID      = cp.CompanyId,
+                AddressID        = cp.AddressId,
+                CompagnieName    = cp.companyName,
+                CompagnieStatus  = cp.companyStatus,
+                CompagnieCode    = cp.companyCode,
 
-
-                CompagnieName = cp.companyName,
-                CompagnieStatus = cp.companyStatus,
-                CompagnieCode = cp.companyCode,
                 Compagniecountry = cp.country,
-                CompagnieState = cp.state,
-                Compagniecity = cp.city,
+                CompagnieState   = cp.state,
+                Compagniecity    = cp.city,
                 CompagnieZipCode = cp.zipCode,
-                CompagnieSuite = cp.suite,
+                CompagnieSuite   = cp.suite,
                 CompagnieCivicNumber = cp.civicNumber,
-                ContactName = cp.name,
-                ContactMail = cp.mail,
-                ContactPhones = cp.phone,
-                Compagnieprividercode = cp.prividercode
-
+                PaymentFrequency = cp.PaymentFrequency,
+                WorkFrequency    = cp.WorkFrequency,
+                TPSNumber        = cp.TPSNumber,
+                TVQNumber        = cp.TVQNumber,
             }
-                         ).ToList();
+            ).ToList();
 
 
             //enlever les code doublons qui devrais aller dans la meme factuer
             return (copiedList.GroupBy(p => p.CompagnieCode)
-            .Select(g => g.First()).ToList());
+            .Select(g => g.First()).OrderBy(c => c.CompagnieName).ToList());
 
+        }
+
+        public List<CompagniePoco> getAllCompagnies()
+        {
+            var cpmList = (
+                        from C in ramssisCleaningContex.Companies
+                        join AC in ramssisCleaningContex.CompanyAddresses on C.CompanyId equals AC.CompanyId
+                        join A in ramssisCleaningContex.Addresses on AC.AddressId equals A.AddressId
+                        select new
+                        {
+                            C.CompanyId,
+                            A.AddressId,
+                            C.companyName,
+                            C.companyStatus,
+                            C.companyCode,
+        
+                            C.PaymentFrequency,
+                            C.WorkFrequency,
+                            A.country,
+                            A.state,
+                            A.city,
+                            A.zipCode,
+                            A.suite,
+                            A.civicNumber,
+                            C.TPSNumber,
+                            C.TVQNumber,
+                        }
+                        ).ToList();
+
+            var copiedList = cpmList.Select(cp => new CompagniePoco
+            {
+                CompagnieID      = cp.CompanyId,
+                AddressID        = cp.AddressId,
+                CompagnieName    = cp.companyName,
+                CompagnieStatus  = cp.companyStatus,
+                CompagnieCode    = cp.companyCode,
+
+                Compagniecountry = cp.country,
+                CompagnieState   = cp.state,
+                Compagniecity    = cp.city,
+                CompagnieZipCode = cp.zipCode,
+                CompagnieSuite   = cp.suite,
+                CompagnieCivicNumber = cp.civicNumber,
+                PaymentFrequency = cp.PaymentFrequency,
+                WorkFrequency    = cp.WorkFrequency,
+                TPSNumber        = cp.TPSNumber,
+                TVQNumber        = cp.TVQNumber,
+            }).ToList();
+
+            return copiedList.GroupBy(p => p.CompagnieCode)
+                .Select(g => g.First()).OrderBy(c => c.CompagnieName).ToList();
+        }
+
+        public List<BillHistory> GetBillByBillNumber(BillSearchStatus BillSearchStatus)
+        {
+
+            if (BillSearchStatus == null)
+                return new List<BillHistory>();
+
+
+            var billhs = (from rcc in ramssisCleaningContex.BillHistories
+                          select rcc).AsQueryable();
+
+            if (!string.IsNullOrEmpty(BillSearchStatus.keysearch))
+            {
+                billhs = billhs.Where(s => s.BillNumber.ToString().Contains(BillSearchStatus.keysearch));
+            }
+
+            if (billhs == null)
+            {
+                List<BillHistory> bhs = new List<BillHistory>();
+                return bhs;
+            }
+
+            return billhs.ToList();
+        }
+
+        public void DesactivateOldWorkType(Guid _CompagnyId)
+        {
+            // Corrected the LINQ query to properly filter and retrieve the work types
+            var workTypes = ramssisCleaningContex.CompanyPricingCalendars
+                .Where(wt => wt.CompanyId.Equals(_CompagnyId))
+                .ToList();
+
+
+            foreach (var wt in workTypes)
+            {
+                wt.IsActive = false;
+            }
+
+            ramssisCleaningContex.SaveChanges();
+        }
+        
+
+        public List<CompanyPricingCalendarPoco> GetCompanyPricingCalendars(Guid CompanyId)
+        {
+            List<CompanyPricingCalendarPoco> companyPricingCalendarPocoLSt = new List<CompanyPricingCalendarPoco>();
+
+            List<CompanyPricingCalendar> companyPricingCalendarLst = ramssisCleaningContex.CompanyPricingCalendars
+                .Where(cpc => cpc.CompanyId == CompanyId && cpc.IsActive == true)
+                .ToList();
+
+            foreach (var wt in companyPricingCalendarLst)
+            {
+                companyPricingCalendarPocoLSt.Add(new CompanyPricingCalendarPoco
+                {
+                    CompanyPricingCalendarId = wt.CompanyPricingCalendarId,
+                    Days = wt.Days,
+                    DaysStatus = wt.DaysStatus,
+                    CompanyBenefitPrice = wt.CompanyBenefitPrice,
+                    EmployeePayment = wt.EmployeePayment,
+                    IsActive = wt.IsActive
+
+                });
+            }
+
+            return companyPricingCalendarPocoLSt;
+
+
+        }
+
+        public List<CompagniePoco> GetCompagnyByEmployee(Guid EmployeeId)
+        {
+            var companiesQuery =
+                from company in ramssisCleaningContex.Companies
+                join companyAddress in ramssisCleaningContex.CompanyAddresses
+                    on company.CompanyId equals companyAddress.CompanyId
+                join address in ramssisCleaningContex.Addresses
+                    on companyAddress.AddressId equals address.AddressId
+                join employeeCompany in ramssisCleaningContex.EmployeeCompanies
+                on company.CompanyId equals employeeCompany.CompanyId
+                where employeeCompany.EmployeeId == EmployeeId
+                select new CompanyInfoDto
+                {
+                    CompanyId = company.CompanyId,
+                    AddressId = address.AddressId,
+                    CompanyName = company.companyName,
+                    CompanyStatus = company.companyStatus,
+                    CompanyCode = company.companyCode,
+                    TPSNumber = company.TPSNumber,
+                    TVQNumber = company.TVQNumber,
+                    PaymentFrequency = company.PaymentFrequency,
+                    WorkFrequency = company.WorkFrequency,
+                    Country = address.country,
+                    State = address.state,
+                    City = address.city,
+                    ZipCode = address.zipCode,
+                    Suite = address.suite,
+                    CivicNumber = address.civicNumber,
+                };
+
+            var companies = companiesQuery.ToList();
+
+            return companies.Select(MapToPoco).ToList();
+
+
+        }
+
+        private CompagniePoco MapToPoco(CompanyInfoDto dto)
+        {
+            return new CompagniePoco
+            {
+                CompagnieID = dto.CompanyId,
+                AddressID = dto.AddressId,
+                ContactID = dto.ClientId,
+                CompagnieName = dto.CompanyName,
+                CompagnieStatus = dto.CompanyStatus,
+                CompagnieCode = dto.CompanyCode,
+                Compagniecountry = dto.Country,
+                CompagnieState = dto.State,
+                Compagniecity = dto.City,
+                CompagnieZipCode = dto.ZipCode,
+                CompagnieSuite = dto.Suite,
+                CompagnieCivicNumber = dto.CivicNumber,
+                TPSNumber = dto.TPSNumber,
+                TVQNumber = dto.TVQNumber,
+                ContactName = dto.ContactName,
+                ContactMail = dto.ContactEmail,
+                ContactPhones = dto.ContactPhone,
+                PaymentFrequency = dto.PaymentFrequency,
+                WorkFrequency = dto.WorkFrequency
+            };
+        }
+
+        public void SaveEmployeePriceChanged(Dictionary<(Guid CompanyPricingCalendarId, Guid EmployeeId, string Day), decimal> EmployeePriceChanged)
+        {
+               foreach (var change in EmployeePriceChanged)
+                {
+
+                var record = ramssisCleaningContex.EmployeeCompagnyPricings
+                            .Where(r => r.CompanyPricingCalendarId == change.Key.CompanyPricingCalendarId
+                            && r.EmployeeId == change.Key.EmployeeId && r.IsActive == true
+                            ).ToList();
+                
+
+                foreach (var rec in record)
+                {
+                    rec.IsActive = false;
+                     //rec.ApplicatedDate = DateTime.Now;
+                }
+
+                    //if (record.Count > 0)
+                    //{
+                    //     //record.IsActive = false;
+                    //    // record.ModifiedDate = DateTime.Now;
+                    //}
+                    //else
+                    //{
+                    EmployeeCompagnyPricing employeeCompagnyPricing = new EmployeeCompagnyPricing
+                        {
+                            CompanyPricingCalendarId = change.Key.CompanyPricingCalendarId,
+                            EmployeeId = change.Key.EmployeeId,
+                            EmployeePayment = change.Value,
+                            IsActive = true,
+                            ApplicatedDate = DateTime.Now
+                        };
+
+                        ramssisCleaningContex.EmployeeCompagnyPricings.Add(employeeCompagnyPricing);
+                    //}              
+                }
+            ramssisCleaningContex.SaveChangesAsync();
         }
 
     }

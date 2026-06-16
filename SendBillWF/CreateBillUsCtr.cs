@@ -1,40 +1,49 @@
-﻿using System;
+﻿using AutoMapper;
+using DataBridge;
+using DataBridge;
+using DataBridge.Entity;
+using DBConnection.Entity;
+using GDTOSQL.Entity;
+using Helpers.generalHelp;
+using Helpers.generalHelp;
+using PdfiumViewer;
+using PrintPDF;
+using SendBillBL;
+using SendBillBL.Entity;
+using SendBillWF.PocoGrid;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using AutoMapper;
-using DataBridge;
-using DataBridge.Entity;
-using GDTOSQL.Entity;
-using PrintPDF;
-using SendBillBL.Entity;
-using SendBillBL;
-using Helpers.generalHelp;
-using System.Drawing.Printing;
-using PdfiumViewer;
 
 
 namespace SendBillWF
 {
     public partial class CreateBillUsCtr : UserControl
     {
-        public CompagniManipulation compagniManipulation = new CompagniManipulation();
+        public CompagniManipulation compagniManipulation;
         List<CompagniePoco> compagnieInfoList = new List<CompagniePoco>();
         List<BillHistoryPoco> _billHistoryPocoLst = new List<BillHistoryPoco>();
+        List<BillDescriptionMAnipulation> billDescriptionMAnipulationList;
+        BillDescriptionMAnipulation billDescriptionMAnipulation;
+        List<BillDescriptionPoco> billDescriptionPoco;
 
         MapperConfiguration config;
         CompagniePoco compagniePocoProvider;
         CompagniePoco compagniePocoClient;
 
+
         SendBill sendBill;
         MailPoco mailPoco;
         DateTime date;
         //string dest;
+        List<CompagniePoco> compagniePocosList;
 
 
         CreateBillUsCtr createBillUsCtr;
@@ -43,13 +52,18 @@ namespace SendBillWF
 
         public CreateBillUsCtr()
         {
-            List<CompagniePoco> compagniePocosList = new List<CompagniePoco>();
+            compagniePocosList = new List<CompagniePoco>();
+            billDescriptionMAnipulationList = new List<BillDescriptionMAnipulation>();
+            compagniManipulation = new CompagniManipulation();
+            billDescriptionMAnipulation = new BillDescriptionMAnipulation();
+            billDescriptionPoco = new List<BillDescriptionPoco>();
 
             InitializeComponent();
 
             config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<CompagniePoco, CompagniePoco>();
+                cfg.CreateMap<BillDescriptionPoco, BillDescription>();
             });
 
             compagniePocosList = compagniManipulation.getActiveCompagnies();
@@ -60,16 +74,30 @@ namespace SendBillWF
             mapper = config.CreateMapper();
 
             //compagnieInfoList = compagniManipulation.getActiveCompagnies();
-            ProviderCBX.DataSource = compagniePocosList.Where(c => string.IsNullOrEmpty(c.Compagnieprividercode)).ToList();
-            ProviderCBX.Name = "CompagnieID";
-            ProviderCBX.ValueMember = "CompagnieName";
+            ProviderCBX.DataSource = compagniePocosList.Where(c => c.CompagnieCode == "NettoyageRamssis" || c.CompagnieCode == "SeifDeals" || c.CompagnieCode == "EntretienRamssis").ToList();  //string.IsNullOrEmpty(c.Compagnieprividercode)).ToList();
+            ProviderCBX.DisplayMember = "CompagnieName";
+            ProviderCBX.ValueMember = "CompagnieID";
 
             ClientCBX.DataSource = compagniePocosList;
-            ClientCBX.Name = "CompagnieID";
-            ClientCBX.ValueMember = "CompagnieName";
+            ClientCBX.DisplayMember = "CompagnieName";
+            ClientCBX.ValueMember = "CompagnieID";
 
             BillNbrLbl.Text = "Bill Number  : " + (HeadersBill.BillHeadersidentifier).ToString();
-            BillDatLbl.Text = "Bill Date        : " + DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+
+
+            // Fix for CS8629: Nullable value type may be null.
+            //HeadersBill.BillHeadersDate = HeadersBill.getBilledDate().ToString("dd-MM-yyyy HH:mm:ss");
+
+
+            //HeadersBill._jobDate.HasValue
+            //? HeadersBill._jobDate.Value.ToString("dd-MM-yyyy HH:mm:ss")
+            //: DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss"); ; // Provide a default value (e.g., empty string) if _jobDate is null.
+
+
+
+
+
+            //BillDatLbl.Text = "Bill Date        : " + HeadersBill._jobDate.Value.ToString("dd-MM-yyyy HH:mm:ss");
 
             ContextMenuStrip menu = new ContextMenuStrip();
             ToolStripMenuItem item = new ToolStripMenuItem("Supprimer");
@@ -79,7 +107,8 @@ namespace SendBillWF
             WorkInfoDgrd.ContextMenuStrip = menu;
 
 
-            HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill()+1;
+            HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill();
+
 
         }
 
@@ -92,67 +121,132 @@ namespace SendBillWF
                 // ProviderTxt 
 
                 compagniePocoProvider = mapper.Map<CompagniePoco>((CompagniePoco)ProviderCBX.SelectedItem);
-
-                ProviderTxt.Text = compagniePocoProvider.CompagnieName;
-
-                ProviderTxt.Text += Environment.NewLine;
-                if (!string.IsNullOrEmpty(compagniePocoProvider.CompagnieSuite))
-                {
-                    ProviderTxt.Text += compagniePocoProvider.CompagnieSuite + "_";
-                }
-
-                ProviderTxt.Text += compagniePocoProvider.CompagnieCivicNumber;
-                ProviderTxt.Text += Environment.NewLine;
-
-                ProviderTxt.Text += compagniePocoProvider.Compagniecity + "," + compagniePocoProvider.CompagnieState
-                                 + "," + compagniePocoProvider.Compagniecountry;
-                ProviderTxt.Text += Environment.NewLine;
-
-                ProviderTxt.Text += compagniePocoProvider.CompagnieZipCode;
-                ProviderTxt.Text += Environment.NewLine;
+                FillPriidersCBX(compagniePocoProvider);
             }
+        }
+
+        private void FillPriidersCBX(CompagniePoco compagniePoc)
+        {
+
+            ProviderCBX.BindingContext = new BindingContext();
+            ProviderCBX.SelectedItem = compagniePocosList.Where(c => c.CompagnieCode.Equals(compagniePoc.CompagnieCode)).FirstOrDefault();
+
+
+            ProviderTxt.Text = compagniePocoProvider.CompagnieName;
+
+            ProviderTxt.Text += Environment.NewLine;
+            if (!string.IsNullOrEmpty(compagniePocoProvider.CompagnieSuite))
+            {
+                ProviderTxt.Text += compagniePocoProvider.CompagnieSuite + "_";
+            }
+
+            ProviderTxt.Text += compagniePocoProvider.CompagnieCivicNumber;
+            ProviderTxt.Text += Environment.NewLine;
+
+            ProviderTxt.Text += compagniePocoProvider.Compagniecity + "," + compagniePocoProvider.CompagnieState
+                             + "," + compagniePocoProvider.Compagniecountry;
+            ProviderTxt.Text += Environment.NewLine;
+
+            ProviderTxt.Text += compagniePocoProvider.CompagnieZipCode;
+            ProviderTxt.Text += Environment.NewLine;
         }
 
         private void ClientCBX_SelectedIndexChanged(object sender, EventArgs e)   //ClientCBX
         {
-            HeadersBill.BillHeadersDate = DateTime.Now.ToString("yyMMdd");
-            //HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill();
-
-            //HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill();
-            //HeadersBill.BillHeadersidentifier += 1;
-
-
-
             if (ClientCBX.SelectedItem != null)
             {
-
                 compagniePocoClient = mapper.Map<CompagniePoco>((CompagniePoco)ClientCBX.SelectedItem);
-
-                HeadersBill.BillCompagnieCode = compagniePocoClient.CompagnieCode;
-
-                HeadersBill.BillPath = @"C:\Users\Administrator\Desktop\projet Facture\Print\PrintPDF\Facture\teste\" + HeadersBill.BillCompagnieCode
-                                   + "_" + HeadersBill.BillHeadersDate + "_" + HeadersBill.BillHeadersidentifier + ".pdf";
-
-                ClientLbl.Text = compagniePocoClient.CompagnieName;
-
-                ClientLbl.Text += Environment.NewLine;
-                if (!string.IsNullOrEmpty(compagniePocoClient.CompagnieSuite))
-                {
-                    ClientLbl.Text += compagniePocoClient.CompagnieSuite + "_";
-
-                }
-
-
-                ClientLbl.Text += compagniePocoClient.CompagnieCivicNumber;
-                ClientLbl.Text += Environment.NewLine;
-
-                ClientLbl.Text += compagniePocoClient.Compagniecity + "," + compagniePocoClient.CompagnieState
-                                 + "," + compagniePocoClient.Compagniecountry;
-                ClientLbl.Text += Environment.NewLine;
-
-                ClientLbl.Text += compagniePocoClient.CompagnieZipCode;
-                ClientLbl.Text += Environment.NewLine;
+                FillClientCBX(compagniePocoClient);
             }
+        }
+
+        public void FillClientCBX(CompagniePoco compagniePoco)
+        {
+
+            HeadersBill.BillHeadersDate = HeadersBill._jobDate.HasValue
+            ? HeadersBill._jobDate.Value.ToString("yyyyMMdd")
+            : DateTime.Now.ToString("yyyyMMdd"); ; // Provide a default value (e.g., empty string) if _jobDate is null.
+
+
+            ClientCBX.BindingContext = new BindingContext();
+            ClientCBX.SelectedItem = compagniePocosList.Where(c => c.CompagnieCode.Equals(compagniePoco.CompagnieCode)).FirstOrDefault();
+
+
+
+            HeadersBill.BillCompagnieCode = compagniePoco.CompagnieCode;
+
+            ClientLbl.Text = compagniePoco.CompagnieName;
+
+            ClientLbl.Text += Environment.NewLine;
+            if (!string.IsNullOrEmpty(compagniePoco.CompagnieSuite))
+            {
+                ClientLbl.Text += compagniePoco.CompagnieSuite + "_";
+
+            }
+
+
+
+
+            ClientLbl.Text += compagniePoco.CompagnieCivicNumber;
+            ClientLbl.Text += Environment.NewLine;
+
+            ClientLbl.Text += compagniePoco.Compagniecity + "," + compagniePoco.CompagnieState
+                             + "," + compagniePoco.Compagniecountry;
+            ClientLbl.Text += Environment.NewLine;
+
+            ClientLbl.Text += compagniePocoClient.CompagnieZipCode;
+            ClientLbl.Text += Environment.NewLine;
+        }
+
+        public void FillBillToUpdate(CompagniePoco compagniePoco, BillHistory billHistory)
+        {
+            ClearUserControl();
+
+            var prv = compagniePocosList.Where(c => c.CompagnieCode.Equals(compagniePoco.CompagnieProvider)).FirstOrDefault();
+
+            FillClientCBX(compagniePoco);
+            FillPriidersCBX(prv);
+            FillBillInfoToUpdate(billHistory);
+
+
+
+        }
+
+        private void ClearUserControl()
+        {
+            BillNbrLbl.Text = "";
+            billDate.Value = DateTime.Now;
+            TotalwithoutTaxLbl.Text = "";
+            TPSLbl.Text = "";
+            TVQLbl.Text = "";
+            TotalwithTaxLbl.Text = "";
+
+        }
+
+        private void FillBillInfoToUpdate(BillHistory billHistory)
+        {
+            billDescriptionPoco = billDescriptionMAnipulation.GetBillDescriptionByBillHistoryId(billHistory.billIdentifier);
+
+
+            var gridList = billDescriptionPoco.Select(x => new BillDescriptionGridRow
+            {
+                QuantityDtg = x.QuantityPoco,
+                DescriptionDtg = x.DescriptionPoco,
+                UnitPrceDgr = x.UnitPricePoco,
+                SumDtg = x.SubTotalPricePoco
+            }).ToList();
+
+
+            WorkInfoDgrd.DataSource = new BindingList<BillDescriptionGridRow>(gridList);
+
+            BillNbrLbl.Text = billHistory.BillNumber;
+            billDate.Value = billHistory.BilledDate;
+            TotalwithoutTaxLbl.Text = $"{billHistory.TotalWithOutTax:N2}  $";
+            TPSLbl.Text = $"{billHistory.TPS:N2}  $";
+            TVQLbl.Text = $"{billHistory.TVQ:N2}  $";
+            TotalwithTaxLbl.Text = $"{billHistory.TotalWithTax:N2}  $";
+
+
 
         }
 
@@ -239,35 +333,46 @@ namespace SendBillWF
 
         private void Save_Click(object sender, EventArgs e)
         {
+
+            HeadersBill.IsSingleBill = true;
             SaveButton();
             ReloadUsrcontrol();
+            HeadersBill.IsUpdate = false;
+
+            ClearUserControl();
+
+
         }
 
         private void SaveButton()
         {
-            PrintPDFBIll _printPDFBIll;
+
             int val = 0;
             float cpyPrice = 0;
             string cpyDescription = "";
             int nbrVisites = 0;
             float ttlPrice = 0;
 
-            //CreateBillUsCtr createBillUsCtr = new CreateBillUsCtr();
+            PrintPDFBIll _printPDFBIll;
+            BillSearchStatus billSearchStatus = new BillSearchStatus();
 
-            compagniePocoClient._workBillInfoList.Clear();
-            
+            //CreateBillUsCtr createBillUsCtr = new CreateBillUsCtr();
 
             foreach (DataGridViewRow row in WorkInfoDgrd.Rows)
             {
                 // Vérifier si la ligne n'est pas la ligne "nouvelle ligne" (si elle existe)
                 if (!row.IsNewRow)
                 {
-                    float.TryParse(row.Cells[2].Value as string, out cpyPrice); //row.Cells["UnitPrceDgr"]
-                    //int.TryParse(row.Cells[1].Value as string, out cpyDescription);//row.Cells["DescriptionDtg"]
+                    float.TryParse(row.Cells[2].Value.ToString(), out cpyPrice);
 
                     cpyDescription = row.Cells[1].Value.ToString();
-                    int.TryParse(row.Cells[0].Value as string, out nbrVisites); //row.Cells["QuantityDtg"]
-                    float.TryParse(row.Cells[3].Value.ToString(), out ttlPrice); //row.Cells["SumDtg"]
+                    if (string.IsNullOrEmpty(cpyDescription))
+                    {
+                        cpyDescription = "service d'entretien menager";
+                    }
+
+                    int.TryParse(row.Cells[0].Value.ToString(), out nbrVisites);
+                    float.TryParse(row.Cells[3].Value.ToString(), out ttlPrice);
 
 
 
@@ -287,11 +392,43 @@ namespace SendBillWF
                 }
             }
 
+            //compagniePocoClient._workBillInfoList.Clear();
+
+
+
+
+            billSearchStatus.keysearch = BillNbrLbl.Text;
+            var bhs = compagniManipulation.GetBillByBillNumber(billSearchStatus).FirstOrDefault();
+            
+
+            if (!HeadersBill.IsUpdate)
+            {
+                
+                //HeadersBill.BillHeadersidentifier = bhs.billIdentifier;
+
+                HeadersBill._jobDate = billDate.Value;
+                HeadersBill.BillHeadersDate = billDate.Value.ToString("yyyyMMdd");
+                HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill() + 1;
+                HeadersBill.BillPath = @"C:\Users\Administrator\Desktop\projet Facture\Print\PrintPDF\Facture\teste\" + HeadersBill.BillCompagnieCode
+                              + "_" + HeadersBill.BillHeadersDate + "_" + HeadersBill.BillHeadersidentifier + ".pdf";
+
+                HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill() + 1;
+            }
+            else
+            {
+                HeadersBill.BillPath = bhs.BillPath;
+                HeadersBill._jobDate = bhs.BilledDate;
+
+            }
+
+
             if (compagniePocoClient != null && compagniePocoProvider != null)
             {
+
+                HeadersBill.IsSingleBill = true;
+
                 _printPDFBIll = new PrintPDFBIll(compagniePocoClient, compagniePocoProvider);
-                HeadersBill.BillHeadersidentifier += 1;
-                SaveBillHistory();                
+                SaveBillHistory();
             }
 
             WorkInfoDgrd.Rows.Clear();
@@ -301,7 +438,9 @@ namespace SendBillWF
 
         public void SaveBillHistory()
         {
-            date = DateTime.Now;
+            List<BillDescriptionPoco> billDescriptionlist = new List<BillDescriptionPoco>();
+
+            date = HeadersBill._jobDate.Value;
 
             float sumPrice = 0;
             int nbrCompagny = 0;
@@ -323,23 +462,37 @@ namespace SendBillWF
             billHistoryPoco.compagnyCode = compagniePocoClient.CompagnieCode;
             billHistoryPoco.MouthBill = "Fevrier";
             billHistoryPoco.BilledDate = date;
-            billHistoryPoco.BillNumber = HeadersBill.BillHeadersDate;
+            billHistoryPoco.BillNumber = HeadersBill.getBilledDate().ToString("yyyyMMdd") + "_" + HeadersBill.BillHeadersidentifier;
 
             string descriptionToSaveHistory = "";
 
             foreach (var item in compagniePocoClient._workBillInfoList)
             {
+                billDescriptionlist.Add(new BillDescriptionPoco
+                {
+                    BillDescriptionPocoId = Guid.NewGuid(),
+                    BillHistoryIdPoco = billHistoryPoco.billIdentifier,
+                    QuantityPoco = item.NumberOfVisite,
+                    DescriptionPoco = item.JobDescription,
+                    UnitPricePoco = item.compagnyPrice,
+                    SubTotalPricePoco = item.Totalprice,
+
+                    // DescriptionPoco = "CompagnyName : " + item.CompagnyName + "  ||NumberOfVisite : " + item.NumberOfVisite + "  ||compagnyPrice : " + item.compagnyPrice,
+
+                });
+
                 descriptionToSaveHistory += "  ||CompagnyName : " + item.CompagnyName + "  ||NumberOfVisite : " + item.NumberOfVisite + "  ||compagnyPrice : " + item.compagnyPrice +
                             Environment.NewLine;
+
                 sumPrice = sumPrice + item.Totalprice;
                 nbrCompagny = nbrCompagny + 1;
 
             }
 
-            billHistoryPoco.BillDescription = descriptionToSaveHistory;
+            billHistoryPoco.BillDescriptionText = descriptionToSaveHistory;
             billHistoryPoco.TotalWithOutTax = sumPrice;
             billHistoryPoco.TPS = (sumPrice * 0.05f);
-            billHistoryPoco.TVQ = (sumPrice * 0.0975f);
+            billHistoryPoco.TVQ = (sumPrice * 0.09975f);
             billHistoryPoco.TotalWithTax = (sumPrice + sumPrice * 0.05f + sumPrice * 0.09975f);
             billHistoryPoco.BillPath = HeadersBill.BillPath;
             billHistoryPoco.BillHistoryNote = "";
@@ -347,13 +500,14 @@ namespace SendBillWF
 
             if (sumPrice != 0 && nbrCompagny != 0 && !string.IsNullOrEmpty(descriptionToSaveHistory))
             {
+
                 _billHistoryPocoLst.Add(billHistoryPoco);
             }
             else
             {
             }
 
-            compagniManipulation.SaveBillHisrory(_billHistoryPocoLst);
+            compagniManipulation.SaveBillHisrory(_billHistoryPocoLst, billDescriptionlist);
         }
 
         private void ReloadUsrcontrol()
@@ -379,6 +533,15 @@ namespace SendBillWF
 
         private void sendBillbtn_Click(object sender, EventArgs e)
         {
+            SaveButton();
+
+            mailPoco.smtpServer = compagniePocoProvider.smtpServer;
+            mailPoco.smtpPort = (int)compagniePocoProvider.smtpPort;
+            mailPoco.smtpUsername = compagniePocoProvider.smtpUsername;
+            mailPoco.smtpPasswor = compagniePocoProvider.smtpPassword;
+
+
+
             mailPoco.From = compagniePocoProvider.ContactMail;
             mailPoco.To = compagniePocoClient.ContactMail;
             mailPoco.Subject = "Facturation des services d'entretien ménager pour le mois de " + date.ToString("MMMM");
@@ -459,6 +622,14 @@ namespace SendBillWF
                     printDoc.Print();
                 }
             }
+        }
+
+        private void billDate_ValueChanged(object sender, EventArgs e)
+        {
+            HeadersBill.BillHeadersDate = billDate.Value.ToString("yyyyMMdd");        // HeadersBill.getBilledDate().ToString("dd-MM-yyyy HH:mm:ss");
+            HeadersBill._jobDate = billDate.Value;
+
+
         }
     }
 }

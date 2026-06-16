@@ -15,6 +15,8 @@ using Helpers.GoogleDrive;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
 using PrintPDF;
+using Helpers.pdfBill;
+using Helpers.generalHelp;
 
 namespace SendBillWF
 {
@@ -25,6 +27,7 @@ namespace SendBillWF
         List<WorkBillInfo> workBillInfos = new List<WorkBillInfo>();
         SheetInfo sheetInfo = new SheetInfo();
         IConfigurationRoot configuration;
+        DateFormatter dateFormatter = new DateFormatter();
 
         public PDFBillFromGDriveUsCtr()
         {
@@ -32,7 +35,7 @@ namespace SendBillWF
             //compagnieInfoList = compagniManipulation.LinkCompagniePayment();
             configuration = new ConfigurationBuilder()
                                .SetBasePath(Directory.GetCurrentDirectory())
-                               .AddJsonFile("C:\\Users\\Administrator\\Desktop\\projet Facture\\Print\\GDTOSQL\\appsettings.json", optional: true, reloadOnChange: true)
+                               .AddJsonFile(@"C:\Users\Administrator\Desktop\projet Facture\Print\GDTOSQL\appsettings.json", optional: true, reloadOnChange: true)
                                .Build();
 
             sheetInfo.spreadsheetId = configuration["AppSettings:spreadsheetId"];
@@ -42,10 +45,15 @@ namespace SendBillWF
 
             SpreadSheetCombobx.Name = "SheetId";
             SpreadSheetCombobx.ValueMember = "SheetTitle";
+            // Fix for CS8629: Nullable value type may be null.
+            HeadersBill.BillHeadersDate = HeadersBill.getBilledDate().ToString(("yyyyMMdd"));
+            HeadersBill._jobDate = billDate.Value;
 
-             HeadersBill.BillHeadersDate = DateTime.Now.ToString("yyMMdd");
-             HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill()+1;
+            HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill() + 1;
+            HeadersBill.BillHeadersDate = billDate.Value.ToString("yyyyMMdd");
         }
+
+
 
         private void SpreadSheetCombobx_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -70,7 +78,7 @@ namespace SendBillWF
 
             foreach (var chk in this.Controls.OfType<CheckBox>().ToList())
             {
-                if(chk.Name != "checkAll")
+                if (chk.Name != "checkAll")
                 {
                     this.Controls.Remove(chk);
                     chk.Dispose();
@@ -79,25 +87,25 @@ namespace SendBillWF
 
             for (int i = 0; i < items.Count; i++)
             {
-                for (int j = 0; j < 3; j++)
+                //for (int j = 0; j < 3; j++)
+                // {
+                CheckBox checkBox = new CheckBox();
+                checkBox.Name = items[i].CompagnyCode;
+                checkBox.Text = items[i].CompagnyName;
+                checkBox.AutoSize = true;
+                checkBox.Location = new Point(xPosition, yPosition);
+
+                // Optionnel : ajouter un événement
+                checkBox.CheckedChanged += (sender, e) =>
                 {
-                    CheckBox checkBox = new CheckBox();
-                    checkBox.Name = items[i + j].CompagnyCode;
-                    checkBox.Text = items[i + j].CompagnyName;
-                    checkBox.AutoSize = true;
-                    checkBox.Location = new Point(xPosition, yPosition);
+                    CheckBox cb = (CheckBox)sender;
+                };
 
-                    // Optionnel : ajouter un événement
-                    checkBox.CheckedChanged += (sender, e) =>
-                    {
-                        CheckBox cb = (CheckBox)sender;
-                    };
+                this.Controls.Add(checkBox);
+                xPosition += 250;
+                //  }
 
-                    this.Controls.Add(checkBox);
-                    xPosition += 250;
-                }
-
-                i = i + 3;
+                //i = i + 3;
                 // Créer une nouvelle checkbox
 
                 xPosition = 20;
@@ -107,7 +115,7 @@ namespace SendBillWF
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Save_Click(object sender, EventArgs e)
         {
 
             var selectedItems = new List<string>();
@@ -121,6 +129,7 @@ namespace SendBillWF
                 }
             }
 
+           
             SavePdfSelectedCompagny(selectedItems);
             UncheckAll();
         }
@@ -129,32 +138,51 @@ namespace SendBillWF
         public void SavePdfSelectedCompagny(List<string> selectedCompagnyListToprint)
 
         {
-            
-           // HeadersBill.BillHeadersDate = DateTime.Now.ToString("yyMMdd");
-           // HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill();
-           
+            List<BillDescriptionPoco> billDescriptionlist = new List<BillDescriptionPoco>();
+
+            // HeadersBill.BillHeadersDate = DateTime.Now.ToString("yyMMdd");
+            // HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill();
+
             PrintPDFBIll _printPDFBIll;
             float sumPrice = 0;
             int nbrCompagny = 0;
 
-           // BillHistoryPoco billHistoryPoco1 = new BillHistoryPoco();
+            // BillHistoryPoco billHistoryPoco1 = new BillHistoryPoco();
             List<BillHistoryPoco> _billHistoryPocoLst = new List<BillHistoryPoco>();
 
-            
+
 
             compagnieInfoList = compagniManipulation.LinkCompagniePayment(sheetInfo);
 
+
             var resultCustomer = compagnieInfoList.Where(item => selectedCompagnyListToprint.Any(item2 => item2 == item.CompagnieCode)).ToList();
 
-       // ILFAUT TROUVER LE PROVIDERS DE LA COMPAGNY
+            HeadersBill._jobDate = billDate.Value;
+
+
+
+            //HeadersBill._jobDate = new DateTime(2025, dateFormatter.getCorrecteNameOfMouth(sheetInfo.SheetTitle), 1);
+
+            // ILFAUT TROUVER LE PROVIDERS DE LA COMPAGNY
 
             foreach (var compagnieInfo in resultCustomer)
             {
-                if(!string.IsNullOrEmpty(compagnieInfo.Compagnieprividercode))
+                if (!string.IsNullOrEmpty(compagnieInfo.CompagnieProvider))
                 {
-                    var compagnieProviderInfo = compagniManipulation.GetCompagnyByName(compagnieInfo.Compagnieprividercode).First();
+                    var compagnieProviderInfo = compagniManipulation.GetCompagnyByName(compagnieInfo.CompagnieProvider).First();
+
+                    //DateTime date = HeadersBill._jobDate.Value;
+
+                    //DateTime finMois = new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month)).AddDays(1).AddTicks(-1);
+
 
                     HeadersBill.BillCompagnieCode = compagnieInfo.CompagnieCode;
+                    //HeadersBill.BillPath = @"C:\Users\Administrator\Desktop\projet Facture\Print\PrintPDF\Facture\teste\" + HeadersBill.BillCompagnieCode
+                    //                   + "_" + HeadersBill.endMounth().ToString("yyMMdd")  + HeadersBill.BillHeadersidentifier + ".pdf"; 
+                    //HeadersBill.BillHeadersDate.ToString("YYMMdd")
+
+
+                    HeadersBill.BillHeadersidentifier = compagniManipulation.getLastBill() + 1;
                     HeadersBill.BillPath = @"C:\Users\Administrator\Desktop\projet Facture\Print\PrintPDF\Facture\teste\" + HeadersBill.BillCompagnieCode
                                        + "_" + HeadersBill.BillHeadersDate + "_" + HeadersBill.BillHeadersidentifier + ".pdf";
 
@@ -172,13 +200,26 @@ namespace SendBillWF
                     billHistoryPoco.compagnyCode = compagnieInfo.CompagnieCode;
 
                     // il faut changer decebre par la date choisi dans la dropdownlist du controleur BillHistoryUsctr
-                    billHistoryPoco.MouthBill = "Decebre";
-                    billHistoryPoco.BilledDate = DateTime.Now;
-                    billHistoryPoco.BillNumber = HeadersBill.BillHeadersDate;
+                    billHistoryPoco.MouthBill = "Decembre";
+                    billHistoryPoco.BilledDate = HeadersBill.getBilledDate();
+
+                    // billHistoryPoco.BilledDate = HeadersBill._jobDate;
+                    billHistoryPoco.BillNumber = HeadersBill.getBilledDate().ToString("yyyyMMdd") + "_" + HeadersBill.BillHeadersidentifier;
 
                     string descriptionToSaveHistory = "";
                     foreach (var item in compagnieInfo._workBillInfoList)
                     {
+                        billDescriptionlist.Add(new BillDescriptionPoco
+                        {
+                            BillDescriptionPocoId = Guid.NewGuid(),
+                            BillHistoryIdPoco = billHistoryPoco.billIdentifier,
+                            QuantityPoco = item.NumberOfVisite,
+                            DescriptionPoco = item.JobDescription,
+                            UnitPricePoco = item.compagnyPrice,
+                            SubTotalPricePoco = item.Totalprice,
+
+                        });
+
                         descriptionToSaveHistory += "  ||CompagnyName : " + item.CompagnyName + "  ||NumberOfVisite : " + item.NumberOfVisite + "  ||compagnyPrice : " + item.compagnyPrice +
                                     Environment.NewLine;
                         sumPrice = sumPrice + item.Totalprice;
@@ -186,7 +227,7 @@ namespace SendBillWF
 
                     }
 
-                    billHistoryPoco.BillDescription = descriptionToSaveHistory;
+                    //billHistoryPoco.BillDescription = descriptionToSaveHistory;
                     billHistoryPoco.TotalWithOutTax = sumPrice;
                     billHistoryPoco.TPS = (sumPrice * 0.05f);
                     billHistoryPoco.TVQ = (sumPrice * 0.0975f);
@@ -205,12 +246,15 @@ namespace SendBillWF
 
                     }
 
+                    
+                    compagniManipulation.SaveBillHisrory(_billHistoryPocoLst, billDescriptionlist);
                     HeadersBill.BillHeadersidentifier += 1;
+                    _billHistoryPocoLst.Remove(billHistoryPoco);
                 }
 
             }
 
-            compagniManipulation.SaveBillHisrory(_billHistoryPocoLst);
+           // compagniManipulation.SaveBillHisrory(_billHistoryPocoLst);
         }
 
         private void checkAll_CheckedChanged(object sender, EventArgs e)
@@ -219,9 +263,9 @@ namespace SendBillWF
             {
                 foreach (Control control in this.Controls)
                 {
-                    if (control is CheckBox cb )
+                    if (control is CheckBox cb)
                     {
-                        cb.Checked = true;                         
+                        cb.Checked = true;
                     }
                 }
             }
@@ -240,6 +284,11 @@ namespace SendBillWF
                     cb.Checked = false;
                 }
             }
+        }
+
+        private void billDate_ValueChanged(object sender, EventArgs e)
+        {
+            HeadersBill.BillHeadersDate = billDate.Value.ToString("yyyyMMdd");
         }
     }
 }

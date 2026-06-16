@@ -1,6 +1,4 @@
 ﻿
-using System;
-using System.IO;
 using DataBridge;
 using DataBridge.Entity;
 using DBConnection.Entity;
@@ -8,7 +6,10 @@ using Helpers.generalHelp;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using PdfiumViewer;
+using System;
 using System.IO;
+using System.IO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 //using iTextSharp.LGPLv2.Core;
 
 
@@ -29,24 +30,26 @@ namespace PrintPDF
         public PrintPDFBIll(CompagniePoco CustomToPrint , CompagniePoco Provider)
         {
   
-            DateTime now = DateTime.Now;
+            //DateTime now = DateTime.Now;
             // Chemin du fichier PDF de sortie
             float sumPrice = 0;
             int nbrCompagny = 0;
             string descriptionToSaveHistory = "";
 
             // Ajouter l'image en arrière-plan
-            /*    string imagePath = "background.jpg"; // Chemin de l'image
-            Image background = Image.GetInstance(imagePath);
-            background.ScaleToFit(PageSize.A4.Width, PageSize.A4.Height); // Ajuster l'image à la taille de la page
-                background.SetAbsolutePosition(0, 0); // Positionner l'image en bas à gauche
-
-                // Ajouter l'image en arrière-plan
-                PdfContentByte content = writer.DirectContentUnder;
-            content.AddImage(background);
-            */
+          //string imagePath = "background.jpg"; // Chemin de l'image
+          //  Image background = Image.GetInstance(imagePath);
+          //  background.ScaleToFit(PageSize.A4.Width, PageSize.A4.Height); // Ajuster l'image à la taille de la page
+          //      background.SetAbsolutePosition(0, 0); // Positionner l'image en bas à gauche
 
 
+            DateTime date = HeadersBill._jobDate.Value;
+
+            DateTime debutMois = new DateTime(date.Year, date.Month, 1);
+
+            DateTime finMois = new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month)).AddDays(1).AddTicks(-1);
+
+            
 
             //remplir les info de la facture
             foreach (var item in CustomToPrint._workBillInfoList)
@@ -86,8 +89,18 @@ namespace PrintPDF
                 Paragraph billInfo = new Paragraph();
 
                 billInfo.Alignment = Element.ALIGN_RIGHT;
-                billInfo.Add("Facture Nº : " + HeadersBill.BillHeadersidentifier + "\n");
-                billInfo.Add("Date: " + DateTime.Now.ToShortDateString() + "\n");
+                billInfo.Add("Facture Nº : " + HeadersBill.getBilledDate().ToString("yyyyMMdd") + "_" + HeadersBill.BillHeadersidentifier + "\n");
+
+                if (HeadersBill.IsSingleBill)
+                {
+                    billInfo.Add("Date: " + HeadersBill._jobDate + "\n");
+                }
+                else
+                {
+                    billInfo.Add("Date: " + finMois + "\n");
+                }
+
+                
                 document.Add(billInfo);
 
 
@@ -143,10 +156,23 @@ namespace PrintPDF
                 table.AddCell(new PdfPCell(new Phrase("Prix unitaire", font)));
                 table.AddCell(new PdfPCell(new Phrase("Total", font)));
 
-
+                
 
                 foreach (var item in CustomToPrint._workBillInfoList)
                 {
+                    if (string.IsNullOrEmpty(item.JobDescription))
+                    {                      
+
+                        if (HeadersBill._jobDate.HasValue)
+                        {
+                            item.JobDescription = "service d'entretien menager " + "du  " + debutMois.ToString("dd/MMM/yyyy") + " au " + finMois.ToString("dd/MMM/yyyy");
+                        }
+                        else
+                        {
+                            item.JobDescription = "service d'entretien menager";
+                        }
+                    }
+
                     table.AddCell(item.JobDescription);
                     table.AddCell(item.NumberOfVisite.ToString());
                     table.AddCell(item.compagnyPrice.ToString());
@@ -193,8 +219,8 @@ namespace PrintPDF
                 document.Add(table2);
 
 
-                document.Add(new Paragraph(new Phrase("TPS : 760240952RT0001", font)));
-                document.Add(new Paragraph(new Phrase("TVQ : 1231282056TQ0001", font)));
+                document.Add(new Paragraph(new Phrase("TPS : " + Provider.TPSNumber, font)));
+                document.Add(new Paragraph(new Phrase("TVQ : " + Provider.TVQNumber, font)));
 
                 document.Add(new Paragraph(" ")); // Espace
 
@@ -203,20 +229,6 @@ namespace PrintPDF
 
                 document.Close();
             }
-            // Fermeture du document
-            
-
-
-
-            // Console.WriteLine("Facture avec image de fond générée avec succès : " + dest);
-
-
         }
-
-
-
-
-
-
     }
 }

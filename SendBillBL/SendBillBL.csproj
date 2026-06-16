@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DataForge\DataBridge.csproj" />
     <ProjectReference Include="..\DBConnection\DBConnection.csproj" />
+    <ProjectReference Include="..\PrintPDF\PrintPDF.csproj" />
   </ItemGroup>
 
 </Project>

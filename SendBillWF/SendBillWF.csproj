@@ -9,6 +9,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Compagny\EmployeeCompagnyPricingDto.cs" />
+    <Compile Remove="Employee\EmployeeBase\EmployeeVisitPricingUctr.cs" />
+    <Compile Remove="Employee\EmployeeBase\EmployeeVisitPricingUctr.Designer.cs" />
+    <Compile Remove="Work\AddWorkUsCtr.cs" />
+    <Compile Remove="Work\AddWorkUsCtr.Designer.cs" />
+    <Compile Remove="Work\WorkTypeUsCtr.cs" />
+    <Compile Remove="Work\WorkTypeUsCtr.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Employee\EmployeeBase\EmployeeVisitPricingUctr.resx" />
+    <EmbeddedResource Remove="Work\AddWorkUsCtr.resx" />
+    <EmbeddedResource Remove="Work\WorkTypeUsCtr.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="PdfiumViewer" Version="2.13.0" />
     <PackageReference Include="PdfiumViewer.Native.x86_64.v8-xfa" Version="2018.4.8.256" />

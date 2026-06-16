@@ -1,4 +1,13 @@
-﻿using System;
+﻿using DataBridge;
+using DataBridge.Entity;
+using DBConnection.Entity;
+using Helpers.generalHelp;
+using Helpers.GoogleDrive;
+using PdfiumViewer;
+using SendBillBL;
+using SendBillBL.Entity;
+using SendBillWF.Bill;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,10 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataBridge;
-using DBConnection.Entity;
-using Helpers.generalHelp;
-using PdfiumViewer;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace SendBillWF
@@ -20,18 +26,34 @@ namespace SendBillWF
     public partial class BillHistoryUsctr : UserControl
     {
         public CompagniManipulation compagniManipulation = new CompagniManipulation();
-        private const int PdfPathColumnIndex = 14;
+        private const int PdfPathColumnIndex = 11;
+        private const int PdfMounthBillColumnIndex = 5;
+        private const int PdfBillNumberColumnIndex = 1;
+        private const int PdfCompagnyCodeColumnIndex = 4;
+
 
         private ContextMenuStrip contextMenuStrip1;
         private ToolStripMenuItem itemImprimer;
         private ToolStripMenuItem itemEnvoyer;
         private ToolStripMenuItem itemDisplay;
+        //private ToolStripMenuItem itemUpdate;
+
+        private readonly Form2 _form2;
 
         public BillHistoryUsctr()
         {
             InitializeComponent();
             InitializeContextMenu();
         }
+
+        public BillHistoryUsctr(Form2 form2)
+        {
+
+            _form2 = form2;
+
+            InitializeContextMenu();
+        }
+
 
         public List<BillHistory> GetBillHistoryList(BillSearchStatus BillSearchStatus)
         {
@@ -88,20 +110,20 @@ namespace SendBillWF
             BillHistoryDGrid.Columns.Add(BilledDate);
 
 
-            DataGridViewTextBoxColumn BillDescription = new DataGridViewTextBoxColumn();
-            BillDescription.HeaderText = "BillDescription"; // Texte d'en-tête de la colonne
-            BillDescription.DataPropertyName = "BillDescription"; // Propriété de la source de données à lier
-            BillHistoryDGrid.Columns.Add(BillDescription);
+            //DataGridViewTextBoxColumn BillDescription = new DataGridViewTextBoxColumn();
+            //BillDescription.HeaderText = "BillDescription"; // Texte d'en-tête de la colonne
+            //BillDescription.DataPropertyName = "BillDescription"; // Propriété de la source de données à lier
+            //BillHistoryDGrid.Columns.Add(BillDescription);
 
-            DataGridViewTextBoxColumn compagnyPrice = new DataGridViewTextBoxColumn();
-            compagnyPrice.HeaderText = "compagnyPrice"; // Texte d'en-tête de la colonne
-            compagnyPrice.DataPropertyName = "compagnyPrice"; // Propriété de la source de données à lier
-            BillHistoryDGrid.Columns.Add(compagnyPrice);
+            //DataGridViewTextBoxColumn compagnyPrice = new DataGridViewTextBoxColumn();
+            //compagnyPrice.HeaderText = "compagnyPrice"; // Texte d'en-tête de la colonne
+            //compagnyPrice.DataPropertyName = "compagnyPrice"; // Propriété de la source de données à lier
+            //BillHistoryDGrid.Columns.Add(compagnyPrice);
 
-            DataGridViewTextBoxColumn NumberOfVisite = new DataGridViewTextBoxColumn();
-            NumberOfVisite.HeaderText = "NumberOfVisite"; // Texte d'en-tête de la colonne
-            NumberOfVisite.DataPropertyName = "NumberOfVisite"; // Propriété de la source de données à lier
-            BillHistoryDGrid.Columns.Add(NumberOfVisite);
+            //DataGridViewTextBoxColumn NumberOfVisite = new DataGridViewTextBoxColumn();
+            //NumberOfVisite.HeaderText = "NumberOfVisite"; // Texte d'en-tête de la colonne
+            //NumberOfVisite.DataPropertyName = "NumberOfVisite"; // Propriété de la source de données à lier
+            //BillHistoryDGrid.Columns.Add(NumberOfVisite);
 
             DataGridViewTextBoxColumn TotalWithOutTax = new DataGridViewTextBoxColumn();
             TotalWithOutTax.HeaderText = "TotalWithOutTax"; // Texte d'en-tête de la colonne
@@ -143,6 +165,12 @@ namespace SendBillWF
             BillHistoryNote.DataPropertyName = "BillHistoryNote"; // Propriété de la source de données à lier
             BillHistoryDGrid.Columns.Add(BillHistoryNote);
 
+            BillHistoryDGrid.AllowUserToOrderColumns = true;
+
+            foreach (DataGridViewColumn col in BillHistoryDGrid.Columns)
+            {
+                col.SortMode = DataGridViewColumnSortMode.Automatic;
+            }
 
             BillSearchStatus.keysearch = keySearchtxt.Text;
 
@@ -213,7 +241,7 @@ namespace SendBillWF
         }
 
 
-        
+
 
         //private void PrintPdfMenuItem_Click(object sender, MouseEventArgs e)
         //{
@@ -226,8 +254,8 @@ namespace SendBillWF
         {
             if (string.IsNullOrEmpty(pdfPath))
             {
-                //MessageBox.Show("Aucun PDF sélectionné ou chemin invalide.", "Erreur",
-                //              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Aucun PDF sélectionné ou chemin invalide.", "Erreur",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 throw new NotImplementedException();
                 //return;
@@ -235,22 +263,22 @@ namespace SendBillWF
 
             if (!File.Exists(pdfPath))
             {
-                //MessageBox.Show($"Le fichier PDF n'existe pas:\n{pdfPath}", "Erreur",
-                //              MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //return;
+                MessageBox.Show($"Le fichier PDF n'existe pas:\n{pdfPath}", "Erreur",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 throw new NotImplementedException();
             }
 
             try
             {
                 PrintPdfWithDialog(pdfPath);
-                //MessageBox.Show("Le PDF a été envoyé à l'imprimante.", "Succès",
-                //              MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Le PDF a été envoyé à l'imprimante.", "Succès",
+                              MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                //MessageBox.Show($"Erreur lors de l'impression:\n{ex.Message}", "Erreur",
-                //              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erreur lors de l'impression:\n{ex.Message}", "Erreur",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -299,6 +327,19 @@ namespace SendBillWF
 
         }
 
+        private string GetSelectedCompagyCode()
+        {
+            if (BillHistoryDGrid.SelectedRows.Count == 0)
+                return string.Empty;
+
+            var selectedRow = BillHistoryDGrid.SelectedRows[0];
+
+            if (PdfPathColumnIndex < selectedRow.Cells.Count)
+                return selectedRow.Cells[PdfPathColumnIndex].Value?.ToString() ?? string.Empty;
+
+            return string.Empty;
+        }
+
         private void BillHistoryDGrid_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -323,27 +364,23 @@ namespace SendBillWF
             itemImprimer = new ToolStripMenuItem("Imprimer");
             itemEnvoyer = new ToolStripMenuItem("Envoyer");
             itemDisplay = new ToolStripMenuItem("afficher");
+            //itemUpdate = new ToolStripMenuItem("Update Bill");
 
-            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { itemImprimer, itemEnvoyer , itemDisplay });
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { itemImprimer, itemEnvoyer, itemDisplay });
 
             itemImprimer.Click += ItemImprimer_Click;
             itemEnvoyer.Click += ItemEnvoyer_Click;
             itemDisplay.Click += ItemDisplay_Click;
+            //itemUpdate.Click += itemUpdate_Click;
         }
-
+        
         private void ItemDisplay_Click(object? sender, EventArgs e)
         {
             if (BillHistoryDGrid.SelectedRows.Count > 0)
             {
                 var row = BillHistoryDGrid.SelectedRows[0];
-                MessageBox.Show("Envoi de la ligne : " + row.Cells[14].Value.ToString(), "Imprimer");
-
-
-                Process.Start(new ProcessStartInfo(row.Cells[14].Value.ToString()) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(row.Cells[PdfPathColumnIndex].Value.ToString()) { UseShellExecute = true });
             }
-
-            
-            //throw new NotImplementedException();
         }
 
         private void ItemImprimer_Click(object sender, EventArgs e)
@@ -359,11 +396,39 @@ namespace SendBillWF
 
         private void ItemEnvoyer_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException("la fonction Envoyer n'est pas implementè : ");
-            //if (BillHistoryDGrid.SelectedRows.Count > 0)
-            //{
-               
-            //}
+            var selectedRow = BillHistoryDGrid.SelectedRows[0];
+
+
+            CompagniManipulation compagniManipulation = new CompagniManipulation();
+            CompagniePoco compagnieInfoClient = new CompagniePoco();
+            CompagniePoco compagnieInfoProvider = new CompagniePoco();
+            SendBill sendBill = new SendBill();
+            MailPoco mailPoco = new MailPoco();
+
+            // recuperer le path et le code de la compagny
+            compagnieInfoClient = compagniManipulation.GetCompagnyByCode(selectedRow.Cells[PdfCompagnyCodeColumnIndex].Value.ToString());
+            compagnieInfoProvider = compagniManipulation.GetCompagnyByCode(compagnieInfoClient.CompagnieProvider);
+
+            mailPoco.From = compagnieInfoProvider.ContactMail;
+            mailPoco.To = compagnieInfoClient.ContactMail;  //compagieInfoLst.ContactMail;
+
+            mailPoco.smtpServer = compagnieInfoProvider.smtpServer;
+            mailPoco.smtpPort = (int)compagnieInfoProvider.smtpPort;
+            mailPoco.smtpUsername = compagnieInfoProvider.smtpUsername;
+            mailPoco.smtpPasswor = compagnieInfoProvider.smtpPassword;
+
+            mailPoco.Path = selectedRow.Cells[PdfPathColumnIndex].Value?.ToString();
+
+            mailPoco.Subject = "Facturation des services d'entretien ménager pour le mois de " + selectedRow.Cells[PdfMounthBillColumnIndex].Value?.ToString();
+
+            //on peux utliser le mois courant ou recuperer le mois de la facture
+            var t = selectedRow.Cells[PdfPathColumnIndex].Value?.ToString();
+
+            mailPoco.Body = "Bonjour," + Environment.NewLine + "Ci-joint en pièce jointe la facture correspondant aux services d'entretien ménager pour le mois de "
+                    + selectedRow.Cells[PdfMounthBillColumnIndex].Value?.ToString() + " de l'année " + selectedRow.Cells[PdfBillNumberColumnIndex].Value.ToString().Substring(0, 4)
+                    + Environment.NewLine + "Merci !" + Environment.NewLine;
+
+            bool state = sendBill.Send(mailPoco);
         }
 
         //private void PrintPdfMenuItem_Click(object sender, DataGridViewCellEventArgs e)
