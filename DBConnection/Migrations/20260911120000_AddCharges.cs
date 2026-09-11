@@ -12,12 +12,15 @@ namespace DBConnection.Migrations
                 IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = N'Charges')
                 BEGIN
                     CREATE TABLE [Charges] (
-                        [ChargeId]    UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-                        [TenantId]    UNIQUEIDENTIFIER NOT NULL,
-                        [Title]       NVARCHAR(300)    NOT NULL,
-                        [Description] NVARCHAR(MAX)    NULL,
-                        [Amount]      DECIMAL(18,2)    NOT NULL,
-                        [CreatedAt]   DATETIME2        NOT NULL DEFAULT SYSUTCDATETIME()
+                        [ChargeId]       UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+                        [TenantId]       UNIQUEIDENTIFIER NOT NULL,
+                        [OwnerCompanyId] UNIQUEIDENTIFIER NOT NULL,
+                        [Title]          NVARCHAR(300)    NOT NULL,
+                        [Description]    NVARCHAR(MAX)    NULL,
+                        [Amount]         DECIMAL(18,2)    NOT NULL,
+                        [CreatedAt]      DATETIME2        NOT NULL DEFAULT SYSUTCDATETIME(),
+                        CONSTRAINT [FK_Charges_OwnerCompany] FOREIGN KEY ([OwnerCompanyId])
+                            REFERENCES [Companies]([CompanyId])
                     );
                 END
 
