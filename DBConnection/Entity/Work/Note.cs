@@ -8,6 +8,7 @@ namespace DBConnection.Entity
     {
         public Guid     NoteId      { get; set; }
         public Guid     TenantId    { get; set; }
+        public Guid     CreatedByEmployeeId { get; set; }
         public string   Title       { get; set; } = string.Empty;
         public string   Description { get; set; } = string.Empty;
         public bool     IsActive    { get; set; } = true;
