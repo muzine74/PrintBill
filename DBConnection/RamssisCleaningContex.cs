@@ -39,6 +39,10 @@ namespace DBConnection
 
         public DbSet<EmployeeFile> EmployeeFiles { get; set; }
 
+        public DbSet<Charge>         Charges         { get; set; }
+        public DbSet<ChargeCompany>  ChargeCompanies { get; set; }
+        public DbSet<ChargeDocument> ChargeDocuments { get; set; }
+
         public DbSet<AppGroup>         AppGroups         { get; set; }
         public DbSet<AppGroupEmployee> AppGroupEmployees { get; set; }
         public DbSet<AppUserRole>      AppUserRoles      { get; set; }
@@ -59,6 +63,7 @@ namespace DBConnection
             ConfigureAppPermissions(modelBuilder);
             ConfigureAppConfig(modelBuilder);
             ConfigureTenants(modelBuilder);
+            ConfigureCharges(modelBuilder);
         }
 
         #region Configurations
@@ -255,6 +260,40 @@ namespace DBConnection
                 e.HasIndex(t => t.Slug).IsUnique();
                 e.Property(t => t.OwnerEmail).HasMaxLength(200);
                 e.Property(t => t.Plan).HasDefaultValue("starter").HasMaxLength(50);
+            });
+        }
+
+        private static void ConfigureCharges(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Charge>(entity =>
+            {
+                entity.HasKey(c => c.ChargeId);
+                entity.Property(c => c.Title).IsRequired().HasMaxLength(300);
+                entity.Property(c => c.Amount).HasColumnType("decimal(18,2)");
+
+                entity.HasMany(c => c.ChargeCompanies)
+                      .WithOne(cc => cc.Charge)
+                      .HasForeignKey(cc => cc.ChargeId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(c => c.ChargeDocuments)
+                      .WithOne(cd => cd.Charge)
+                      .HasForeignKey(cd => cd.ChargeId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ChargeCompany>(entity =>
+            {
+                entity.HasKey(cc => new { cc.ChargeId, cc.CompanyId });
+                entity.Property(cc => cc.Percentage).HasColumnType("decimal(5,2)");
+                entity.HasOne(cc => cc.Company).WithMany().HasForeignKey(cc => cc.CompanyId);
+            });
+
+            modelBuilder.Entity<ChargeDocument>(entity =>
+            {
+                entity.HasKey(cd => cd.ChargeDocumentId);
+                entity.Property(cd => cd.FileName).IsRequired().HasMaxLength(500);
+                entity.Property(cd => cd.OriginalName).IsRequired().HasMaxLength(500);
             });
         }
 
