@@ -35,6 +35,8 @@ namespace DBConnection
 
         public DbSet<PointageValidation> PointageValidations { get; set; }
 
+        public DbSet<Note> Notes { get; set; }
+
         public DbSet<EmployeeFile> EmployeeFiles { get; set; }
 
         public DbSet<AppGroup>         AppGroups         { get; set; }
