@@ -11,6 +11,7 @@ namespace DBConnection.Entity
         public string   Title       { get; set; } = string.Empty;
         public string   Description { get; set; } = string.Empty;
         public bool     IsActive    { get; set; } = true;
+        public bool     IsDeleted   { get; set; } = false;
         public DateTime CreatedAt   { get; set; }
     }
 }
