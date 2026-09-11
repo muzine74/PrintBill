@@ -23,6 +23,13 @@ namespace DBConnection.Migrations
                             REFERENCES [Companies]([CompanyId])
                     );
                 END
+                ELSE IF EXISTS (
+                    SELECT 1 FROM sys.columns
+                    WHERE object_id = OBJECT_ID('Charges') AND name = 'OwnerCompanyId' AND is_nullable = 0
+                )
+                BEGIN
+                    ALTER TABLE [Charges] ALTER COLUMN [OwnerCompanyId] UNIQUEIDENTIFIER NULL;
+                END
 
                 IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = N'ChargeCompanies')
                 BEGIN
