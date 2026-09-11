@@ -14,7 +14,7 @@ namespace DBConnection.Migrations
                     CREATE TABLE [Charges] (
                         [ChargeId]       UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
                         [TenantId]       UNIQUEIDENTIFIER NOT NULL,
-                        [OwnerCompanyId] UNIQUEIDENTIFIER NOT NULL,
+                        [OwnerCompanyId] UNIQUEIDENTIFIER NULL,
                         [Title]          NVARCHAR(300)    NOT NULL,
                         [Description]    NVARCHAR(MAX)    NULL,
                         [Amount]         DECIMAL(18,2)    NOT NULL,
