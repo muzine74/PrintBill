@@ -271,8 +271,6 @@ namespace DBConnection
                 entity.Property(c => c.Title).IsRequired().HasMaxLength(300);
                 entity.Property(c => c.Amount).HasColumnType("decimal(18,2)");
 
-                entity.HasOne(c => c.OwnerCompany).WithMany().HasForeignKey(c => c.OwnerCompanyId);
-
                 entity.HasMany(c => c.ChargeCompanies)
                       .WithOne(cc => cc.Charge)
                       .HasForeignKey(cc => cc.ChargeId)
