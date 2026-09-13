@@ -28,6 +28,10 @@ namespace DBConnection.Entity
         public decimal  TpsRate   { get; set; } = 5m;
         public decimal  TvqRate   { get; set; } = 9.975m;
 
+        /// <summary>Numéro de compte payeur ARC (format 123456789RP0001), requis sur les
+        /// feuillets T4A émis par cette compagnie.</summary>
+        public string? PayerAccountNumber { get; set; }
+
         // ── Coordonnées bancaires ────────────────────────────────────────────
         public string? BankCoordinates { get; set; }
 
