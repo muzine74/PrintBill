@@ -12,7 +12,13 @@ namespace DBConnection.Entity
         // ── Compagnie ────────────────────────────────────────────────────────
         public string? LogoPath       { get; set; }
         public string? CompanyName    { get; set; }
+        /// <summary>Adresse civique (numéro + rue) — voir aussi CompanyCity/CompanyProvince/
+        /// CompanyPostalCode/CompanyCountry pour les autres composantes de l'adresse.</summary>
         public string? CompanyAddress { get; set; }
+        public string? CompanyCity       { get; set; }
+        public string? CompanyProvince   { get; set; } = "QC";
+        public string? CompanyPostalCode { get; set; }
+        public string? CompanyCountry    { get; set; } = "Canada";
         public string? CompanyPhone   { get; set; }
         public string? CompanyEmail   { get; set; }
 
