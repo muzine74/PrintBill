@@ -33,6 +33,8 @@ namespace DBConnection
 
         public DbSet<EmployeeTimeLog> EmployeeTimeLogs { get; set; }
 
+        public DbSet<EmployeePayment> EmployeePayments { get; set; }
+
         public DbSet<PointageValidation> PointageValidations { get; set; }
 
         public DbSet<Note> Notes { get; set; }
@@ -64,6 +66,7 @@ namespace DBConnection
             ConfigureAppConfig(modelBuilder);
             ConfigureTenants(modelBuilder);
             ConfigureCharges(modelBuilder);
+            ConfigureEmployeePayments(modelBuilder);
         }
 
         #region Configurations
@@ -294,6 +297,18 @@ namespace DBConnection
                 entity.HasKey(cd => cd.ChargeDocumentId);
                 entity.Property(cd => cd.FileName).IsRequired().HasMaxLength(500);
                 entity.Property(cd => cd.OriginalName).IsRequired().HasMaxLength(500);
+            });
+        }
+
+        private static void ConfigureEmployeePayments(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<EmployeePayment>(entity =>
+            {
+                entity.HasKey(p => p.EmployeePaymentId);
+                entity.Property(p => p.AmountPaid).HasColumnType("decimal(18,2)");
+                entity.Property(p => p.Note).HasMaxLength(1000);
+                entity.HasIndex(p => new { p.TenantId, p.EmployeeId, p.PeriodStart, p.PeriodEnd }).IsUnique();
+                entity.HasOne(p => p.Employee).WithMany().HasForeignKey(p => p.EmployeeId);
             });
         }
 
