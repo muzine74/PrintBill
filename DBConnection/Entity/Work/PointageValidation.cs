@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DBConnection.Entity
@@ -18,5 +19,9 @@ namespace DBConnection.Entity
 
         // Navigation
         public virtual Employee Employee { get; set; } = null!;
+
+        /// <summary>Photo figée des compagnies affectées à l'employé au moment de la validation.
+        /// L'historique d'une semaine validée se lit ici, jamais dans l'affectation actuelle.</summary>
+        public virtual ICollection<PointageValidationCompany> Companies { get; set; } = new List<PointageValidationCompany>();
     }
 }

@@ -36,8 +36,10 @@ namespace DBConnection
         public DbSet<EmployeePayment> EmployeePayments { get; set; }
 
         public DbSet<PointageValidation> PointageValidations { get; set; }
+        public DbSet<PointageValidationCompany> PointageValidationCompanies { get; set; }
 
         public DbSet<Note> Notes { get; set; }
+        public DbSet<NoteLink> NoteLinks { get; set; }
 
         public DbSet<EmployeeFile> EmployeeFiles { get; set; }
 
@@ -67,6 +69,8 @@ namespace DBConnection
             ConfigureTenants(modelBuilder);
             ConfigureCharges(modelBuilder);
             ConfigureEmployeePayments(modelBuilder);
+            ConfigureNoteLinks(modelBuilder);
+            ConfigurePointageValidationCompanies(modelBuilder);
         }
 
         #region Configurations
@@ -297,6 +301,33 @@ namespace DBConnection
                 entity.HasKey(cd => cd.ChargeDocumentId);
                 entity.Property(cd => cd.FileName).IsRequired().HasMaxLength(500);
                 entity.Property(cd => cd.OriginalName).IsRequired().HasMaxLength(500);
+            });
+        }
+
+        private static void ConfigurePointageValidationCompanies(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PointageValidationCompany>(entity =>
+            {
+                entity.HasKey(c => new { c.PointageValidationId, c.CompanyId });
+                entity.HasOne(c => c.PointageValidation)
+                      .WithMany(v => v.Companies)
+                      .HasForeignKey(c => c.PointageValidationId)
+                      .OnDelete(DeleteBehavior.Cascade);   // annuler la validation supprime la photo
+            });
+        }
+
+        private static void ConfigureNoteLinks(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<NoteLink>(entity =>
+            {
+                entity.HasKey(l => l.NoteLinkId);
+                entity.Property(l => l.EntityType).HasMaxLength(20).IsRequired();
+                entity.HasIndex(l => new { l.EntityType, l.EntityId });
+                entity.HasIndex(l => new { l.NoteId, l.EntityType, l.EntityId }).IsUnique();
+                entity.HasOne(l => l.Note)
+                      .WithMany(n => n.Links)
+                      .HasForeignKey(l => l.NoteId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
 

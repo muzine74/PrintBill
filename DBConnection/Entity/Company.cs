@@ -1,3 +1,4 @@
+using System;
 namespace DBConnection.Entity
 {
     public class Company
@@ -18,6 +19,9 @@ namespace DBConnection.Entity
 
         public string? WorkFrequency   { get; set; }
         public string? PaymentFrequency { get; set; }
+        /// <summary>Planning bi-hebdomadaire : lundi où commence la « Semaine 1 » (puis une semaine sur deux).
+        /// null = non renseigné (on ne peut pas savoir quelle semaine du calendrier est S1 ou S2).</summary>
+        public DateOnly? BiWeeklyStart { get; set; }
 
         public virtual ICollection<CompanyContact> CompanyContacts { get; set; } = new List<CompanyContact>();
         public virtual ICollection<EmployeeCompany> EmployeeCompanies { get; set; } = new List<EmployeeCompany>();

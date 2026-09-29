@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DBConnection.Entity
@@ -14,5 +15,10 @@ namespace DBConnection.Entity
         public bool     IsActive    { get; set; } = true;
         public bool     IsDeleted   { get; set; } = false;
         public DateTime CreatedAt   { get; set; }
+
+        // Entités auxquelles la note est rattachée (0..n, types mélangés possibles).
+        // Une note active liée s'affiche en alerte lors des actions sur l'une de ces entités.
+        // (Les anciennes colonnes Notes.LinkedEntityType/LinkedEntityId restent en base, non utilisées.)
+        public virtual ICollection<NoteLink> Links { get; set; } = new List<NoteLink>();
     }
 }
