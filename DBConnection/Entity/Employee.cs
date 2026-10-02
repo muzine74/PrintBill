@@ -15,6 +15,14 @@ namespace DBConnection.Entity
         public string? notes { get; set; }
         public bool   IsActive     { get; set; } = true;
         public string EmployeeType { get; set; } = "Permanent";
+        /// <summary>Mode de rémunération : "Hourly" = par heure ; null (ou autre) = par visite (planning).</summary>
+        public string? PayMode { get; set; }
+        /// <summary>Chef d'équipe : peut superviser des employés et d'autres chefs d'équipe.</summary>
+        public bool    IsTeamLead { get; set; }
+        /// <summary>Chef d'équipe / responsable direct (obligatoire, sauf pour un chef au sommet de la hiérarchie).</summary>
+        public Guid?   ManagerId  { get; set; }
+        /// <summary>Design de couleurs choisi par l'utilisateur ("nuit", "ocean", "jour", "ciel") ; null = défaut.</summary>
+        public string? UiTheme    { get; set; }
         public Guid   TenantId     { get; set; }
 
         public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();

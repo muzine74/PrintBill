@@ -24,6 +24,14 @@ namespace DBConnection.Entity
 
         public DateTime? BeginWorkDate { get; set; }
         public DateTime? EndWorkDate { get; set; }
+        /// <summary>Pointage horaire : taux client figé à l'enregistrement (facturation). ClientPrice = paie de l'employé.</summary>
+        public decimal? ClientHourlyRate { get; set; }
+        /// <summary>Employé payé à l'heure : taux payé figé à l'enregistrement (null = payé à la visite).</summary>
+        public decimal? PayHourlyRate { get; set; }
+        /// <summary>Saisie en heures : total des plages de la journée (BeginWorkDate = début de la 1re, EndWorkDate = fin de la dernière).</summary>
+        public decimal? WorkedHours { get; set; }
+        /// <summary>Détail des plages de la journée : "08:00-11:30;13:00-15:00".</summary>
+        public string? TimeRanges { get; set; }
 
         // Foreign key
         public Guid CompanyId { get; set; }

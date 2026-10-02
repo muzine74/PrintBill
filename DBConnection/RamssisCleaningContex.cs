@@ -147,6 +147,24 @@ namespace DBConnection
 
             modelBuilder.Entity<EmployeeCompany>()
                         .HasKey(ec => new { ec.EmployeeId, ec.CompanyId });
+            modelBuilder.Entity<EmployeeCompany>().Property(ec => ec.HourlyRate).HasColumnType("decimal(18,2)");
+
+            // Facturation par heure (migration 20261009000000_AddHourlyBilling)
+            modelBuilder.Entity<Company>().Property(c => c.BillingMode).HasMaxLength(20);
+            modelBuilder.Entity<Company>().Property(c => c.HourlyClientRate).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Company>().Property(c => c.HourlyEmployeeRate).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<EmployeeTimeLog>().Property(l => l.ClientHourlyRate).HasColumnType("decimal(18,2)");
+            // Mode de rémunération employé (migration 20261010000000_AddEmployeePayMode)
+            modelBuilder.Entity<Employee>().Property(e => e.PayMode).HasMaxLength(20);
+            modelBuilder.Entity<EmployeeCompany>().Property(ec => ec.PayMode).HasMaxLength(20);   // 20261011000000
+            // Hiérarchie d'équipe (migration 20261013000000_AddTeamHierarchy) — pas de FK : la cohérence
+            // (même tenant, chef d'équipe, sans boucle) est validée par EmployeeService / TeamHierarchy.
+            modelBuilder.Entity<Employee>().Property(e => e.IsTeamLead).HasDefaultValue(false);
+            modelBuilder.Entity<Employee>().Property(e => e.UiTheme).HasMaxLength(20);   // 20261014000000_AddEmployeeUiTheme
+            // Plusieurs plages horaires par jour (migration 20261012000000_AddTimeLogRanges)
+            modelBuilder.Entity<EmployeeTimeLog>().Property(l => l.WorkedHours).HasColumnType("decimal(9,2)");
+            modelBuilder.Entity<EmployeeTimeLog>().Property(l => l.TimeRanges).HasMaxLength(400);
+            modelBuilder.Entity<EmployeeTimeLog>().Property(l => l.PayHourlyRate).HasColumnType("decimal(18,2)");
 
 
             

@@ -23,6 +23,13 @@ namespace DBConnection.Entity
         /// null = non renseigné (on ne peut pas savoir quelle semaine du calendrier est S1 ou S2).</summary>
         public DateOnly? BiWeeklyStart { get; set; }
 
+        /// <summary>Mode de facturation : "Hourly" = par heure ; null (ou autre) = par tâche (visites, planning).</summary>
+        public string?  BillingMode        { get; set; }
+        /// <summary>Par heure : taux horaire facturé au client.</summary>
+        public decimal? HourlyClientRate   { get; set; }
+        /// <summary>Par heure : taux horaire payé à l'employé par défaut (remplacé par EmployeeCompany.HourlyRate).</summary>
+        public decimal? HourlyEmployeeRate { get; set; }
+
         public virtual ICollection<CompanyContact> CompanyContacts { get; set; } = new List<CompanyContact>();
         public virtual ICollection<EmployeeCompany> EmployeeCompanies { get; set; } = new List<EmployeeCompany>();
         public virtual ICollection<CompanyPricingCalendar> CompanyPricingCalendars { get; set; } = new List<CompanyPricingCalendar>();
