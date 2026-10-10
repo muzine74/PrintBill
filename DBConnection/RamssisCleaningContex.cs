@@ -34,6 +34,11 @@ namespace DBConnection
         public DbSet<EmployeeTimeLog> EmployeeTimeLogs { get; set; }
 
         public DbSet<EmployeePayment> EmployeePayments { get; set; }
+        public DbSet<EmployeePaymentHistory> EmployeePaymentHistories { get; set; }
+        public DbSet<BankTransaction> BankTransactions { get; set; }
+        public DbSet<BankLexiconEntry> BankLexiconEntries { get; set; }
+        public DbSet<Communication> Communications { get; set; }
+        public DbSet<Attachment> Attachments { get; set; }
 
         public DbSet<PointageValidation> PointageValidations { get; set; }
         public DbSet<PointageValidationCompany> PointageValidationCompanies { get; set; }
@@ -295,6 +300,8 @@ namespace DBConnection
                 entity.HasKey(c => c.ChargeId);
                 entity.Property(c => c.Title).IsRequired().HasMaxLength(300);
                 entity.Property(c => c.Amount).HasColumnType("decimal(18,2)");
+                entity.Property(c => c.ChargeDate).HasColumnType("date");
+                entity.Property(c => c.RecurringThrough).HasColumnType("date");
 
                 entity.HasMany(c => c.ChargeCompanies)
                       .WithOne(cc => cc.Charge)
@@ -354,10 +361,79 @@ namespace DBConnection
             modelBuilder.Entity<EmployeePayment>(entity =>
             {
                 entity.HasKey(p => p.EmployeePaymentId);
+                entity.Property(p => p.TpsAmount).HasColumnType("decimal(18,2)");
+                entity.Property(p => p.TvqAmount).HasColumnType("decimal(18,2)");
                 entity.Property(p => p.AmountPaid).HasColumnType("decimal(18,2)");
                 entity.Property(p => p.Note).HasMaxLength(1000);
-                entity.HasIndex(p => new { p.TenantId, p.EmployeeId, p.PeriodStart, p.PeriodEnd }).IsUnique();
+                entity.Property(p => p.PaidDates).HasMaxLength(4000);
+                // Non unique depuis 2026-10 : une semaine peut avoir plusieurs versements (une ligne par versement)
+                entity.HasIndex(p => new { p.TenantId, p.EmployeeId, p.PeriodStart, p.PeriodEnd })
+                      .HasDatabaseName("IX_EmployeePayments_Tenant_Employee_Period");
                 entity.HasOne(p => p.Employee).WithMany().HasForeignKey(p => p.EmployeeId);
+            });
+
+            modelBuilder.Entity<BankLexiconEntry>(entity =>
+            {
+                entity.HasKey(l => l.BankLexiconEntryId);
+                entity.Property(l => l.Keyword).HasMaxLength(100);
+                entity.Property(l => l.TargetType).HasMaxLength(20);
+                entity.Property(l => l.CreatedBy).HasMaxLength(256);
+                entity.HasIndex(l => l.TenantId);
+            });
+
+            modelBuilder.Entity<Communication>(entity =>
+            {
+                entity.HasKey(c => c.CommunicationId);
+                entity.Property(c => c.TargetType).HasMaxLength(20);
+                entity.Property(c => c.Channel).HasMaxLength(20);
+                entity.Property(c => c.Direction).HasMaxLength(10);
+                entity.Property(c => c.Contact).HasMaxLength(500);
+                entity.Property(c => c.Subject).HasMaxLength(300);
+                entity.Property(c => c.Body).HasMaxLength(4000);
+                entity.Property(c => c.Attachment).HasMaxLength(260);
+                entity.Property(c => c.Error).HasMaxLength(1000);
+                entity.Property(c => c.CreatedBy).HasMaxLength(256);
+                entity.HasIndex(c => new { c.TenantId, c.TargetType, c.TargetId, c.OccurredAt })
+                      .HasDatabaseName("IX_Communications_Tenant_Target_Date");
+            });
+
+            modelBuilder.Entity<Attachment>(entity =>
+            {
+                entity.HasKey(a => a.AttachmentId);
+                entity.Property(a => a.OwnerType).HasMaxLength(20);
+                entity.Property(a => a.FileName).HasMaxLength(100);
+                entity.Property(a => a.OriginalName).HasMaxLength(260);
+                entity.Property(a => a.UploadedBy).HasMaxLength(256);
+                entity.HasIndex(a => new { a.TenantId, a.OwnerType, a.OwnerId })
+                      .HasDatabaseName("IX_Attachments_Tenant_Owner");
+            });
+
+            modelBuilder.Entity<BankTransaction>(entity =>
+            {
+                entity.HasKey(b => b.BankTransactionId);
+                entity.Property(b => b.Description).HasMaxLength(500);
+                entity.Property(b => b.Withdrawal).HasColumnType("decimal(18,2)");
+                entity.Property(b => b.Deposit).HasColumnType("decimal(18,2)");
+                entity.Property(b => b.AccountNumber).HasMaxLength(50);
+                entity.Property(b => b.ImportedBy).HasMaxLength(256);
+                entity.Property(b => b.ValidatedBy).HasMaxLength(256);
+                entity.Property(b => b.SourceFile).HasMaxLength(260);
+                entity.HasIndex(b => new { b.TenantId, b.TransactionDate });
+            });
+
+            modelBuilder.Entity<EmployeePaymentHistory>(entity =>
+            {
+                entity.HasKey(h => h.EmployeePaymentHistoryId);
+                entity.Property(h => h.PreviousAmount).HasColumnType("decimal(18,2)");
+                entity.Property(h => h.NewAmount).HasColumnType("decimal(18,2)");
+                entity.Property(h => h.Delta).HasColumnType("decimal(18,2)");
+                entity.Property(h => h.TpsAmount).HasColumnType("decimal(18,2)");
+                entity.Property(h => h.TvqAmount).HasColumnType("decimal(18,2)");
+                entity.Property(h => h.ChangedBy).HasMaxLength(256);
+                entity.Property(h => h.PaidDates).HasMaxLength(4000);
+                entity.Property(h => h.Note).HasMaxLength(1000);
+                entity.HasIndex(h => new { h.TenantId, h.EmployeeId, h.PeriodStart, h.PeriodEnd });
+                entity.HasOne(h => h.Employee).WithMany().HasForeignKey(h => h.EmployeeId).OnDelete(DeleteBehavior.NoAction);
             });
         }
 

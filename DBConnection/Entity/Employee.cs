@@ -17,6 +17,11 @@ namespace DBConnection.Entity
         public string EmployeeType { get; set; } = "Permanent";
         /// <summary>Mode de rémunération : "Hourly" = par heure ; null (ou autre) = par visite (planning).</summary>
         public string? PayMode { get; set; }
+        /// <summary>Numéros de taxes de l'employé (travailleur autonome). Renseigné = la taxe s'ajoute à ses paiements.</summary>
+        [System.ComponentModel.DataAnnotations.MaxLength(50)]
+        public string? TpsNumber { get; set; }
+        [System.ComponentModel.DataAnnotations.MaxLength(50)]
+        public string? TvqNumber { get; set; }
         /// <summary>Chef d'équipe : peut superviser des employés et d'autres chefs d'équipe.</summary>
         public bool    IsTeamLead { get; set; }
         /// <summary>Chef d'équipe / responsable direct (obligatoire, sauf pour un chef au sommet de la hiérarchie).</summary>
