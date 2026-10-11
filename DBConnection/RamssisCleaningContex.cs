@@ -39,6 +39,9 @@ namespace DBConnection
         public DbSet<BankLexiconEntry> BankLexiconEntries { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Attachment> Attachments { get; set; }
+        public DbSet<TelephonyConfig> TelephonyConfigs { get; set; }
+        public DbSet<CallRecordingAccess> CallRecordingAccesses { get; set; }
+        public DbSet<MailboxConfig> MailboxConfigs { get; set; }
 
         public DbSet<PointageValidation> PointageValidations { get; set; }
         public DbSet<PointageValidationCompany> PointageValidationCompanies { get; set; }
@@ -393,8 +396,49 @@ namespace DBConnection
                 entity.Property(c => c.Attachment).HasMaxLength(260);
                 entity.Property(c => c.Error).HasMaxLength(1000);
                 entity.Property(c => c.CreatedBy).HasMaxLength(256);
+                entity.Property(c => c.CallNumber).HasMaxLength(20);
+                entity.Property(c => c.CallSid).HasMaxLength(64);
+                entity.Property(c => c.CallStatus).HasMaxLength(20);
+                entity.Property(c => c.RecordingFile).HasMaxLength(100);
+                entity.Property(c => c.ExternalId).HasMaxLength(400);
                 entity.HasIndex(c => new { c.TenantId, c.TargetType, c.TargetId, c.OccurredAt })
                       .HasDatabaseName("IX_Communications_Tenant_Target_Date");
+                entity.HasIndex(c => new { c.TenantId, c.ExternalId })
+                      .HasDatabaseName("IX_Communications_Tenant_ExternalId");
+            });
+
+            modelBuilder.Entity<MailboxConfig>(entity =>
+            {
+                entity.HasKey(m => m.TenantId);
+                entity.Property(m => m.TenantId).ValueGeneratedNever();
+                entity.Property(m => m.DirectoryId).HasMaxLength(64);
+                entity.Property(m => m.ClientId).HasMaxLength(64);
+                entity.Property(m => m.ClientSecret).HasMaxLength(2000);
+                entity.Property(m => m.Mailbox).HasMaxLength(256);
+                entity.Property(m => m.LastError).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<TelephonyConfig>(entity =>
+            {
+                entity.HasKey(t => t.TenantId);
+                entity.Property(t => t.TenantId).ValueGeneratedNever();
+                entity.Property(t => t.AccountSid).HasMaxLength(64);
+                entity.Property(t => t.AuthToken).HasMaxLength(1000);
+                entity.Property(t => t.ApiKeySid).HasMaxLength(64);
+                entity.Property(t => t.ApiKeySecret).HasMaxLength(1000);
+                entity.Property(t => t.TwimlAppSid).HasMaxLength(64);
+                entity.Property(t => t.CallerNumber).HasMaxLength(20);
+                entity.Property(t => t.PublicBaseUrl).HasMaxLength(200);
+                entity.Property(t => t.RecordingMode).HasMaxLength(10);
+                entity.Property(t => t.RecordingNotice).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<CallRecordingAccess>(entity =>
+            {
+                entity.HasKey(a => a.CallRecordingAccessId);
+                entity.Property(a => a.ListenedBy).HasMaxLength(256);
+                entity.HasIndex(a => new { a.TenantId, a.CommunicationId })
+                      .HasDatabaseName("IX_CallRecordingAccesses_Tenant_Communication");
             });
 
             modelBuilder.Entity<Attachment>(entity =>

@@ -31,5 +31,19 @@ namespace DBConnection.Entity
         public string? Error          { get; set; }
         public DateTime CreatedAt     { get; set; }   // UTC
         public string?  CreatedBy     { get; set; }
+        /// <summary>Courriel reçu, lu dans la boîte de l'entreprise : son identifiant (« Message-ID »), pour ne
+        /// pas l'ajouter deux fois ; null pour toute autre entrée.</summary>
+        public string?  ExternalId    { get; set; }
+
+        // ── Appel passé depuis TimeGuard (téléphonie Twilio) ; null pour toute autre entrée ──
+        /// <summary>Numéro composé, au format E.164 (+15145550123).</summary>
+        public string? CallNumber      { get; set; }
+        /// <summary>Identifiant Twilio de l'appel ; null tant que l'appel n'a pas démarré.</summary>
+        public string? CallSid         { get; set; }
+        /// <summary>« pending », « completed », « no-answer », « busy », « failed » ou « canceled ».</summary>
+        public string? CallStatus      { get; set; }
+        public int?    DurationSeconds { get; set; }
+        /// <summary>Nom du fichier d'enregistrement sur disque ; null = pas d'enregistrement (ou supprimé).</summary>
+        public string? RecordingFile   { get; set; }
     }
 }
