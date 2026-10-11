@@ -42,6 +42,7 @@ namespace DBConnection
         public DbSet<TelephonyConfig> TelephonyConfigs { get; set; }
         public DbSet<CallRecordingAccess> CallRecordingAccesses { get; set; }
         public DbSet<MailboxConfig> MailboxConfigs { get; set; }
+        public DbSet<TenantPermission> TenantPermissions { get; set; }
 
         public DbSet<PointageValidation> PointageValidations { get; set; }
         public DbSet<PointageValidationCompany> PointageValidationCompanies { get; set; }
@@ -405,6 +406,12 @@ namespace DBConnection
                       .HasDatabaseName("IX_Communications_Tenant_Target_Date");
                 entity.HasIndex(c => new { c.TenantId, c.ExternalId })
                       .HasDatabaseName("IX_Communications_Tenant_ExternalId");
+            });
+
+            modelBuilder.Entity<TenantPermission>(entity =>
+            {
+                entity.HasKey(t => new { t.TenantId, t.Key });
+                entity.Property(t => t.Key).HasMaxLength(100);
             });
 
             modelBuilder.Entity<MailboxConfig>(entity =>
