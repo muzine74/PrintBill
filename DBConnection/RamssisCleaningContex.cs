@@ -43,6 +43,10 @@ namespace DBConnection
         public DbSet<CallRecordingAccess> CallRecordingAccesses { get; set; }
         public DbSet<MailboxConfig> MailboxConfigs { get; set; }
         public DbSet<TenantPermission> TenantPermissions { get; set; }
+        public DbSet<CalendarEvent>    CalendarEvents    { get; set; }
+        public DbSet<CalendarAttendee> CalendarAttendees { get; set; }
+        public DbSet<CalendarReminder> CalendarReminders { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
 
         public DbSet<PointageValidation> PointageValidations { get; set; }
         public DbSet<PointageValidationCompany> PointageValidationCompanies { get; set; }
@@ -80,6 +84,51 @@ namespace DBConnection
             ConfigureEmployeePayments(modelBuilder);
             ConfigureNoteLinks(modelBuilder);
             ConfigurePointageValidationCompanies(modelBuilder);
+            ConfigureCalendar(modelBuilder);
+        }
+
+        private static void ConfigureCalendar(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CalendarEvent>(entity =>
+            {
+                entity.HasKey(e => e.EventId);
+                entity.Property(e => e.Title).HasMaxLength(200);
+                entity.Property(e => e.Description).HasMaxLength(4000);
+                entity.Property(e => e.Location).HasMaxLength(300);
+                entity.Property(e => e.Kind).HasMaxLength(20);
+                entity.Property(e => e.CreatedBy).HasMaxLength(256);
+                entity.HasIndex(e => new { e.TenantId, e.StartsAt })
+                      .HasDatabaseName("IX_CalendarEvents_Tenant_Start");
+                entity.HasIndex(e => new { e.TenantId, e.OrganizerId })
+                      .HasDatabaseName("IX_CalendarEvents_Tenant_Organizer");
+            });
+
+            modelBuilder.Entity<CalendarAttendee>(entity =>
+            {
+                entity.HasKey(a => new { a.EventId, a.EmployeeId });
+                entity.Property(a => a.Response).HasMaxLength(20);
+                entity.HasIndex(a => a.EmployeeId).HasDatabaseName("IX_CalendarAttendees_Employee");
+                entity.HasOne(a => a.Event).WithMany(e => e.Attendees).HasForeignKey(a => a.EventId).OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<CalendarReminder>(entity =>
+            {
+                entity.HasKey(r => r.ReminderId);
+                entity.Property(r => r.Channel).HasMaxLength(10);
+                entity.HasIndex(r => new { r.SentAt, r.DueAt }).HasDatabaseName("IX_CalendarReminders_Sent_Due");
+                entity.HasOne(r => r.Event).WithMany(e => e.Reminders).HasForeignKey(r => r.EventId).OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<UserNotification>(entity =>
+            {
+                entity.HasKey(n => n.NotificationId);
+                entity.Property(n => n.Kind).HasMaxLength(30);
+                entity.Property(n => n.Title).HasMaxLength(200);
+                entity.Property(n => n.Body).HasMaxLength(1000);
+                entity.Property(n => n.Link).HasMaxLength(300);
+                entity.HasIndex(n => new { n.TenantId, n.EmployeeId, n.ReadAt, n.CreatedAt })
+                      .HasDatabaseName("IX_UserNotifications_Tenant_Employee");
+            });
         }
 
         #region Configurations
