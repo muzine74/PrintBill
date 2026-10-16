@@ -27,6 +27,11 @@ namespace DBConnection.Entity
         public decimal TPS { get; set; }
         public decimal TVQ { get; set; }
         public decimal TotalWithTax { get; set; }
+
+        // Taux (%) FIGÉS à la création de la facture : une modification des taux de la configuration
+        // ne s'applique qu'aux nouvelles factures (la modification d'une facture non envoyée et ses avoirs gardent ces taux).
+        public decimal TpsRate { get; set; }
+        public decimal TvqRate { get; set; }
         public string BillPath { get; set; }
         public string? AfterSendedBillPath { get; set; }
         public bool? Issended { get; set; }

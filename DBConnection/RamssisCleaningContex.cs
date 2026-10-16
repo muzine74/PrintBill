@@ -242,6 +242,12 @@ namespace DBConnection
                         .HasIndex(b => b.Id)
                         .IsUnique();
 
+            modelBuilder.Entity<BillHistory>(e =>
+            {
+                e.Property(b => b.TpsRate).HasColumnType("decimal(9,4)");
+                e.Property(b => b.TvqRate).HasColumnType("decimal(9,4)");
+            });
+
             modelBuilder.Entity<BillDescription>()
                         .HasOne(d => d.BillHistoris)
                         .WithMany(h => h.BillDescriptions)
