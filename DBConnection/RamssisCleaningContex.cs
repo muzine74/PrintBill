@@ -38,6 +38,8 @@ namespace DBConnection
         public DbSet<BankTransaction> BankTransactions { get; set; }
         public DbSet<BankLexiconEntry> BankLexiconEntries { get; set; }
         public DbSet<Communication> Communications { get; set; }
+        /// <summary>Comptes reliés entre entreprises (« Mes entreprises »).</summary>
+        public DbSet<CredentialLink> CredentialLinks { get; set; }
         public DbSet<Attachment> Attachments { get; set; }
         public DbSet<TelephonyConfig> TelephonyConfigs { get; set; }
         public DbSet<CallRecordingAccess> CallRecordingAccesses { get; set; }
@@ -241,6 +243,13 @@ namespace DBConnection
             modelBuilder.Entity<BillHistory>()
                         .HasIndex(b => b.Id)
                         .IsUnique();
+
+            modelBuilder.Entity<CredentialLink>(e =>
+            {
+                e.HasIndex(l => l.LinkGroupId);
+                e.Property(l => l.PasswordStamp).HasMaxLength(64);
+                e.Property(l => l.CreatedBy).HasMaxLength(256);
+            });
 
             modelBuilder.Entity<BillHistory>(e =>
             {
