@@ -48,5 +48,10 @@ namespace DBConnection.Entity
 
         // ── Application ──────────────────────────────────────────────────────
         public string? AppVersion { get; set; }
+
+        // ── Sécurité ─────────────────────────────────────────────────────────
+        /// <summary>Délai d'inactivité (minutes) avant expiration de la session : au-delà, il faut se reconnecter.
+        /// 0 = désactivé (la session dure jusqu'à l'expiration du jeton, 8 h).</summary>
+        public int IdleTimeoutMinutes { get; set; }
     }
 }
