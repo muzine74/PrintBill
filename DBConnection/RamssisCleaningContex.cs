@@ -36,6 +36,7 @@ namespace DBConnection
         public DbSet<EmployeePayment> EmployeePayments { get; set; }
         public DbSet<EmployeePaymentHistory> EmployeePaymentHistories { get; set; }
         public DbSet<BankTransaction> BankTransactions { get; set; }
+        public DbSet<BankMatch> BankMatches { get; set; }
         public DbSet<BankLexiconEntry> BankLexiconEntries { get; set; }
         public DbSet<Communication> Communications { get; set; }
         /// <summary>Comptes reliés entre entreprises (« Mes entreprises »).</summary>
@@ -533,7 +534,23 @@ namespace DBConnection
                 entity.Property(b => b.ImportedBy).HasMaxLength(256);
                 entity.Property(b => b.ValidatedBy).HasMaxLength(256);
                 entity.Property(b => b.SourceFile).HasMaxLength(260);
+                entity.Property(b => b.Note).HasMaxLength(1000);
+                entity.Property(b => b.NoteUpdatedBy).HasMaxLength(256);
                 entity.HasIndex(b => new { b.TenantId, b.TransactionDate });
+            });
+
+            modelBuilder.Entity<BankMatch>(entity =>
+            {
+                entity.HasKey(m => m.BankMatchId);
+                entity.Property(m => m.TargetType).HasMaxLength(20);
+                entity.Property(m => m.Amount).HasColumnType("decimal(18,2)");
+                entity.Property(m => m.CreatedBy).HasMaxLength(256);
+                entity.HasIndex(m => new { m.TenantId, m.BankTransactionId }).HasDatabaseName("IX_BankMatches_Tenant_Transaction");
+                // Une facture / une charge n'est associée qu'à une seule transaction
+                entity.HasIndex(m => new { m.TenantId, m.BillIdentifier }).IsUnique()
+                      .HasFilter("[BillIdentifier] IS NOT NULL").HasDatabaseName("UX_BankMatches_Tenant_Bill");
+                entity.HasIndex(m => new { m.TenantId, m.TargetId }).IsUnique()
+                      .HasFilter("[TargetId] IS NOT NULL").HasDatabaseName("UX_BankMatches_Tenant_Target");
             });
 
             modelBuilder.Entity<EmployeePaymentHistory>(entity =>

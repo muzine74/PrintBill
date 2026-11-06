@@ -24,6 +24,11 @@ namespace DBConnection.Entity
         public DateTime? ValidatedAt { get; set; }          // UTC
         public string?   ValidatedBy { get; set; }
 
+        // Note libre saisie sur la page (null = aucune)
+        public string?   Note          { get; set; }        // 1000 caractères max
+        public DateTime? NoteUpdatedAt { get; set; }        // UTC
+        public string?   NoteUpdatedBy { get; set; }
+
         public DateTime ImportedAt { get; set; }            // UTC
         public string?  ImportedBy { get; set; }
         public string?  SourceFile { get; set; }
